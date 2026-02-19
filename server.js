@@ -8,7 +8,7 @@ const db = require('./database');
 
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3001;
 
 // klasörler
 const BASE = "/home/mahsum/instaapp";
