@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 require('dotenv').config();
-const { login } = require('./auth');
+const { login, register, logAction, verifyToken, isAdmin } = require('./auth');
 const db = require('./database');
 
 
@@ -21,7 +21,7 @@ app.use("/ui", express.static(path.join(__dirname, "ui")));
 // ---------------- utils ----------------
 function readJsonSafe(p) {
   try {
-	return JSON.parse(fs.readFileSync(p, { encoding: "utf8" }));
+    return JSON.parse(fs.readFileSync(p, { encoding: "utf8" }));
   } catch (e) {
     return null;
   }
@@ -64,7 +64,7 @@ function decodeLiteralUnicodeEscapes(s) {
       s = s.replace(/\\u([0-9a-fA-F]{4})/g, (_, h) =>
         String.fromCharCode(parseInt(h, 16))
       );
-    } catch (_) {}
+    } catch (_) { }
   }
   return s;
 }
@@ -178,10 +178,10 @@ function buildLibrary() {
         let type = mediaUris.length > 1 ? "CAROUSEL" : "POST";
         if (f.toLowerCase().includes("reel")) type = "REEL";
 
-	const id = crypto
- 	.createHash("sha1")
-  	.update(`${f}|${ts}|${mediaUris.join("|")}`)
-  	.digest("hex");
+        const id = crypto
+          .createHash("sha1")
+          .update(`${f}|${ts}|${mediaUris.join("|")}`)
+          .digest("hex");
 
 
         const edited = edits[id] || {};
@@ -211,19 +211,48 @@ function buildLibrary() {
 // ---------------- UI routes ----------------
 app.get("/", (req, res) => res.redirect("/library"));
 
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "ui", "login.html"));
+});
+
 app.get("/library", (req, res) => {
   res.sendFile(path.join(__dirname, "ui", "index.html"));
 });
 
 // ---------------- API ----------------
-app.get("/api/library", (req, res) => {
+app.post("/api/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+  const ip = req.ip || req.headers['x-forwarded-for'] || '';
+  try {
+    const data = await login(email, password, ip);
+    res.json(data);
+  } catch (err) {
+    res.status(401).json({ error: err });
+  }
+});
+
+app.post("/api/auth/register", async (req, res) => {
+  const { name, email, password } = req.body;
+  try {
+    const data = await register(name, email, password);
+    res.json({ ok: true, ...data });
+  } catch (err) {
+    res.status(400).json({ error: err });
+  }
+});
+
+app.get("/api/auth/me", verifyToken, (req, res) => {
+  res.json(req.user);
+});
+
+app.get("/api/library", verifyToken, (req, res) => {
   const { type } = req.query;
   let items = buildLibrary();
   if (type) items = items.filter((x) => x.type === type.toUpperCase());
   res.json(items);
 });
 
-app.get("/api/item/:id", (req, res) => {
+app.get("/api/item/:id", verifyToken, (req, res) => {
   const id = req.params.id;
   const items = buildLibrary();
   const item = items.find((x) => x.id === id);
@@ -231,7 +260,7 @@ app.get("/api/item/:id", (req, res) => {
   res.json(item);
 });
 
-app.put("/api/item/:id", (req, res) => {
+app.put("/api/item/:id", verifyToken, (req, res) => {
   const id = req.params.id;
   const { caption } = req.body || {};
   if (typeof caption !== "string") return res.status(400).json({ error: "caption_required" });
