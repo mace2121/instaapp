@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giriş Yap - Amed Güncel Sosyal Medya Paneli</title>
+    <title>Giriş | InstaApp Yönetim Paneli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
+            --bg: #0f172a;
+            --card: #1e293b;
             --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --text: #f8fafc;
+            --subtext: #94a3b8;
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
@@ -21,189 +28,146 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
+            height: 100vh;
+            overflow: hidden;
         }
-        .container {
-            background: var(--card-bg);
-            padding: 2rem;
+
+        .login-card {
+            background: var(--card);
+            padding: 2.5rem;
             border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             width: 100%;
             max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
+
         h1 {
             font-size: 1.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .tabs {
-            display: flex;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 0.75rem;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-        .tab.active {
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
+            margin-bottom: 0.5rem;
             font-weight: 600;
+            text-align: center;
         }
+
+        p.subtitle {
+            color: var(--subtext);
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
+
         label {
             display: block;
-            margin-bottom: 0.5rem;
             font-size: 0.875rem;
-            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--subtext);
         }
+
         input {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 0.75rem 1rem;
             border-radius: 0.5rem;
-            box-sizing: border-box;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
         }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
         button {
             width: 100%;
-            padding: 0.75rem;
-            background-color: var(--primary);
+            background: var(--primary);
             color: white;
             border: none;
+            padding: 0.75rem;
             border-radius: 0.5rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
+            transition: opacity 0.2s;
             margin-top: 1rem;
         }
+
         button:hover {
-            background-color: var(--primary-dark);
+            opacity: 0.9;
         }
-        .message {
+
+        .error {
+            color: #ef4444;
+            font-size: 0.875rem;
             margin-top: 1rem;
             text-align: center;
-            font-size: 0.875rem;
+            display: none;
         }
-        .error { color: #ef4444; }
-        .success { color: #10b981; }
-        #register-form { display: none; }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Sosyal Medya Paneli</h1>
-        <div class="tabs">
-            <div class="tab active" id="login-tab">Giriş Yap</div>
-            <div class="tab" id="register-tab">Kayıt Ol</div>
-        </div>
+    <div class="login-card">
+        <h1>InstaApp</h1>
+        <p class="subtitle">Yönetim paneline giriş yapın</p>
 
-        <form id="login-form">
+        <form id="loginForm">
             <div class="form-group">
                 <label>E-posta</label>
-                <input type="email" id="login-email" required>
+                <input type="email" id="email" required placeholder="admin@instaapp.com">
             </div>
             <div class="form-group">
                 <label>Şifre</label>
-                <input type="password" id="login-password" required>
+                <input type="password" id="password" required placeholder="••••••••">
             </div>
-            <button type="submit">Giriş Yap</button>
+            <button type="submit" id="submitBtn">Giriş Yap</button>
         </form>
-
-        <form id="register-form">
-            <div class="form-group">
-                <label>Ad Soyad</label>
-                <input type="text" id="reg-name" required>
-            </div>
-            <div class="form-group">
-                <label>E-posta</label>
-                <input type="email" id="reg-email" required>
-            </div>
-            <div class="form-group">
-                <label>Şifre</label>
-                <input type="password" id="reg-password" required>
-            </div>
-            <button type="submit">Kayıt Ol</button>
-        </form>
-
-        <div id="message" class="message"></div>
+        <div id="error" class="error"></div>
     </div>
 
     <script>
-        const loginTab = document.getElementById('login-tab');
-        const registerTab = document.getElementById('register-tab');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const messageDiv = document.getElementById('message');
+        const form = document.getElementById('loginForm');
+        const errorDiv = document.getElementById('error');
+        const btn = document.getElementById('submitBtn');
 
-        loginTab.onclick = () => {
-            loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
-        };
-
-        registerTab.onclick = () => {
-            registerTab.classList.add('active');
-            loginTab.classList.remove('active');
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-        };
-
-        loginForm.onsubmit = async (e) => {
+        form.onsubmit = async (e) => {
             e.preventDefault();
-            messageDiv.className = 'message';
-            messageDiv.textContent = 'Giriş yapılıyor...';
+            errorDiv.style.display = 'none';
+            btn.textContent = 'Giriş yapılıyor...';
+            btn.disabled = true;
 
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: document.getElementById('login-email').value,
-                    password: document.getElementById('login-password').value
-                })
-            });
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-            const data = await res.json();
-            if (res.ok) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                window.location.href = '/library';
-            } else {
-                messageDiv.className = 'message error';
-                messageDiv.textContent = data.error || 'Giriş başarısız';
-            }
-        };
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
 
-        registerForm.onsubmit = async (e) => {
-            e.preventDefault();
-            messageDiv.className = 'message';
-            messageDiv.textContent = 'Kayıt yapılıyor...';
-
-            const res = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: document.getElementById('reg-name').value,
-                    email: document.getElementById('reg-email').value,
-                    password: document.getElementById('reg-password').value
-                })
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-                messageDiv.className = 'message success';
-                messageDiv.textContent = 'Kayıt başarılı! Şimdi giriş yapabilirsiniz.';
-                loginTab.click();
-            } else {
-                messageDiv.className = 'message error';
-                messageDiv.textContent = data.error || 'Kayıt başarısız';
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/panel';
+                } else {
+                    throw new Error(data.error || 'Giriş başarısız');
+                }
+            } catch (err) {
+                errorDiv.textContent = err.message;
+                errorDiv.style.display = 'block';
+                btn.textContent = 'Giriş Yap';
+                btn.disabled = false;
             }
         };
     </script>
 </body>
+
 </html>

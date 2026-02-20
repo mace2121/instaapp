@@ -1,0 +1,153 @@
+{
+    "name": "Instagram Share Workflow",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "share-instagram",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                460,
+                340
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://graph.facebook.com/v24.0/{{$json.body.account_id}}/media",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "access_token",
+                            "value": "={{$json.body.access_token}}"
+                        },
+                        {
+                            "name": "image_url",
+                            "value": "={{$json.body.image_url}}"
+                        },
+                        {
+                            "name": "caption",
+                            "value": "={{$json.body.caption}}"
+                        },
+                        {
+                            "name": "video_url",
+                            "value": "={{$json.body.video_url}}"
+                        },
+                        {
+                            "name": "media_type",
+                            "value": "={{$json.body.media_type}}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "name": "Create Media Container",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 1,
+            "position": [
+                680,
+                340
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://graph.facebook.com/v24.0/{{$node[\"Webhook\"].json[\"body\"][\"account_id\"]}}/media_publish",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "creation_id",
+                            "value": "={{$json.id}}"
+                        },
+                        {
+                            "name": "access_token",
+                            "value": "={{$node[\"Webhook\"].json[\"body\"][\"access_token\"]}}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "name": "Publish Media",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 1,
+            "position": [
+                900,
+                340
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{$json}}",
+                "options": {}
+            },
+            "name": "Respond to Webhook",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1120,
+                340
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Create Media Container",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Create Media Container": {
+            "main": [
+                [
+                    {
+                        "node": "Publish Media",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Publish Media": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

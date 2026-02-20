@@ -1,20 +1,21 @@
-require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('./database');
 
-function login(email, password, ip = '') {
+// --- Auth Functions ---
+
+async function login(email, password, ip = '') {
   return new Promise((resolve, reject) => {
     db.get(`SELECT * FROM users WHERE email = ?`, [email], async (err, user) => {
       if (err || !user) {
-        logAction(null, 'LOGIN_FAILED', `Email: ${email}, Error: Kullanıcı bulunamadı`, ip, 'ERROR');
-        return reject("Kullanıcı bulunamadı");
+        logAction(null, 'LOGIN_FAILED', `Email: ${email}, Hata: Kullanıcı bulunamadı`, ip, 'ERROR');
+        return reject("Geçersiz e-posta veya şifre");
       }
 
       const match = await bcrypt.compare(password, user.password_hash);
       if (!match) {
-        logAction(user.id, 'LOGIN_FAILED', `Email: ${email}, Error: Şifre yanlış`, ip, 'ERROR');
-        return reject("Şifre yanlış");
+        logAction(user.id, 'LOGIN_FAILED', `Email: ${email}, Hata: Yanlış şifre`, ip, 'ERROR');
+        return reject("Geçersiz e-posta veya şifre");
       }
 
       const token = jwt.sign(
@@ -23,13 +24,14 @@ function login(email, password, ip = '') {
         { expiresIn: "7d" }
       );
 
-      logAction(user.id, 'LOGIN_SUCCESS', `User: ${user.name}`, ip, 'SUCCESS');
+      logAction(user.id, 'LOGIN_SUCCESS', `Kullanıcı: ${user.name}`, ip, 'SUCCESS');
       resolve({ token, user: { id: user.id, name: user.name, role: user.role } });
     });
   });
 }
 
-function register(name, email, password, role = 'user') {
+async function register(name, email, password, role = 'editor', actorId = null) {
+  // Sadece süper admin kullanıcı ekleyebilir (actorId kontrolü API seviyesinde yapılacak)
   return new Promise(async (resolve, reject) => {
     try {
       const hash = await bcrypt.hash(password, 10);
@@ -38,10 +40,10 @@ function register(name, email, password, role = 'user') {
         [name, email, hash, role],
         function (err) {
           if (err) {
-            if (err.message.includes('UNIQUE')) return reject("Bu e-posta adresi zaten kullanımda");
+            if (err.message.includes('UNIQUE')) return reject("Bu e-posta adresi zaten kayıtlı");
             return reject(err.message);
           }
-          logAction(this.lastID, 'REGISTER', `Name: ${name}, Email: ${email}`, '', 'SUCCESS');
+          logAction(actorId, 'USER_CREATED', `Yeni Kullanıcı: ${name}, Rol: ${role}`, '', 'SUCCESS');
           resolve({ id: this.lastID });
         }
       );
@@ -51,6 +53,31 @@ function register(name, email, password, role = 'user') {
   });
 }
 
+// --- Middleware ---
+
+function verifyToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: 'Giriş yapmanız gerekiyor' });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Oturum geçersiz' });
+    req.user = user;
+    next();
+  });
+}
+
+function isSuperAdmin(req, res, next) {
+  if (req.user && req.user.role === 'super_admin') {
+    next();
+  } else {
+    res.status(403).json({ error: 'Bu işlem için Süper Admin yetkisi gerekiyor' });
+  }
+}
+
+// --- Logging ---
+
 function logAction(userId, action, details, ip = '', status = 'INFO') {
   db.run(
     `INSERT INTO logs (user_id, action, details, ip_address, status) VALUES (?, ?, ?, ?, ?)`,
@@ -58,25 +85,32 @@ function logAction(userId, action, details, ip = '', status = 'INFO') {
   );
 }
 
-function verifyToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+// --- Settings ---
 
-  if (!token) return res.status(401).json({ error: 'Yetkisiz erişim' });
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Geçersiz token' });
-    req.user = user;
-    next();
+function getSettings() {
+  return new Promise((resolve, reject) => {
+    db.all(`SELECT * FROM settings`, [], (err, rows) => {
+      if (err) return reject(err);
+      const settings = {};
+      rows.forEach(r => settings[r.key] = r.value);
+      resolve(settings);
+    });
   });
 }
 
-function isAdmin(req, res, next) {
-  if (req.user && req.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).json({ error: 'Admin yetkisi gerekli' });
-  }
+async function updatePassword(userId, newPassword) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const hash = await bcrypt.hash(newPassword, 10);
+      db.run(`UPDATE users SET password_hash = ? WHERE id = ?`, [hash, userId], function (err) {
+        if (err) return reject(err.message);
+        logAction(userId, 'PASSWORD_UPDATED', `Şifre güncellendi`, '', 'SUCCESS');
+        resolve({ ok: true });
+      });
+    } catch (e) {
+      reject(e.message);
+    }
+  });
 }
 
-module.exports = { login, register, logAction, verifyToken, isAdmin };
+module.exports = { login, register, logAction, verifyToken, isSuperAdmin, getSettings, updatePassword };
