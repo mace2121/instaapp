@@ -194,7 +194,7 @@ app.post("/api/admin/test-connection", verifyToken, isSuperAdmin, async (req, re
   if (!META_ACCESS_TOKEN || !INSTAGRAM_BUSINESS_ACCOUNT_ID) return res.status(400).json({ error: "Token ve ID gerekli" });
 
   try {
-    const url = `https://graph.facebook.com/v19.0/${INSTAGRAM_BUSINESS_ACCOUNT_ID}?fields=name,username&access_token=${META_ACCESS_TOKEN}`;
+    const url = `https://graph.facebook.com/v24.0/${INSTAGRAM_BUSINESS_ACCOUNT_ID}?fields=name,username&access_token=${META_ACCESS_TOKEN}`;
     const apiRes = await fetch(url);
     const data = await apiRes.json();
 
@@ -228,7 +228,7 @@ async function metaRequest(endpoint, params = {}, method = 'POST') {
   const token = settings.META_ACCESS_TOKEN;
   if (!token) throw new Error("Meta Access Token eksik.");
 
-  const urlObj = new URL(`https://graph.facebook.com/v19.0/${endpoint}`);
+  const urlObj = new URL(`https://graph.facebook.com/v24.0/${endpoint}`);
   urlObj.searchParams.append('access_token', token);
 
   if (method === 'GET') {
@@ -352,7 +352,7 @@ app.post("/api/share", verifyToken, async (req, res) => {
     };
 
     // Step 1: Create Container
-    const urlCreate = `https://graph.facebook.com/v19.0/${bid}/media`;
+    const urlCreate = `https://graph.facebook.com/v24.0/${bid}/media`;
     let cmdCreate = `curl -s -X POST "${urlCreate}" -H "Content-Type: application/json"`;
     cmdCreate += ` -d '${JSON.stringify(containerParams).replace(/'/g, "'\\''")}'`;
 
@@ -390,7 +390,7 @@ app.post("/api/share", verifyToken, async (req, res) => {
           creation_id: containerId
         };
 
-        const urlPublish = `https://graph.facebook.com/v19.0/${bid}/media_publish`;
+        const urlPublish = `https://graph.facebook.com/v24.0/${bid}/media_publish`;
         let cmdPublish = `curl -s -X POST "${urlPublish}" -H "Content-Type: application/json"`;
         cmdPublish += ` -d '${JSON.stringify(publishParams).replace(/'/g, "'\\''")}'`;
 
