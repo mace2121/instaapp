@@ -181,9 +181,15 @@ app.get("/api/admin/settings", verifyToken, isSuperAdmin, async (req, res) => {
 
 app.post("/api/admin/settings", verifyToken, isSuperAdmin, async (req, res) => {
   try {
-    const stmt = db.prepare(`INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)`);
-    for (const [k, v] of Object.entries(req.body)) stmt.run(k, v);
-    stmt.finalize();
+    const entries = Object.entries(req.body);
+    for (const [k, v] of entries) {
+      await new Promise((resolve, reject) => {
+        db.run(`INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)`, [k, v], function (err) {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+    }
     logAction(req.user.id, 'SETTINGS_UPDATED', `API Ayarları Güncellendi`, req.ip, 'SUCCESS');
     res.json({ ok: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
