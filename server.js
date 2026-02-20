@@ -461,9 +461,9 @@ app.post("/api/share", verifyToken, async (req, res) => {
       const isVideo = m.kind === 'video' || (typeof m.url === 'string' && m.url.match(/\.(mp4|mov|avi|mkv)$/i));
       const params = {
         caption: caption || "",
-        [isVideo ? 'video_url' : 'image_url']: m.url
+        [isVideo ? 'video_url' : 'image_url']: m.url,
+        media_type: isVideo ? 'VIDEO' : 'IMAGE'
       };
-      if (isVideo) params.media_type = 'VIDEO';
       if (isVideo && (caption || "").toLowerCase().includes("#reel")) params.media_type = 'REELS';
 
       const container = await metaRequest(`${bid}/media`, params);
