@@ -405,11 +405,31 @@
       height: 28px;
       border-radius: 50%;
       background: #ddd;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
     }
 
-    .ig-username {
-      font-weight: 600;
-      font-size: 0.9rem;
+    .ig-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sidebar-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #eee;
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+
+    .sidebar-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .ig-caption-area {
@@ -589,453 +609,507 @@
       </div>
       <div class="nav-item" data-role="super_admin" onclick="showTab('settings'); toggleSidebar(false)">
         <i class="ri-settings-3-line"></i> Ayarlar
-      </div>
-      <div class="nav-item" data-role="super_admin" onclick="showTab('logs'); toggleSidebar(false)">
-        <i class="ri-file-list-3-line"></i> Kayıtlar
-      </div>
-    </div>
-    <div class="user-info">
-      <div>
-        <div id="u-name" style="font-weight:600;">...</div>
-        <div id="u-role" style="font-size: 0.8rem; color: var(--text-muted);">...</div>
-      </div>
-      <div style="display:flex; gap:0.5rem; align-items:center;">
-        <span onclick="showTab('profile'); toggleSidebar(false)" style="cursor:pointer; font-size:1.2rem;"
-          title="Profil"><i class="ri-user-line"></i></span>
-        <span class="logout" id="logoutBtn" title="Çıkış Yap"><i class="ri-logout-box-r-line"></i></span>
-      </div>
-    </div>
-  </div>
-
-  <div class="main">
-    <header>
-      <div style="display:flex; align-items:center;">
-        <div class="menu-toggle" onclick="toggleSidebar()">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 12h18M3 6h18M3 18h18" />
-          </svg>
-        </div>
-        <div class="header-title" id="pageTitle">Kütüphane</div>
-      </div>
-      <div>
-        <button class="btn btn-secondary" onclick="toggleTheme()"
-          style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px;">
-          <i id="themeIcon" class="ri-moon-line" style="font-size: 1.2rem;"></i>
-        </button>
-      </div>
-    </header>
-
-    <div class="content-area">
-
-      <!-- LIBRARY TAB -->
-      <div id="library" class="tab-content active">
-        <div class="filters">
-          <div class="filter-pill active" onclick="filterType(null)">Tümü</div>
-          <div class="filter-pill" onclick="filterType('REEL')">Reels</div>
-          <div class="filter-pill" onclick="filterType('CAROUSEL')">Albüm</div>
-          <div class="filter-pill" onclick="filterType('POST')">Post</div>
-          <div class="filter-pill" onclick="filterType('STORY')">Hikaye</div>
-        </div>
-        <div id="libraryGrid" class="grid">
-          <!-- JS will populate -->
-        </div>
-        <div id="paginationControls"
-          style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem; padding-bottom:2rem;">
+        <div class="user-info"
+          style="display:flex; align-items:center; gap:0.75rem; padding:1rem; border-top:1px solid var(--border);">
+          <div class="sidebar-avatar" id="sidebarAvatar">
+            <i class="ri-user-line"
+              style="font-size:1.2rem; display:flex; align-items:center; justify-content:center; height:100%;"></i>
+          </div>
+          <div style="flex:1; overflow:hidden;">
+            <div id="u-name" style="font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...
+            </div>
+            <div id="u-role" style="font-size: 0.8rem; color: var(--text-muted);">...</div>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <span onclick="showTab('profile'); toggleSidebar(false)" style="cursor:pointer; font-size:1.2rem;"
+              title="Profil"><i class="ri-user-settings-line"></i></span>
+            <span class="logout" id="logoutBtn" title="Çıkış Yap"><i class="ri-logout-box-r-line"></i></span>
+          </div>
         </div>
       </div>
 
-      <!-- QUICK SHARE TAB -->
-      <div id="quickshare" class="tab-content">
-        <div class="ig-card">
+      <div class="main">
+        <header>
+          <div style="display:flex; align-items:center;">
+            <div class="menu-toggle" onclick="toggleSidebar()">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h18M3 6h18M3 18h18" />
+              </svg>
+            </div>
+            <div class="header-title" id="pageTitle">Kütüphane</div>
+          </div>
+          <div>
+            <button class="btn btn-secondary" onclick="toggleTheme()"
+              style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px;">
+              <i id="themeIcon" class="ri-moon-line" style="font-size: 1.2rem;"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="content-area">
+
+          <!-- LIBRARY TAB -->
+          <div id="library" class="tab-content active">
+            <div class="filters">
+              <div class="filter-pill active" onclick="filterType(null)">Tümü</div>
+              <div class="filter-pill" onclick="filterType('REEL')">Reels</div>
+              <div class="filter-pill" onclick="filterType('CAROUSEL')">Albüm</div>
+              <div class="filter-pill" onclick="filterType('POST')">Post</div>
+              <div class="filter-pill" onclick="filterType('STORY')">Hikaye</div>
+            </div>
+            <div id="libraryGrid" class="grid">
+              <!-- JS will populate -->
+            </div>
+            <div id="paginationControls"
+              style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem; padding-bottom:2rem;">
+            </div>
+          </div>
+
+          <!-- QUICK SHARE TAB -->
+          <div id="quickshare" class="tab-content">
+            <div class="ig-card">
+              <!-- Header -->
+              <div class="ig-modal-header" style="justify-content: center;">
+                <span>Hızlı Paylaşım</span>
+              </div>
+
+              <!-- Body -->
+              <div class="ig-modal-body">
+
+                <!-- Left: Image Preview & Dropzone -->
+                <div class="ig-preview-pane" id="quickPreviewPane"
+                  style="flex-direction: column; align-items: center; justify-content: center; padding: 0;">
+
+                  <!-- Empty State -->
+                  <div id="quickEmptyState"
+                    style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div id="dropZone"
+                      style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; transition: background 0.2s;">
+                      <i class="ri-image-add-line"
+                        style="font-size: 5rem; color: var(--text-main); margin-bottom: 0.5rem; font-weight: 100;"></i>
+                      <div
+                        style="font-size: 1.25rem; margin-top: 1rem; margin-bottom: 2rem; font-weight: 300; color: var(--text-main);">
+                        Fotoğrafları ve videoları buraya sürükle</div>
+                      <button class="btn btn-primary" onclick="document.getElementById('multiUploadInput').click()"
+                        style="padding: 0.5rem 1rem; border-radius: 0.5rem;">Bilgisayardan seç</button>
+                    </div>
+                  </div>
+
+                  <!-- Filled State -->
+                  <div id="quickFilledState"
+                    style="display: none; width: 100%; height: 100%; background: #000; position: relative;">
+                    <div id="uploadPreview"
+                      style="display:flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;">
+                      <!-- Images will go here -->
+                    </div>
+                  </div>
+
+                  <input type="file" id="multiUploadInput" multiple style="display:none;" accept="image/*,video/*"
+                    onchange="handleMultiUpload(this)">
+
+                </div>
+
+                <!-- Right: Details/Caption -->
+                <div class="ig-details-pane">
+                  <div class="ig-user-row">
+                    <div class="ig-avatar"></div>
+                    <div class="ig-username" id="quickUsername">InstaApp Admin</div>
+                  </div>
+
+                  <div style="padding: 0 1rem; margin-bottom: 1rem;">
+                    <label
+                      style="color: var(--text-muted); font-size: 0.8rem; display:block; margin-bottom: 0.5rem;">Oran</label>
+                    <div style="display:flex; gap: 0.5rem;">
+                      <label class="filter-pill active" onclick="setQuickFormat(this)"><input type="radio" name="format"
+                          value="auto" checked hidden> Orijinal</label>
+                      <label class="filter-pill" onclick="setQuickFormat(this)"><input type="radio" name="format"
+                          value="1:1" hidden> 1:1</label>
+                      <label class="filter-pill" onclick="setQuickFormat(this)"><input type="radio" name="format"
+                          value="4:5" hidden> 4:5</label>
+                    </div>
+                  </div>
+
+                  <script>
+                    function setQuickFormat(lbl) {
+                      document.querySelectorAll('input[name="format"]').forEach(el => {
+                        el.closest('.filter-pill').classList.remove('active');
+                      });
+                      lbl.classList.add('active');
+                      lbl.querySelector('input').checked = true;
+                    }
+                  </script>
+
+                  <div class="ig-caption-area">
+                    <textarea id="quickCaption" placeholder="Açıklama veya Yorum Yaz..."></textarea>
+                  </div>
+
+                  <div class="ig-footer">
+                    <button id="quickShareBtn" class="btn btn-primary"
+                      style="width: 100%; padding: 0.8rem;">Paylaş</button>
+                    <div id="quickStatus" style="margin-top: 1rem; font-weight: 500; text-align:center;"></div>
+                    <div class="ig-progress-wrapper" id="quickProgressWrapper" style="margin-top: 1rem;">
+                      <div class="ig-progress-bar" id="quickProgressBar"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <script>
+              const dropZone = document.getElementById('dropZone');
+              dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--primary)';
+                dropZone.style.backgroundColor = 'rgba(66, 104, 246, 0.05)';
+              });
+              dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--border)';
+                dropZone.style.backgroundColor = 'transparent';
+              });
+              dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.style.borderColor = 'var(--border)';
+                dropZone.style.backgroundColor = 'transparent';
+                if (e.dataTransfer.files.length > 0) {
+                  const input = document.getElementById('multiUploadInput');
+                  input.files = e.dataTransfer.files;
+                  handleMultiUpload(input);
+                }
+              });
+            </script>
+          </div>
+
+          <!-- PROFILE TAB -->
+          <div id="profile" class="tab-content">
+            <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center;">
+              <div style="margin-bottom: 2rem;">
+                <div id="profileAvatarPreview" class="sidebar-avatar"
+                  style="width: 100px; height: 100px; margin: 0 auto 1rem;">
+                  <i class="ri-user-line"
+                    style="font-size:3rem; display:flex; align-items:center; justify-content:center; height:100%;"></i>
+                </div>
+                <button class="btn btn-secondary" onclick="document.getElementById('avatarInput').click()">
+                  <i class="ri-image-edit-line"></i> Resim Değiştir
+                </button>
+                <input type="file" id="avatarInput" style="display:none" accept="image/*" onchange="uploadAvatar(this)">
+              </div>
+
+              <form id="profileUpdateForm"
+                style="text-align: left; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                <div style="margin-bottom: 1rem;">
+                  <label>Ad Soyad</label>
+                  <input type="text" id="profile_name" required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                  <label>E-posta (Salt Okunur)</label>
+                  <input type="email" id="profile_email" readonly style="opacity: 0.7; cursor: not-allowed;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Değişiklikleri Kaydet</button>
+              </form>
+
+              <form id="updatePasswordForm"
+                style="margin-top: 2rem; text-align: left; border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                <h3>Şifre Güncelle</h3>
+                <div style="margin-top: 1rem;">
+                  <label>Yeni Şifre</label>
+                  <input type="password" id="new_password" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">Şifreyi
+                  Güncelle</button>
+              </form>
+              <div id="profileStatus" style="margin-top: 1rem;"></div>
+            </div>
+          </div>
+
+          <!-- USERS TAB (Admin) -->
+          <div id="users" class="tab-content">
+            <div class="grid" style="grid-template-columns: 1fr;">
+              <div class="card" style="overflow-x: auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                  <h3>Kullanıcılar</h3>
+                </div>
+                <table style="min-width: 600px;">
+                  <thead>
+                    <tr>
+                      <th>İsim</th>
+                      <th>E-posta</th>
+                      <th>Rol</th>
+                      <th style="text-align:right">İşlem</th>
+                    </tr>
+                  </thead>
+                  <tbody id="userTableBody"></tbody>
+                </table>
+              </div>
+              <div class="card">
+                <h3>Yeni Kullanıcı Ekle</h3>
+                <form id="addUserForm"
+                  style="display:grid; gap:1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                  <div><label>İsim</label><input type="text" id="add_name" required></div>
+                  <div><label>E-posta</label><input type="email" id="add_email" required></div>
+                  <div><label>Şifre</label><input type="password" id="add_password" required></div>
+                  <div><label>Rol</label><select id="add_role">
+                      <option value="editor">Editör</option>
+                      <option value="super_admin">Admin</option>
+                    </select></div>
+                  <div style="grid-column: 1/-1;"><button type="submit" class="btn btn-primary"
+                      style="width:100%">Ekle</button></div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- SETTINGS TAB (Admin) -->
+          <div id="settings" class="tab-content">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+              <h3>Meta API Ayarları</h3>
+              <form id="settingsForm" style="margin-top: 1.5rem;">
+                <div style="margin-bottom:1rem;"><label>App ID</label><input type="text" id="META_APP_ID"></div>
+                <div style="margin-bottom:1rem;"><label>App Secret</label><input type="password" id="META_APP_SECRET">
+                </div>
+                <div style="margin-bottom:1rem;"><label>Access Token</label><input type="password"
+                    id="META_ACCESS_TOKEN">
+                </div>
+                <div style="margin-bottom:1rem;"><label>Business Account ID</label><input type="text"
+                    id="INSTAGRAM_BUSINESS_ACCOUNT_ID"></div>
+                <div style="margin-bottom:1rem; border-top:1px solid #eee; padding-top:1rem;">
+                  <label>n8n Webhook URL (Opsiyonel)</label>
+                  <input type="text" id="N8N_WEBHOOK_URL" placeholder="https://primary.n8n.com/webhook/..."
+                    style="width:100%">
+                  <small style="color:#666">Eğer girilirse, paylaşım bu adrese gönderilir.</small>
+                </div>
+                <div style="display:flex; gap:1rem;">
+                  <button type="button" class="btn btn-secondary" onclick="testConnection()"><i
+                      class="ri-plug-line"></i>
+                    Bağlantıyı Test Et</button>
+                  <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Kaydet</button>
+                </div>
+              </form>
+              <div id="settingsStatus" style="margin-top: 1rem;"></div>
+            </div>
+          </div>
+
+          <script>
+            async function testConnection() {
+              const btn = document.querySelector('button[onclick="testConnection()"]');
+              const status = document.getElementById('settingsStatus');
+              const token = document.getElementById('META_ACCESS_TOKEN').value;
+              const bid = document.getElementById('INSTAGRAM_BUSINESS_ACCOUNT_ID').value;
+
+              if (!token || !bid) {
+                status.innerHTML = '<span style="color:var(--danger)"><i class="ri-alert-line"></i> Önce Token ve ID giriniz.</span>';
+                return;
+              }
+
+              btn.disabled = true;
+              status.innerHTML = 'Bağlanılıyor...';
+
+              try {
+                const res = await fetch('/api/admin/test-connection', {
+                  method: 'POST',
+                  headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}`, 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ META_ACCESS_TOKEN: token, INSTAGRAM_BUSINESS_ACCOUNT_ID: bid })
+                });
+                const d = await res.json();
+                if (d.ok) {
+                  status.innerHTML = `<div style="color:var(--success); background:#ecfdf5; padding:1rem; border-radius:0.5rem; border:1px solid #10b981;">
+                        <strong><i class="ri-checkbox-circle-line"></i> Bağlantı Başarılı!</strong><br>
+                        Hesap: ${d.data.name} (@${d.data.username})<br>
+                        ID: ${d.data.id}
+                    </div>`;
+                } else {
+                  throw new Error(d.error);
+                }
+              } catch (e) {
+                status.innerHTML = `<div style="color:var(--danger); background:#fef2f2; padding:1rem; border-radius:0.5rem; border:1px solid #ef4444;">
+                    <strong><i class="ri-close-circle-line"></i> Hata:</strong> ${e.message}
+                </div>`;
+              } finally {
+                btn.disabled = false;
+              }
+            }
+          </script>
+
+          <!-- LOGS TAB (Admin) -->
+          <div id="logs" class="tab-content">
+            <div class="card" style="overflow-x: auto;">
+              <table style="min-width: 800px;">
+                <thead>
+                  <tr>
+                    <th>Zaman</th>
+                    <th>Kullanıcı</th>
+                    <th>İşlem</th>
+                    <th>Detay</th>
+                    <th>Durum</th>
+                  </tr>
+                </thead>
+                <tbody id="logTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INSTAGRAM STYLE EDIT MODAL -->
+      <div class="modal-overlay" id="editModalOverlay" onclick="closeEditModal(event)">
+        <div class="ig-modal" id="editModal" onclick="event.stopPropagation()">
           <!-- Header -->
-          <div class="ig-modal-header" style="justify-content: center;">
-            <span>Hızlı Paylaşım</span>
+          <div class="ig-modal-header">
+            <button onclick="closeEditModal()">İptal</button>
+            <span>Düzenle & Paylaş</span>
+            <button class="ig-share-btn" id="modalShareBtnText" onclick="shareFromModal()">Paylaş</button>
           </div>
 
           <!-- Body -->
           <div class="ig-modal-body">
 
-            <!-- Left: Image Preview & Dropzone -->
-            <div class="ig-preview-pane" id="quickPreviewPane"
-              style="flex-direction: column; align-items: center; justify-content: center; padding: 0;">
-
-              <!-- Empty State -->
-              <div id="quickEmptyState"
-                style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <div id="dropZone"
-                  style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; transition: background 0.2s;">
-                  <i class="ri-image-add-line"
-                    style="font-size: 5rem; color: var(--text-main); margin-bottom: 0.5rem; font-weight: 100;"></i>
-                  <div
-                    style="font-size: 1.25rem; margin-top: 1rem; margin-bottom: 2rem; font-weight: 300; color: var(--text-main);">
-                    Fotoğrafları ve videoları buraya sürükle</div>
-                  <button class="btn btn-primary" onclick="document.getElementById('multiUploadInput').click()"
-                    style="padding: 0.5rem 1rem; border-radius: 0.5rem;">Bilgisayardan seç</button>
-                </div>
+            <!-- Left: Image Preview -->
+            <div class="ig-preview-pane">
+              <div id="modalMediaPreview"
+                style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000;">
+                <!-- Media injected here -->
               </div>
-
-              <!-- Filled State -->
-              <div id="quickFilledState"
-                style="display: none; width: 100%; height: 100%; background: #000; position: relative;">
-                <div id="uploadPreview"
-                  style="display:flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;">
-                  <!-- Images will go here -->
-                </div>
-              </div>
-
-              <input type="file" id="multiUploadInput" multiple style="display:none;" accept="image/*,video/*"
-                onchange="handleMultiUpload(this)">
-
             </div>
 
-            <!-- Right: Details/Caption -->
+            <!-- Details -->
             <div class="ig-details-pane">
               <div class="ig-user-row">
-                <div class="ig-avatar"></div>
-                <div class="ig-username" id="quickUsername">InstaApp Admin</div>
+                <div class="ig-avatar" id="quickAvatar"></div>
+                <div class="ig-username" id="quickUsername">...</div>
               </div>
-
-              <div style="padding: 0 1rem; margin-bottom: 1rem;">
-                <label
-                  style="color: var(--text-muted); font-size: 0.8rem; display:block; margin-bottom: 0.5rem;">Oran</label>
-                <div style="display:flex; gap: 0.5rem;">
-                  <label class="filter-pill active" onclick="setQuickFormat(this)"><input type="radio" name="format"
-                      value="auto" checked hidden> Orijinal</label>
-                  <label class="filter-pill" onclick="setQuickFormat(this)"><input type="radio" name="format"
-                      value="1:1" hidden> 1:1</label>
-                  <label class="filter-pill" onclick="setQuickFormat(this)"><input type="radio" name="format"
-                      value="4:5" hidden> 4:5</label>
-                </div>
-              </div>
-
-              <script>
-                function setQuickFormat(lbl) {
-                  document.querySelectorAll('input[name="format"]').forEach(el => {
-                    el.closest('.filter-pill').classList.remove('active');
-                  });
-                  lbl.classList.add('active');
-                  lbl.querySelector('input').checked = true;
-                }
-              </script>
-
               <div class="ig-caption-area">
-                <textarea id="quickCaption" placeholder="Açıklama veya Yorum Yaz..."></textarea>
+                <textarea id="modalCaption" placeholder="Açıklama veya Yorum Yaz..."></textarea>
               </div>
-
               <div class="ig-footer">
-                <button id="quickShareBtn" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">Paylaş</button>
-                <div id="quickStatus" style="margin-top: 1rem; font-weight: 500; text-align:center;"></div>
-                <div class="ig-progress-wrapper" id="quickProgressWrapper" style="margin-top: 1rem;">
-                  <div class="ig-progress-bar" id="quickProgressBar"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                  <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;" onclick="saveCaption()">
+                    <i class="ri-save-line"></i> Kaydet</button>
+                  <div id="modalStatus" style="font-size:0.85rem; font-weight:500;"></div>
+                </div>
+
+                <div class="ig-progress-wrapper" id="modalProgressWrapper">
+                  <div class="ig-progress-bar" id="modalProgressBar"></div>
                 </div>
               </div>
             </div>
 
           </div>
-        </div>
-
-        <script>
-          const dropZone = document.getElementById('dropZone');
-          dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--primary)';
-            dropZone.style.backgroundColor = 'rgba(66, 104, 246, 0.05)';
-          });
-          dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--border)';
-            dropZone.style.backgroundColor = 'transparent';
-          });
-          dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--border)';
-            dropZone.style.backgroundColor = 'transparent';
-            if (e.dataTransfer.files.length > 0) {
-              const input = document.getElementById('multiUploadInput');
-              input.files = e.dataTransfer.files;
-              handleMultiUpload(input);
-            }
-          });
-        </script>
-      </div>
-
-      <!-- PROFILE TAB -->
-      <div id="profile" class="tab-content">
-        <div class="card" style="max-width: 500px; margin: 0 auto;">
-          <h3>Profil Ayarları</h3>
-          <form id="updatePasswordForm" style="margin-top: 1.5rem;">
-            <label>Yeni Şifre</label>
-            <input type="password" id="new_password" required minlength="6">
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Şifreyi
-              Güncelle</button>
-          </form>
-          <div id="passStatus" style="margin-top: 1rem;"></div>
-        </div>
-      </div>
-
-      <!-- USERS TAB (Admin) -->
-      <div id="users" class="tab-content">
-        <div class="grid" style="grid-template-columns: 1fr;">
-          <div class="card" style="overflow-x: auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-              <h3>Kullanıcılar</h3>
-            </div>
-            <table style="min-width: 600px;">
-              <thead>
-                <tr>
-                  <th>İsim</th>
-                  <th>E-posta</th>
-                  <th>Rol</th>
-                  <th style="text-align:right">İşlem</th>
-                </tr>
-              </thead>
-              <tbody id="userTableBody"></tbody>
-            </table>
-          </div>
-          <div class="card">
-            <h3>Yeni Kullanıcı Ekle</h3>
-            <form id="addUserForm"
-              style="display:grid; gap:1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-              <div><label>İsim</label><input type="text" id="add_name" required></div>
-              <div><label>E-posta</label><input type="email" id="add_email" required></div>
-              <div><label>Şifre</label><input type="password" id="add_password" required></div>
-              <div><label>Rol</label><select id="add_role">
-                  <option value="editor">Editör</option>
-                  <option value="super_admin">Admin</option>
-                </select></div>
-              <div style="grid-column: 1/-1;"><button type="submit" class="btn btn-primary"
-                  style="width:100%">Ekle</button></div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- SETTINGS TAB (Admin) -->
-      <div id="settings" class="tab-content">
-        <div class="card" style="max-width: 800px; margin: 0 auto;">
-          <h3>Meta API Ayarları</h3>
-          <form id="settingsForm" style="margin-top: 1.5rem;">
-            <div style="margin-bottom:1rem;"><label>App ID</label><input type="text" id="META_APP_ID"></div>
-            <div style="margin-bottom:1rem;"><label>App Secret</label><input type="password" id="META_APP_SECRET"></div>
-            <div style="margin-bottom:1rem;"><label>Access Token</label><input type="password" id="META_ACCESS_TOKEN">
-            </div>
-            <div style="margin-bottom:1rem;"><label>Business Account ID</label><input type="text"
-                id="INSTAGRAM_BUSINESS_ACCOUNT_ID"></div>
-            <div style="margin-bottom:1rem; border-top:1px solid #eee; padding-top:1rem;">
-              <label>n8n Webhook URL (Opsiyonel)</label>
-              <input type="text" id="N8N_WEBHOOK_URL" placeholder="https://primary.n8n.com/webhook/..."
-                style="width:100%">
-              <small style="color:#666">Eğer girilirse, paylaşım bu adrese gönderilir.</small>
-            </div>
-            <div style="display:flex; gap:1rem;">
-              <button type="button" class="btn btn-secondary" onclick="testConnection()"><i class="ri-plug-line"></i>
-                Bağlantıyı Test Et</button>
-              <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Kaydet</button>
-            </div>
-          </form>
-          <div id="settingsStatus" style="margin-top: 1rem;"></div>
         </div>
       </div>
 
       <script>
-        async function testConnection() {
-          const btn = document.querySelector('button[onclick="testConnection()"]');
-          const status = document.getElementById('settingsStatus');
-          const token = document.getElementById('META_ACCESS_TOKEN').value;
-          const bid = document.getElementById('INSTAGRAM_BUSINESS_ACCOUNT_ID').value;
+        // --- AUTH & SETUP ---
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login';
 
-          if (!token || !bid) {
-            status.innerHTML = '<span style="color:var(--danger)"><i class="ri-alert-line"></i> Önce Token ve ID giriniz.</span>';
-            return;
+        function toggleSidebar(force) {
+          const sb = document.getElementById('sidebar');
+          const ov = document.getElementById('sidebarOverlay');
+          if (typeof force === 'boolean') {
+            if (force) { sb.classList.add('open'); ov.classList.add('open'); }
+            else { sb.classList.remove('open'); ov.classList.remove('open'); }
+          } else {
+            sb.classList.toggle('open');
+            ov.classList.toggle('open');
           }
+        }
 
-          btn.disabled = true;
-          status.innerHTML = 'Bağlanılıyor...';
+        // Role check for UI
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-          try {
-            const res = await fetch('/api/admin/test-connection', {
-              method: 'POST',
-              headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}`, 'Content-Type': 'application/json' },
-              body: JSON.stringify({ META_ACCESS_TOKEN: token, INSTAGRAM_BUSINESS_ACCOUNT_ID: bid })
-            });
-            const d = await res.json();
-            if (d.ok) {
-              status.innerHTML = `<div style="color:var(--success); background:#ecfdf5; padding:1rem; border-radius:0.5rem; border:1px solid #10b981;">
-                        <strong><i class="ri-checkbox-circle-line"></i> Bağlantı Başarılı!</strong><br>
-                        Hesap: ${d.data.name} (@${d.data.username})<br>
-                        ID: ${d.data.id}
-                    </div>`;
-            } else {
-              throw new Error(d.error);
+        // Initial Setup
+        function updateUIWithUser(userData) {
+          if (!userData) return;
+          const avatarHtml = userData.avatar_url ? `<img src="${userData.avatar_url}">` : `<i class="ri-user-line"></i>`;
+
+          document.getElementById('u-name').textContent = userData.name || 'Bilinmiyor';
+          document.getElementById('sidebarAvatar').innerHTML = avatarHtml;
+
+          // Update Modals
+          if (document.getElementById('quickUsername')) document.getElementById('quickUsername').textContent = userData.name;
+          if (document.getElementById('quickAvatar')) document.getElementById('quickAvatar').innerHTML = avatarHtml;
+
+          if (document.getElementById('modalUsername')) document.getElementById('modalUsername').textContent = userData.name;
+          if (document.getElementById('modalAvatar')) document.getElementById('modalAvatar').innerHTML = avatarHtml;
+
+          // Update Profile Tab
+          if (document.getElementById('profile_name')) document.getElementById('profile_name').value = userData.name || '';
+          if (document.getElementById('profile_email')) document.getElementById('profile_email').value = userData.email || '';
+          if (document.getElementById('profileAvatarPreview')) document.getElementById('profileAvatarPreview').innerHTML = avatarHtml;
+
+          document.getElementById('u-role').textContent = userData.role === 'super_admin' ? 'Süper Admin' : 'Editör';
+        }
+
+        updateUIWithUser(user);
+
+        document.querySelectorAll('[data-role="super_admin"]').forEach(el => {
+          if (user.role !== 'super_admin') el.style.display = 'none';
+        });
+
+        // --- NAVIGATION ---
+        function toggleSidebar(force) {
+          const sidebar = document.getElementById('sidebar');
+          const overlay = document.getElementById('sidebarOverlay');
+          const isOpen = sidebar.classList.contains('open');
+          if (force === false || isOpen) {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+          } else {
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+          }
+        }
+
+        function showTab(t) {
+          document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
+          document.getElementById(t).classList.add('active');
+
+          // Highlight nav item
+          const navItems = document.querySelectorAll('.nav-item');
+          navItems.forEach(item => {
+            if (item.onclick && item.onclick.toString().includes(t)) {
+              item.classList.add('active');
+              document.getElementById('pageTitle').textContent = item.textContent.trim(); // Removed substring since textContent ignores innerHTML
             }
-          } catch (e) {
-            status.innerHTML = `<div style="color:var(--danger); background:#fef2f2; padding:1rem; border-radius:0.5rem; border:1px solid #ef4444;">
-                    <strong><i class="ri-close-circle-line"></i> Hata:</strong> ${e.message}
-                </div>`;
-          } finally {
-            btn.disabled = false;
-          }
+          });
+
+          if (t === 'library') loadLibrary();
+          if (t === 'settings') loadSettings();
+          if (t === 'logs') loadLogs();
+          if (t === 'users') loadUsers();
+
+          // Special cases
+          if (t === 'profile') document.getElementById('pageTitle').textContent = 'Profil Ayarları';
         }
-      </script>
 
-      <!-- LOGS TAB (Admin) -->
-      <div id="logs" class="tab-content">
-        <div class="card" style="overflow-x: auto;">
-          <table style="min-width: 800px;">
-            <thead>
-              <tr>
-                <th>Zaman</th>
-                <th>Kullanıcı</th>
-                <th>İşlem</th>
-                <th>Detay</th>
-                <th>Durum</th>
-              </tr>
-            </thead>
-            <tbody id="logTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- INSTAGRAM STYLE EDIT MODAL -->
-  <div class="modal-overlay" id="editModalOverlay" onclick="closeEditModal(event)">
-    <div class="ig-modal" id="editModal" onclick="event.stopPropagation()">
-      <!-- Header -->
-      <div class="ig-modal-header">
-        <button onclick="closeEditModal()">İptal</button>
-        <span>Düzenle & Paylaş</span>
-        <button class="ig-share-btn" id="modalShareBtnText" onclick="shareFromModal()">Paylaş</button>
-      </div>
-
-      <!-- Body -->
-      <div class="ig-modal-body">
-
-        <!-- Left: Image Preview -->
-        <div class="ig-preview-pane">
-          <div id="modalMediaPreview"
-            style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000;">
-            <!-- Media injected here -->
-          </div>
-        </div>
-
-        <!-- Right: Details/Caption -->
-        <div class="ig-details-pane">
-          <div class="ig-user-row">
-            <div class="ig-avatar"></div>
-            <div class="ig-username" id="modalUsername">InstaApp Admin</div>
-          </div>
-          <div class="ig-caption-area">
-            <textarea id="modalCaption" placeholder="Açıklama veya Yorum Yaz..."></textarea>
-          </div>
-          <div class="ig-footer">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;" onclick="saveCaption()">
-                <i class="ri-save-line"></i> Kaydet</button>
-              <div id="modalStatus" style="font-size:0.85rem; font-weight:500;"></div>
-            </div>
-
-            <div class="ig-progress-wrapper" id="modalProgressWrapper">
-              <div class="ig-progress-bar" id="modalProgressBar"></div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // --- AUTH & SETUP ---
-    const token = localStorage.getItem('token');
-    if (!token) window.location.href = '/login';
-
-    function toggleSidebar(force) {
-      const sb = document.getElementById('sidebar');
-      const ov = document.getElementById('sidebarOverlay');
-      if (typeof force === 'boolean') {
-        if (force) { sb.classList.add('open'); ov.classList.add('open'); }
-        else { sb.classList.remove('open'); ov.classList.remove('open'); }
-      } else {
-        sb.classList.toggle('open');
-        ov.classList.toggle('open');
-      }
-    }
-
-    // Role check for UI
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-
-    // Initial Setup
-    document.getElementById('u-name').textContent = user.name || 'Bilinmiyor';
-    document.getElementById('quickUsername').textContent = user.name || 'Bilinmiyor';
-    document.getElementById('u-role').textContent = user.role === 'super_admin' ? 'Süper Admin' : 'Editör';
-    document.querySelectorAll('[data-role="super_admin"]').forEach(el => {
-      if (user.role !== 'super_admin') el.style.display = 'none';
-    });
-
-    // --- NAVIGATION ---
-    function toggleSidebar(force) {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebarOverlay');
-      const isOpen = sidebar.classList.contains('open');
-      if (force === false || isOpen) {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('open');
-      } else {
-        sidebar.classList.add('open');
-        overlay.classList.add('open');
-      }
-    }
-
-    function showTab(t) {
-      document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
-      document.getElementById(t).classList.add('active');
-
-      // Highlight nav item
-      const navItems = document.querySelectorAll('.nav-item');
-      navItems.forEach(item => {
-        if (item.onclick && item.onclick.toString().includes(t)) {
-          item.classList.add('active');
-          document.getElementById('pageTitle').textContent = item.textContent.trim(); // Removed substring since textContent ignores innerHTML
-        }
-      });
-
-      if (t === 'library') loadLibrary();
-      if (t === 'settings') loadSettings();
-      if (t === 'logs') loadLogs();
-      if (t === 'users') loadUsers();
-
-      // Special cases
-      if (t === 'profile') document.getElementById('pageTitle').textContent = 'Profil Ayarları';
-    }
-
-    // --- LIBRARY LOGIC ---
-    let currentType = null;
-    let currentPage = 1;
-    async function loadLibrary(page = 1) {
-      currentPage = page;
-      const grid = document.getElementById('libraryGrid');
-      const paginationControls = document.getElementById('paginationControls');
-      grid.innerHTML = '<div style="padding:1rem">Yükleniyor...</div>';
-      try {
-        let url = `/api/library?limit=30&page=${currentPage}`;
-        if (currentType) url += `&type=${currentType}`;
-        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        const items = data.items || data;
-        const pagination = data.pagination || null;
-        if (items.length === 0) { grid.innerHTML = '<div style="padding:1rem; color:var(--text-muted)">İçerik bulunamadı.</div>'; if (paginationControls) paginationControls.innerHTML = ''; return; }
-        grid.innerHTML = items.map(item => {
-          // Safe caption escape
-          const safeCaption = (item.caption || '').replace(/"/g, '&quot;');
-          return `
+        // --- LIBRARY LOGIC ---
+        let currentType = null;
+        let currentPage = 1;
+        async function loadLibrary(page = 1) {
+          currentPage = page;
+          const grid = document.getElementById('libraryGrid');
+          const paginationControls = document.getElementById('paginationControls');
+          grid.innerHTML = '<div style="padding:1rem">Yükleniyor...</div>';
+          try {
+            let url = `/api/library?limit=30&page=${currentPage}`;
+            if (currentType) url += `&type=${currentType}`;
+            const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await res.json();
+            const items = data.items || data;
+            const pagination = data.pagination || null;
+            if (items.length === 0) { grid.innerHTML = '<div style="padding:1rem; color:var(--text-muted)">İçerik bulunamadı.</div>'; if (paginationControls) paginationControls.innerHTML = ''; return; }
+            grid.innerHTML = items.map(item => {
+              // Safe caption escape
+              const safeCaption = (item.caption || '').replace(/"/g, '&quot;');
+              return `
                     <div class="item-card">
                         <div class="item-media">
                             <span class="item-badge">${item.type}</span>
                             ${item.media[0].kind === 'video'
-              ? `<video src="${item.media[0].url}" muted loop onmouseenter="this.play()" onmouseleave="this.pause()"></video>`
-              : `<img src="${item.cover_url}" loading="lazy">`}
+                  ? `<video src="${item.media[0].url}" muted loop onmouseenter="this.play()" onmouseleave="this.pause()"></video>`
+                  : `<img src="${item.cover_url}" loading="lazy">`}
                         </div>
                         <div class="item-content">
                             <div class="item-caption">${item.caption || '<em style="color:#ccc">Açıklama yok</em>'}</div>
@@ -1048,319 +1122,373 @@
                     </div>
                 `}).join('');
 
-        if (paginationControls && pagination && pagination.totalPages > 1) {
-          let html = '';
-          if (pagination.currentPage > 1) {
-            html += `<button class="btn btn-secondary" onclick="loadLibrary(${pagination.currentPage - 1})">Önceki</button>`;
-          }
-          html += `<span style="font-weight: 500;">Sayfa ${pagination.currentPage} / ${pagination.totalPages}</span>`;
-          if (pagination.currentPage < pagination.totalPages) {
-            html += `<button class="btn btn-secondary" onclick="loadLibrary(${pagination.currentPage + 1})">Sonraki</button>`;
-          }
-          paginationControls.innerHTML = html;
-        } else if (paginationControls) {
-          paginationControls.innerHTML = '';
+            if (paginationControls && pagination && pagination.totalPages > 1) {
+              let html = '';
+              if (pagination.currentPage > 1) {
+                html += `<button class="btn btn-secondary" onclick="loadLibrary(${pagination.currentPage - 1})">Önceki</button>`;
+              }
+              html += `<span style="font-weight: 500;">Sayfa ${pagination.currentPage} / ${pagination.totalPages}</span>`;
+              if (pagination.currentPage < pagination.totalPages) {
+                html += `<button class="btn btn-secondary" onclick="loadLibrary(${pagination.currentPage + 1})">Sonraki</button>`;
+              }
+              paginationControls.innerHTML = html;
+            } else if (paginationControls) {
+              paginationControls.innerHTML = '';
+            }
+
+          } catch (err) { grid.innerHTML = 'Hata oluştu.'; if (document.getElementById('paginationControls')) document.getElementById('paginationControls').innerHTML = ''; }
         }
 
-      } catch (err) { grid.innerHTML = 'Hata oluştu.'; if (document.getElementById('paginationControls')) document.getElementById('paginationControls').innerHTML = ''; }
-    }
-
-    function filterType(type) {
-      currentType = type;
-      currentPage = 1;
-      document.querySelectorAll('.filter-pill').forEach(b => {
-        b.classList.toggle('active', (type && b.textContent.toUpperCase().includes(type)) || (!type && b.textContent === 'Tümü'));
-      });
-      loadLibrary(1);
-    }
-
-    // --- MODAL & SHARE LOGIC ---
-    let activeItemId = null;
-    let activeCustomMedia = null; // For quick uploads
-
-    function openEditModal(itemId, url, kind) {
-      activeItemId = itemId;
-      activeCustomMedia = null; // Reset custom upload state
-      const currentCaption = document.getElementById(`cap_${itemId}`).value;
-
-      // UI Update
-      const preview = document.getElementById('modalMediaPreview');
-      preview.innerHTML = kind === 'video'
-        ? `<video src="${url}" controls style="max-height:100%; max-width:100%"></video>`
-        : `<img src="${url}" style="max-height:100%; max-width:100%">`;
-
-      document.getElementById('modalCaption').value = currentCaption;
-      document.getElementById('modalStatus').innerHTML = '';
-
-      // Show Sheet
-      document.getElementById('editModalOverlay').classList.add('open');
-      const u = JSON.parse(localStorage.getItem('user') || '{}');
-      document.getElementById('modalUsername').innerText = u.name || 'Admin';
-
-      // Reset progress UI
-      document.getElementById('modalProgressWrapper').style.display = 'none';
-      document.getElementById('modalProgressBar').style.width = '0%';
-      document.getElementById('modalStatus').innerHTML = '';
-      document.getElementById('modalShareBtnText').innerText = 'Paylaş';
-      document.getElementById('modalShareBtnText').disabled = false;
-    }
-
-    function closeEditModal(e) {
-      if (e && e.target !== document.getElementById('editModalOverlay')) return;
-      document.getElementById('editModalOverlay').classList.remove('open');
-      activeItemId = null;
-      activeCustomMedia = null;
-      setTimeout(() => {
-        document.getElementById('modalMediaPreview').innerHTML = ''; // Cleanup video
-      }, 300);
-    }
-
-    async function saveCaption() {
-      const newCap = document.getElementById('modalCaption').value;
-      const status = document.getElementById('modalStatus');
-      try {
-        const res = await fetch('/api/library/update-caption', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemId: activeItemId, newCaption: newCap })
-        });
-        if (res.ok) {
-          status.innerHTML = '<span style="color:var(--success)">✅ Kaydedildi</span>';
-          // Update hidden input and grid if visible
-          if (document.getElementById(`cap_${activeItemId}`)) {
-            document.getElementById(`cap_${activeItemId}`).value = newCap;
-          }
-          loadLibrary(currentPage); // Refresh grid to show new caption
-        }
-      } catch (e) { status.innerHTML = 'Hata oluştu'; }
-    }
-
-    async function shareFromModal() {
-      const btn = document.getElementById('modalShareBtnText');
-      const status = document.getElementById('modalStatus');
-      const caption = document.getElementById('modalCaption').value;
-      const progressWrap = document.getElementById('modalProgressWrapper');
-      const progressBar = document.getElementById('modalProgressBar');
-
-      btn.disabled = true;
-      btn.innerText = 'Bekleyin...';
-      status.innerHTML = '🚀 Paylaşılıyor...';
-      progressWrap.style.display = 'block';
-      progressBar.style.width = '20%';
-
-      try {
-        if (activeItemId) {
-          await fetch('/api/library/update-caption', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ itemId: activeItemId, newCaption: caption })
+        function filterType(type) {
+          currentType = type;
+          currentPage = 1;
+          document.querySelectorAll('.filter-pill').forEach(b => {
+            b.classList.toggle('active', (type && b.textContent.toUpperCase().includes(type)) || (!type && b.textContent === 'Tümü'));
           });
+          loadLibrary(1);
         }
 
-        progressBar.style.width = '50%';
+        // --- PROFILE MANAGEMENT ---
+        async function uploadAvatar(input) {
+          if (!input.files || !input.files[0]) return;
+          const formData = new FormData();
+          formData.append('avatar', input.files[0]);
 
-        const payload = activeItemId
-          ? { itemId: activeItemId, caption: caption }
-          : { customMedia: activeCustomMedia, caption: caption };
+          const status = document.getElementById('profileStatus');
+          status.innerHTML = 'Fotoğraf yükleniyor...';
 
-        const res = await fetch('/api/share', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        progressBar.style.width = '80%';
-
-        if (res.ok) {
-          progressBar.style.width = '100%';
-          status.innerHTML = '<span style="color:var(--success)">✅ Paylaşıldı!</span>';
-          btn.innerText = 'Tamamlandı';
-          setTimeout(closeEditModal, 1500);
-        } else {
-          const d = await res.json();
-          throw new Error(d.error);
+          try {
+            const res = await fetch('/api/profile/avatar', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+              body: formData
+            });
+            const d = await res.json();
+            if (res.ok) {
+              status.innerHTML = '<span style="color:var(--success)">✅ Fotoğraf güncellendi!</span>';
+              user.avatar_url = d.avatar_url;
+              localStorage.setItem('user', JSON.stringify(user));
+              updateUIWithUser(user);
+            } else {
+              throw new Error(d.error);
+            }
+          } catch (e) {
+            status.innerHTML = `<span style="color:var(--danger)">❌ Hata: ${e.message}</span>`;
+          }
         }
-      } catch (e) {
-        progressBar.style.width = '100%';
-        progressBar.style.background = 'var(--danger)';
-        status.innerHTML = `<span style="color:var(--danger)">❌ ${e.message}</span>`;
-        btn.innerText = 'Hata';
-      } finally {
-        setTimeout(() => { btn.disabled = false; }, 2000);
-      }
-    }
 
-    // --- QUICK UPLOAD LOGIC ---
-    // (Similar logic but optimized for new UI)
-    let quickFiles = [];
-    async function handleMultiUpload(input) {
-      if (!input.files.length) return;
-      const formData = new FormData();
-      Array.from(input.files).forEach(f => formData.append('files', f));
+        document.getElementById('profileUpdateForm').onsubmit = async (e) => {
+          e.preventDefault();
+          const newName = document.getElementById('profile_name').value;
+          const status = document.getElementById('profileStatus');
 
-      try {
-        const res = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
-        const data = await res.json();
-        if (res.ok) {
-          quickFiles = data.media;
-          renderQuickPreview();
+          try {
+            const res = await fetch('/api/profile/update', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: newName })
+            });
+            const d = await res.json();
+            if (res.ok) {
+              status.innerHTML = '<span style="color:var(--success)">✅ Profil güncellendi!</span>';
+              user.name = newName;
+              localStorage.setItem('user', JSON.stringify(user));
+              updateUIWithUser(user);
+            } else {
+              throw new Error(d.error);
+            }
+          } catch (e) {
+            status.innerHTML = `<span style="color:var(--danger)">❌ Hata: ${e.message}</span>`;
+          }
+        };
+
+        // --- MODAL & SHARE LOGIC ---
+        let activeItemId = null;
+        let activeCustomMedia = null; // For quick uploads
+
+        function openEditModal(itemId, url, kind) {
+          activeItemId = itemId;
+          activeCustomMedia = null; // Reset custom upload state
+          const currentCaption = document.getElementById(`cap_${itemId}`).value;
+
+          // UI Update
+          const preview = document.getElementById('modalMediaPreview');
+          preview.innerHTML = kind === 'video'
+            ? `<video src="${url}" controls style="max-height:100%; max-width:100%"></video>`
+            : `<img src="${url}" style="max-height:100%; max-width:100%">`;
+
+          document.getElementById('modalCaption').value = currentCaption;
+          document.getElementById('modalStatus').innerHTML = '';
+
+          // Show Sheet
+          document.getElementById('editModalOverlay').classList.add('open');
+          const u = JSON.parse(localStorage.getItem('user') || '{}');
+          document.getElementById('modalUsername').innerText = u.name || 'Admin';
+
+          // Reset progress UI
+          document.getElementById('modalProgressWrapper').style.display = 'none';
+          document.getElementById('modalProgressBar').style.width = '0%';
+          document.getElementById('modalStatus').innerHTML = '';
+          document.getElementById('modalShareBtnText').innerText = 'Paylaş';
+          document.getElementById('modalShareBtnText').disabled = false;
         }
-      } catch (e) { alert('Yükleme hatası'); }
-    }
 
-    function renderQuickPreview() {
-      const div = document.getElementById('uploadPreview');
-      div.innerHTML = quickFiles.map(f => `
+        function closeEditModal(e) {
+          if (e && e.target !== document.getElementById('editModalOverlay')) return;
+          document.getElementById('editModalOverlay').classList.remove('open');
+          activeItemId = null;
+          activeCustomMedia = null;
+          setTimeout(() => {
+            document.getElementById('modalMediaPreview').innerHTML = ''; // Cleanup video
+          }, 300);
+        }
+
+        async function saveCaption() {
+          const newCap = document.getElementById('modalCaption').value;
+          const status = document.getElementById('modalStatus');
+          try {
+            const res = await fetch('/api/library/update-caption', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ itemId: activeItemId, newCaption: newCap })
+            });
+            if (res.ok) {
+              status.innerHTML = '<span style="color:var(--success)">✅ Kaydedildi</span>';
+              // Update hidden input and grid if visible
+              if (document.getElementById(`cap_${activeItemId}`)) {
+                document.getElementById(`cap_${activeItemId}`).value = newCap;
+              }
+              loadLibrary(currentPage); // Refresh grid to show new caption
+            }
+          } catch (e) { status.innerHTML = 'Hata oluştu'; }
+        }
+
+        async function shareFromModal() {
+          const btn = document.getElementById('modalShareBtnText');
+          const status = document.getElementById('modalStatus');
+          const caption = document.getElementById('modalCaption').value;
+          const progressWrap = document.getElementById('modalProgressWrapper');
+          const progressBar = document.getElementById('modalProgressBar');
+
+          btn.disabled = true;
+          btn.innerText = 'Bekleyin...';
+          status.innerHTML = '🚀 Paylaşılıyor...';
+          progressWrap.style.display = 'block';
+          progressBar.style.width = '20%';
+
+          try {
+            if (activeItemId) {
+              await fetch('/api/library/update-caption', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itemId: activeItemId, newCaption: caption })
+              });
+            }
+
+            progressBar.style.width = '50%';
+
+            const payload = activeItemId
+              ? { itemId: activeItemId, caption: caption }
+              : { customMedia: activeCustomMedia, caption: caption };
+
+            const res = await fetch('/api/share', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            progressBar.style.width = '80%';
+
+            if (res.ok) {
+              progressBar.style.width = '100%';
+              status.innerHTML = '<span style="color:var(--success)">✅ Paylaşıldı!</span>';
+              btn.innerText = 'Tamamlandı';
+              setTimeout(closeEditModal, 1500);
+            } else {
+              const d = await res.json();
+              throw new Error(d.error);
+            }
+          } catch (e) {
+            progressBar.style.width = '100%';
+            progressBar.style.background = 'var(--danger)';
+            status.innerHTML = `<span style="color:var(--danger)">❌ ${e.message}</span>`;
+            btn.innerText = 'Hata';
+          } finally {
+            setTimeout(() => { btn.disabled = false; }, 2000);
+          }
+        }
+
+        // --- QUICK UPLOAD LOGIC ---
+        // (Similar logic but optimized for new UI)
+        let quickFiles = [];
+        async function handleMultiUpload(input) {
+          if (!input.files.length) return;
+          const formData = new FormData();
+          Array.from(input.files).forEach(f => formData.append('files', f));
+
+          try {
+            const res = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+            const data = await res.json();
+            if (res.ok) {
+              quickFiles = data.media;
+              renderQuickPreview();
+            }
+          } catch (e) { alert('Yükleme hatası'); }
+        }
+
+        function renderQuickPreview() {
+          const div = document.getElementById('uploadPreview');
+          div.innerHTML = quickFiles.map(f => `
                 <div style="width:100%; height:100%; flex-shrink: 0; scroll-snap-align: start; display:flex; align-items:center; justify-content:center;">
                     ${f.kind === 'video'
-          ? `<video src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;" controls></video>`
-          : `<img src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;">`}
+              ? `<video src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;" controls></video>`
+              : `<img src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;">`}
                 </div>
             `).join('');
 
-      if (quickFiles.length > 0) {
-        document.getElementById('quickEmptyState').style.display = 'none';
-        document.getElementById('quickFilledState').style.display = 'block';
-      } else {
-        document.getElementById('quickFilledState').style.display = 'none';
-        document.getElementById('quickEmptyState').style.display = 'flex';
-      }
-    }
+          if (quickFiles.length > 0) {
+            document.getElementById('quickEmptyState').style.display = 'none';
+            document.getElementById('quickFilledState').style.display = 'block';
+          } else {
+            document.getElementById('quickFilledState').style.display = 'none';
+            document.getElementById('quickEmptyState').style.display = 'flex';
+          }
+        }
 
-    document.getElementById('quickShareBtn').onclick = async () => {
-      const status = document.getElementById('quickStatus');
-      const progressWrap = document.getElementById('quickProgressWrapper');
-      const progressBar = document.getElementById('quickProgressBar');
-      const btn = document.getElementById('quickShareBtn');
+        document.getElementById('quickShareBtn').onclick = async () => {
+          const status = document.getElementById('quickStatus');
+          const progressWrap = document.getElementById('quickProgressWrapper');
+          const progressBar = document.getElementById('quickProgressBar');
+          const btn = document.getElementById('quickShareBtn');
 
-      if (quickFiles.length === 0) {
-        status.innerHTML = '<span style="color:var(--danger)">Lütfen önce dosya yükleyin!</span>';
-        return;
-      }
+          if (quickFiles.length === 0) {
+            status.innerHTML = '<span style="color:var(--danger)">Lütfen önce dosya yükleyin!</span>';
+            return;
+          }
 
-      const caption = document.getElementById('quickCaption').value;
-      const format = document.querySelector('input[name="format"]:checked').value;
+          const caption = document.getElementById('quickCaption').value;
+          const format = document.querySelector('input[name="format"]:checked').value;
 
-      btn.disabled = true;
-      btn.innerText = 'Bekleyin...';
-      status.innerHTML = '🚀 Paylaşılıyor...';
-      progressWrap.style.display = 'block';
-      progressBar.style.width = '20%';
+          btn.disabled = true;
+          btn.innerText = 'Bekleyin...';
+          status.innerHTML = '🚀 Paylaşılıyor...';
+          progressWrap.style.display = 'block';
+          progressBar.style.width = '20%';
 
-      try {
-        progressBar.style.width = '60%';
-        const res = await fetch('/api/share', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ customMedia: quickFiles, caption, format })
+          try {
+            progressBar.style.width = '60%';
+            const res = await fetch('/api/share', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ customMedia: quickFiles, caption, format })
+            });
+
+            progressBar.style.width = '80%';
+
+            if (res.ok) {
+              progressBar.style.width = '100%';
+              status.innerHTML = '<span style="color:var(--success)"><i class="ri-checkbox-circle-line"></i> Başarıyla Paylaşıldı!</span>';
+              btn.innerText = 'Tamamlandı';
+              setTimeout(() => {
+                quickFiles = [];
+                renderQuickPreview();
+                document.getElementById('quickCaption').value = '';
+                progressWrap.style.display = 'none';
+                progressBar.style.width = '0%';
+                btn.innerText = 'Paylaş';
+                btn.disabled = false;
+                status.innerHTML = '';
+              }, 2000);
+            } else {
+              const d = await res.json();
+              throw new Error(d.error || 'Bilinmeyen Hata');
+            }
+          } catch (e) {
+            progressBar.style.width = '100%';
+            progressBar.style.background = 'var(--danger)';
+            status.innerHTML = `<span style="color:var(--danger)"><i class="ri-close-circle-line"></i> ${e.message}</span>`;
+            btn.innerText = 'Hata';
+            setTimeout(() => {
+              btn.disabled = false;
+              btn.innerText = 'Tekrar Dene';
+              progressBar.style.background = ''; // reset to gradient
+            }, 2000);
+          }
+        };
+
+        // --- AUTH & OTHER TABS ---
+        document.getElementById('logoutBtn').onclick = () => { localStorage.clear(); window.location.href = '/login'; };
+
+        // --- THEME TOGGLE ---
+        function toggleTheme() {
+          const isDark = document.body.classList.toggle('dark-mode');
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+          updateThemeIcon(isDark);
+        }
+
+        function updateThemeIcon(isDark) {
+          const icon = document.getElementById('themeIcon');
+          if (icon) {
+            icon.className = isDark ? 'ri-sun-line' : 'ri-moon-line';
+          }
+        }
+
+        // Apply saved theme on load
+        if (localStorage.getItem('theme') === 'dark') {
+          document.body.classList.add('dark-mode');
+          updateThemeIcon(true);
+        }
+
+        // Load default
+        showTab('library');
+
+        // Format selector toggle
+        document.querySelectorAll('input[name="format"]').forEach(radio => {
+          radio.addEventListener('change', (e) => {
+            document.querySelectorAll('.filter-pill input[name="format"]').forEach(i => i.closest('.filter-pill').classList.remove('active'));
+            e.target.closest('.filter-pill').classList.add('active');
+          });
         });
 
-        progressBar.style.width = '80%';
-
-        if (res.ok) {
-          progressBar.style.width = '100%';
-          status.innerHTML = '<span style="color:var(--success)"><i class="ri-checkbox-circle-line"></i> Başarıyla Paylaşıldı!</span>';
-          btn.innerText = 'Tamamlandı';
-          setTimeout(() => {
-            quickFiles = [];
-            renderQuickPreview();
-            document.getElementById('quickCaption').value = '';
-            progressWrap.style.display = 'none';
-            progressBar.style.width = '0%';
-            btn.innerText = 'Paylaş';
-            btn.disabled = false;
-            status.innerHTML = '';
-          }, 2000);
-        } else {
-          const d = await res.json();
-          throw new Error(d.error || 'Bilinmeyen Hata');
+        // Simplified Admin Loaders (same as before but cleaner code organization possible)
+        async function loadSettings() {
+          const res = await fetch('/api/admin/settings', { headers: { 'Authorization': `Bearer ${token}` } });
+          const data = await res.json();
+          Object.keys(data).forEach(k => { if (document.getElementById(k)) document.getElementById(k).value = data[k]; });
         }
-      } catch (e) {
-        progressBar.style.width = '100%';
-        progressBar.style.background = 'var(--danger)';
-        status.innerHTML = `<span style="color:var(--danger)"><i class="ri-close-circle-line"></i> ${e.message}</span>`;
-        btn.innerText = 'Hata';
-        setTimeout(() => {
-          btn.disabled = false;
-          btn.innerText = 'Tekrar Dene';
-          progressBar.style.background = ''; // reset to gradient
-        }, 2000);
-      }
-    };
+        // ... (User/Log loaders similar to before) ...
+      </script>
 
-    // --- AUTH & OTHER TABS ---
-    document.getElementById('logoutBtn').onclick = () => { localStorage.clear(); window.location.href = '/login'; };
-
-    // --- THEME TOGGLE ---
-    function toggleTheme() {
-      const isDark = document.body.classList.toggle('dark-mode');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      updateThemeIcon(isDark);
-    }
-
-    function updateThemeIcon(isDark) {
-      const icon = document.getElementById('themeIcon');
-      if (icon) {
-        icon.className = isDark ? 'ri-sun-line' : 'ri-moon-line';
-      }
-    }
-
-    // Apply saved theme on load
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark-mode');
-      updateThemeIcon(true);
-    }
-
-    // Load default
-    showTab('library');
-
-    // Format selector toggle
-    document.querySelectorAll('input[name="format"]').forEach(radio => {
-      radio.addEventListener('change', (e) => {
-        document.querySelectorAll('.filter-pill input[name="format"]').forEach(i => i.closest('.filter-pill').classList.remove('active'));
-        e.target.closest('.filter-pill').classList.add('active');
-      });
-    });
-
-    // Simplified Admin Loaders (same as before but cleaner code organization possible)
-    async function loadSettings() {
-      const res = await fetch('/api/admin/settings', { headers: { 'Authorization': `Bearer ${token}` } });
-      const data = await res.json();
-      Object.keys(data).forEach(k => { if (document.getElementById(k)) document.getElementById(k).value = data[k]; });
-    }
-    // ... (User/Log loaders similar to before) ...
-  </script>
-
-  <!-- Restore full functionality of Users/Logs/Settings from previous file if needed or keep minimal -->
-  <script>
-    // Restoring critical admin functions
-    async function loadUsers() {
-      const tbody = document.getElementById('userTableBody');
-      tbody.innerHTML = '<tr><td colspan="4">Yükleniyor...</td></tr>';
-      const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
-      const users = await res.json();
-      tbody.innerHTML = users.map(u => `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td style="text-align:right"><button onclick="deleteUser(${u.id})" class="btn" style="color:red">Sil</button></td></tr>`).join('');
-    }
-    async function deleteUser(id) { await fetch(`/api/admin/users/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } }); loadUsers(); }
-    document.getElementById('addUserForm').onsubmit = async (e) => {
-      e.preventDefault();
-      const data = { name: document.getElementById('add_name').value, email: document.getElementById('add_email').value, password: document.getElementById('add_password').value, role: document.getElementById('add_role').value };
-      await fetch('/api/admin/users', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      loadUsers(); e.target.reset();
-    }
-    async function loadLogs() {
-      const res = await fetch('/api/admin/logs', { headers: { 'Authorization': `Bearer ${token}` } });
-      const logs = await res.json();
-      document.getElementById('logTableBody').innerHTML = logs.map(l => `<tr><td>${new Date(l.created_at).toLocaleString('tr-TR')}</td><td>${l.user_name || '-'}</td><td>${l.action}</td><td>${l.details}</td><td>${l.status}</td></tr>`).join('');
-    }
-    document.getElementById('settingsForm').onsubmit = async (e) => {
-      e.preventDefault();
-      const data = {};
-      ['META_APP_ID', 'META_APP_SECRET', 'META_ACCESS_TOKEN', 'INSTAGRAM_BUSINESS_ACCOUNT_ID', 'N8N_WEBHOOK_URL'].forEach(k => data[k] = document.getElementById(k).value);
-      await fetch('/api/admin/settings', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      alert('Kaydedildi');
-    }
-  </script>
+      <!-- Restore full functionality of Users/Logs/Settings from previous file if needed or keep minimal -->
+      <script>
+        // Restoring critical admin functions
+        async function loadUsers() {
+          const tbody = document.getElementById('userTableBody');
+          tbody.innerHTML = '<tr><td colspan="4">Yükleniyor...</td></tr>';
+          const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
+          const users = await res.json();
+          tbody.innerHTML = users.map(u => `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td style="text-align:right"><button onclick="deleteUser(${u.id})" class="btn" style="color:red">Sil</button></td></tr>`).join('');
+        }
+        async function deleteUser(id) { await fetch(`/api/admin/users/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } }); loadUsers(); }
+        document.getElementById('addUserForm').onsubmit = async (e) => {
+          e.preventDefault();
+          const data = { name: document.getElementById('add_name').value, email: document.getElementById('add_email').value, password: document.getElementById('add_password').value, role: document.getElementById('add_role').value };
+          await fetch('/api/admin/users', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          loadUsers(); e.target.reset();
+        }
+        async function loadLogs() {
+          const res = await fetch('/api/admin/logs', { headers: { 'Authorization': `Bearer ${token}` } });
+          const logs = await res.json();
+          document.getElementById('logTableBody').innerHTML = logs.map(l => `<tr><td>${new Date(l.created_at).toLocaleString('tr-TR')}</td><td>${l.user_name || '-'}</td><td>${l.action}</td><td>${l.details}</td><td>${l.status}</td></tr>`).join('');
+        }
+        document.getElementById('settingsForm').onsubmit = async (e) => {
+          e.preventDefault();
+          const data = {};
+          ['META_APP_ID', 'META_APP_SECRET', 'META_ACCESS_TOKEN', 'INSTAGRAM_BUSINESS_ACCOUNT_ID', 'N8N_WEBHOOK_URL'].forEach(k => data[k] = document.getElementById(k).value);
+          await fetch('/api/admin/settings', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+          alert('Kaydedildi');
+        }
+      </script>
 </body>
 
 </html>

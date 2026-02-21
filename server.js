@@ -228,6 +228,40 @@ app.post("/api/auth/update-password", verifyToken, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+app.post("/api/profile/update", verifyToken, async (req, res) => {
+  const { name } = req.body;
+  if (!name) return res.status(400).json({ error: "İsim gerekli" });
+  try {
+    const { updateProfile } = require('./auth');
+    await updateProfile(req.user.id, { name });
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post("/api/profile/avatar", verifyToken, upload.single('avatar'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "Dosya yüklenemedi" });
+
+  const finalPath = req.file.path;
+  let publicUrl = `http://168.231.125.93:3000/uploads/${req.file.filename}`;
+
+  try {
+    const util = require('util');
+    const exec = util.promisify(require('child_process').exec);
+    const { stdout } = await exec(`curl -s -F "reqtype=fileupload" -F "fileToUpload=@${finalPath}" https://catbox.moe/user/api.php`);
+    if (stdout.startsWith('http')) publicUrl = stdout.trim();
+  } catch (err) {
+    console.error("[Avatar Catbox] Failed:", err);
+  }
+
+  try {
+    const { updateProfile } = require('./auth');
+    await updateProfile(req.user.id, { name: req.user.name, avatar_url: publicUrl });
+    res.json({ ok: true, avatar_url: publicUrl });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ---------------- Meta Engine ----------------
 async function metaRequest(endpoint, params = {}, method = 'POST') {
   const settings = await getSettings();

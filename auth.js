@@ -19,13 +19,13 @@ async function login(email, password, ip = '') {
       }
 
       const token = jwt.sign(
-        { id: user.id, name: user.name, role: user.role },
+        { id: user.id, name: user.name, role: user.role, avatar_url: user.avatar_url },
         process.env.JWT_SECRET,
         { expiresIn: "7d" }
       );
 
       logAction(user.id, 'LOGIN_SUCCESS', `Kullanıcı: ${user.name}`, ip, 'SUCCESS');
-      resolve({ token, user: { id: user.id, name: user.name, role: user.role } });
+      resolve({ token, user: { id: user.id, name: user.name, role: user.role, avatar_url: user.avatar_url, email: user.email } });
     });
   });
 }
@@ -113,4 +113,26 @@ async function updatePassword(userId, newPassword) {
   });
 }
 
-module.exports = { login, register, logAction, verifyToken, isSuperAdmin, getSettings, updatePassword };
+async function updateProfile(userId, data) {
+  const { name, avatar_url } = data;
+  return new Promise((resolve, reject) => {
+    let sql = "UPDATE users SET name = ?";
+    const params = [name];
+
+    if (avatar_url !== undefined) {
+      sql += ", avatar_url = ?";
+      params.push(avatar_url);
+    }
+
+    sql += " WHERE id = ?";
+    params.push(userId);
+
+    db.run(sql, params, function (err) {
+      if (err) return reject(err.message);
+      logAction(userId, 'PROFILE_UPDATED', `Profil güncellendi: ${name}`, '', 'SUCCESS');
+      resolve({ ok: true });
+    });
+  });
+}
+
+module.exports = { login, register, logAction, verifyToken, isSuperAdmin, getSettings, updatePassword, updateProfile };

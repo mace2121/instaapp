@@ -18,8 +18,16 @@ db.serialize(() => {
         email TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
         role TEXT CHECK(role IN ('super_admin', 'editor')) DEFAULT 'editor',
+        avatar_url TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
+
+  // Migration: Add avatar_url if it doesn't exist
+  db.all("PRAGMA table_info(users)", (err, columns) => {
+    if (!err && !columns.some(c => c.name === 'avatar_url')) {
+      db.run("ALTER TABLE users ADD COLUMN avatar_url TEXT");
+    }
+  });
 
   // Denetim Günlükleri
   db.run(`CREATE TABLE IF NOT EXISTS logs (
