@@ -289,6 +289,10 @@
       -webkit-backdrop-filter: blur(4px);
     }
 
+    #sidebarOverlay {
+      z-index: 40;
+    }
+
     .modal-overlay.open {
       display: flex;
       align-items: center;
@@ -296,6 +300,7 @@
       opacity: 1;
     }
 
+    .ig-card,
     .ig-modal {
       background: var(--card-bg);
       border-radius: 12px;
@@ -309,6 +314,14 @@
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
       transform: scale(0.95);
       transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .ig-card {
+      width: 100%;
+      margin: 0 auto;
+      transform: none;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border);
     }
 
     .modal-overlay.open .ig-modal {
@@ -613,70 +626,100 @@
 
       <!-- QUICK SHARE TAB -->
       <div id="quickshare" class="tab-content">
-        <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
-          <h3>Hızlı Paylaşım</h3>
-          <p style="color: var(--text-muted); margin-bottom: 2rem;">Birden fazla dosya seçip carousel
-            oluşturabilirsiniz.</p>
-
-          <div id="dropZone" onclick="document.getElementById('multiUploadInput').click()"
-            style="border: 2px dashed var(--border); padding: 3rem; border-radius: 1rem; cursor: pointer; margin-bottom: 1rem; transition: border-color 0.2s;">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📂</div>
-            <div>Dosya Seç / Sürükle</div>
-          </div>
-          <input type="file" id="multiUploadInput" multiple style="display:none;" accept="image/*,video/*"
-            onchange="handleMultiUpload(this)">
-
-          <script>
-            const dropZone = document.getElementById('dropZone');
-
-            dropZone.addEventListener('dragover', (e) => {
-              e.preventDefault();
-              dropZone.style.borderColor = 'var(--primary)';
-              dropZone.style.backgroundColor = 'rgba(66, 104, 246, 0.05)';
-            });
-
-            dropZone.addEventListener('dragleave', (e) => {
-              e.preventDefault();
-              dropZone.style.borderColor = 'var(--border)';
-              dropZone.style.backgroundColor = 'transparent';
-            });
-
-            dropZone.addEventListener('drop', (e) => {
-              e.preventDefault();
-              dropZone.style.borderColor = 'var(--border)';
-              dropZone.style.backgroundColor = 'transparent';
-
-              if (e.dataTransfer.files.length > 0) {
-                const input = document.getElementById('multiUploadInput');
-                input.files = e.dataTransfer.files;
-                handleMultiUpload(input);
-              }
-            });
-          </script>
-
-          <div id="uploadPreview"
-            style="display:grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 0.5rem; margin-bottom: 1rem;">
+        <div class="ig-card">
+          <!-- Header -->
+          <div class="ig-modal-header" style="justify-content: center;">
+            <span>Hızlı Paylaşım</span>
           </div>
 
-          <div style="text-align: left; margin-bottom: 1rem;">
-            <label style="color: var(--text-muted); font-size: 0.8rem;">Format Seçimi</label>
-            <div style="display:flex; gap: 0.5rem; margin-top: 0.5rem;">
-              <label class="filter-pill active"><input type="radio" name="format" value="auto" checked hidden>
-                Otomatik</label>
-              <label class="filter-pill"><input type="radio" name="format" value="1:1" hidden> Kare</label>
-              <label class="filter-pill"><input type="radio" name="format" value="4:5" hidden> Portre</label>
+          <!-- Body -->
+          <div class="ig-modal-body">
+
+            <!-- Left: Image Preview & Dropzone -->
+            <div class="ig-preview-pane"
+              style="flex-direction: column; align-items: stretch; justify-content: flex-start; padding: 1rem;">
+              <div id="dropZone" onclick="document.getElementById('multiUploadInput').click()"
+                style="border: 2px dashed var(--border); padding: 2rem; border-radius: 1rem; cursor: pointer; text-align: center; transition: border-color 0.2s;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📂</div>
+                <div style="color: var(--text-muted);">Sürükle bırak veya tıkla</div>
+              </div>
+              <input type="file" id="multiUploadInput" multiple style="display:none;" accept="image/*,video/*"
+                onchange="handleMultiUpload(this)">
+
+              <div id="uploadPreview"
+                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; margin-top: 1rem; overflow-y:auto;">
+              </div>
             </div>
-          </div>
 
-          <textarea id="quickCaption" placeholder="Açıklama giriniz..." rows="4"></textarea>
+            <!-- Right: Details/Caption -->
+            <div class="ig-details-pane">
+              <div class="ig-user-row">
+                <div class="ig-avatar"></div>
+                <div class="ig-username" id="quickUsername">InstaApp Admin</div>
+              </div>
 
-          <button id="quickShareBtn" class="btn btn-primary"
-            style="width: 100%; margin-top: 1rem; padding: 1rem;">Paylaş</button>
-          <div id="quickStatus" style="margin-top: 1rem; font-weight: 500;"></div>
-          <div class="ig-progress-wrapper" id="quickProgressWrapper" style="margin-top: 1rem;">
-            <div class="ig-progress-bar" id="quickProgressBar"></div>
+              <div style="padding: 0 1rem; margin-bottom: 1rem;">
+                <label
+                  style="color: var(--text-muted); font-size: 0.8rem; display:block; margin-bottom: 0.5rem;">Oran</label>
+                <div style="display:flex; gap: 0.5rem;">
+                  <label class="filter-pill active" onclick="setQuickFormat(this)"><input type="radio" name="format"
+                      value="auto" checked hidden> Orijinal</label>
+                  <label class="filter-pill" onclick="setQuickFormat(this)"><input type="radio" name="format"
+                      value="1:1" hidden> 1:1</label>
+                  <label class="filter-pill" onclick="setQuickFormat(this)"><input type="radio" name="format"
+                      value="4:5" hidden> 4:5</label>
+                </div>
+              </div>
+
+              <script>
+                function setQuickFormat(lbl) {
+                  document.querySelectorAll('input[name="format"]').forEach(el => {
+                    el.closest('.filter-pill').classList.remove('active');
+                  });
+                  lbl.classList.add('active');
+                  lbl.querySelector('input').checked = true;
+                }
+              </script>
+
+              <div class="ig-caption-area">
+                <textarea id="quickCaption" placeholder="Açıklama veya Yorum Yaz..."></textarea>
+              </div>
+
+              <div class="ig-footer">
+                <button id="quickShareBtn" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">Paylaş</button>
+                <div id="quickStatus" style="margin-top: 1rem; font-weight: 500; text-align:center;"></div>
+                <div class="ig-progress-wrapper" id="quickProgressWrapper" style="margin-top: 1rem;">
+                  <div class="ig-progress-bar" id="quickProgressBar"></div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
+
+        <script>
+          const dropZone = document.getElementById('dropZone');
+          dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--primary)';
+            dropZone.style.backgroundColor = 'rgba(66, 104, 246, 0.05)';
+          });
+          dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border)';
+            dropZone.style.backgroundColor = 'transparent';
+          });
+          dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border)';
+            dropZone.style.backgroundColor = 'transparent';
+            if (e.dataTransfer.files.length > 0) {
+              const input = document.getElementById('multiUploadInput');
+              input.files = e.dataTransfer.files;
+              handleMultiUpload(input);
+            }
+          });
+        </script>
       </div>
 
       <!-- PROFILE TAB -->
@@ -886,7 +929,8 @@
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     // Initial Setup
-    document.getElementById('u-name').textContent = user.name;
+    document.getElementById('u-name').textContent = user.name || 'Bilinmiyor';
+    document.getElementById('quickUsername').textContent = user.name || 'Bilinmiyor';
     document.getElementById('u-role').textContent = user.role === 'super_admin' ? 'Süper Admin' : 'Editör';
     document.querySelectorAll('[data-role="super_admin"]').forEach(el => {
       if (user.role !== 'super_admin') el.style.display = 'none';
