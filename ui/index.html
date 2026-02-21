@@ -242,6 +242,7 @@
       margin-bottom: 1rem;
       display: -webkit-box;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
       height: 2.6em;
@@ -272,64 +273,151 @@
       border-color: var(--primary);
     }
 
-    /* --- Bottom Sheet Modal --- */
+    /* --- Instagram Style Modal --- */
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: var(--overlay);
+      background: rgba(0, 0, 0, 0.65);
       z-index: 100;
       display: none;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.2s ease;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
     .modal-overlay.open {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       opacity: 1;
     }
 
-    .bottom-sheet {
-      position: fixed;
-      bottom: -100%;
-      left: 0;
-      width: 100%;
+    .ig-modal {
       background: var(--card-bg);
-      border-top-left-radius: 1rem;
-      border-top-right-radius: 1rem;
-      box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
-      z-index: 101;
-      transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      max-height: 90vh;
+      border-radius: 12px;
+      width: 90vw;
+      max-width: 950px;
+      height: 80vh;
+      max-height: 850px;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+      transform: scale(0.95);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .bottom-sheet.open {
-      bottom: 0;
+    .modal-overlay.open .ig-modal {
+      transform: scale(1);
     }
 
-    .sheet-header {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border);
+    .ig-modal-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 1rem;
     }
 
-    .sheet-content {
-      padding: 1.5rem;
-      overflow-y: auto;
+    .ig-modal-header button {
+      background: none;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-main);
+      font-size: 0.9rem;
     }
 
-    .sheet-drag-handle {
-      width: 40px;
-      height: 5px;
-      background: var(--border);
-      border-radius: 3px;
-      margin: 0 auto 1rem auto;
+    .ig-modal-header .ig-share-btn {
+      color: #0095f6;
+    }
+
+    .ig-modal-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .ig-preview-pane {
+      flex: 3;
+      background: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ig-details-pane {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+    }
+
+    .ig-user-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+    }
+
+    .ig-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ddd;
+    }
+
+    .ig-username {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .ig-caption-area {
+      flex: 1;
+      padding: 0 1rem;
+    }
+
+    .ig-caption-area textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      resize: none;
+      outline: none;
+      padding: 0;
+      font-size: 1rem;
+      background: transparent;
+    }
+
+    .ig-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Progress Bar */
+    .ig-progress-wrapper {
+      width: 100%;
+      height: 4px;
+      background: #eee;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .ig-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      transition: width 0.3s ease;
     }
 
     /* --- Responsive --- */
@@ -342,7 +430,6 @@
       }
 
       .sidebar.open {
-        transform: translateX(260px);
         left: 0;
       }
 
@@ -363,6 +450,20 @@
         margin-right: 1rem;
         cursor: pointer;
       }
+
+      .ig-modal-body {
+        flex-direction: column;
+      }
+
+      .ig-preview-pane {
+        flex: auto;
+        height: 50%;
+      }
+
+      .ig-details-pane {
+        flex: auto;
+        height: 50%;
+      }
     }
 
     @media (min-width: 769px) {
@@ -370,20 +471,7 @@
         display: none;
       }
 
-      /* On desktop, bottom sheet behaves more like a centered modal if desired, 
-               but user asked for "up from bottom". Let's keep it specific or wide centered. */
-      .bottom-sheet {
-        max-width: 600px;
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: -100%;
-        /* Reset logic for desktop override if needed */
-        border-radius: 1rem 1rem 0 0;
-      }
-
-      .bottom-sheet.open {
-        bottom: 0;
-      }
+      /* In Desktop, modal is already handled by grid/flex */
     }
 
     /* Form Elements */
@@ -584,7 +672,10 @@
 
           <button id="quickShareBtn" class="btn btn-primary"
             style="width: 100%; margin-top: 1rem; padding: 1rem;">Paylaş</button>
-          <div id="quickStatus" style="margin-top: 1rem;"></div>
+          <div id="quickStatus" style="margin-top: 1rem; font-weight: 500;"></div>
+          <div class="ig-progress-wrapper" id="quickProgressWrapper" style="margin-top: 1rem;">
+            <div class="ig-progress-bar" id="quickProgressBar"></div>
+          </div>
         </div>
       </div>
 
@@ -727,35 +818,71 @@
     </div>
   </div>
 
-  <!-- BOTTOM SHEET EDIT MODAL -->
-  <div class="modal-overlay" id="editModalOverlay" onclick="closeEditModal()"></div>
-  <div class="bottom-sheet" id="editModal">
-    <div class="sheet-drag-handle"></div>
-    <div class="sheet-header">
-      <h3>Düzenle & Paylaş</h3>
-      <button class="btn btn-secondary" onclick="closeEditModal()">Kapat</button>
-    </div>
-    <div class="sheet-content">
-      <div id="modalMediaPreview"
-        style="width:100%; aspect-ratio:16/9; margin-bottom:1rem; border-radius:0.5rem; overflow:hidden; background:#000; display:flex; align-items:center; justify-content:center;">
-        <!-- Media goes here -->
+  <!-- INSTAGRAM STYLE EDIT MODAL -->
+  <div class="modal-overlay" id="editModalOverlay" onclick="closeEditModal(event)">
+    <div class="ig-modal" id="editModal" onclick="event.stopPropagation()">
+      <!-- Header -->
+      <div class="ig-modal-header">
+        <button onclick="closeEditModal()">İptal</button>
+        <span>Düzenle & Paylaş</span>
+        <button class="ig-share-btn" id="modalShareBtnText" onclick="shareFromModal()">Paylaş</button>
       </div>
 
-      <label style="display:block; margin-bottom:0.5rem; font-weight:500;">Açıklama</label>
-      <textarea id="modalCaption" rows="5" style="margin-bottom:1.5rem;"></textarea>
+      <!-- Body -->
+      <div class="ig-modal-body">
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <button class="btn btn-secondary" id="saveCaptionBtn" onclick="saveCaption()">💾 Sadece Kaydet</button>
-        <button class="btn btn-primary" id="modalShareBtn" onclick="shareFromModal()">🚀 Paylaş</button>
+        <!-- Left: Image Preview -->
+        <div class="ig-preview-pane">
+          <div id="modalMediaPreview"
+            style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#000;">
+            <!-- Media injected here -->
+          </div>
+        </div>
+
+        <!-- Right: Details/Caption -->
+        <div class="ig-details-pane">
+          <div class="ig-user-row">
+            <div class="ig-avatar"></div>
+            <div class="ig-username" id="modalUsername">InstaApp Admin</div>
+          </div>
+          <div class="ig-caption-area">
+            <textarea id="modalCaption" placeholder="Açıklama veya Yorum Yaz..."></textarea>
+          </div>
+          <div class="ig-footer">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;" onclick="saveCaption()">💾
+                Kaydet</button>
+              <div id="modalStatus" style="font-size:0.85rem; font-weight:500;"></div>
+            </div>
+
+            <div class="ig-progress-wrapper" id="modalProgressWrapper">
+              <div class="ig-progress-bar" id="modalProgressBar"></div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div id="modalStatus" style="margin-top:1rem; text-align:center;"></div>
     </div>
   </div>
 
   <script>
     // --- AUTH & SETUP ---
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('insta_token');
     if (!token) window.location.href = '/login';
+
+    function toggleSidebar(force) {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('sidebarOverlay');
+      if (typeof force === 'boolean') {
+        if (force) { sb.classList.add('open'); ov.classList.add('open'); }
+        else { sb.classList.remove('open'); ov.classList.remove('open'); }
+      } else {
+        sb.classList.toggle('open');
+        ov.classList.toggle('open');
+      }
+    }
+
+    // Role check for UI
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     // Initial Setup
@@ -885,12 +1012,22 @@
 
       // Show Sheet
       document.getElementById('editModalOverlay').classList.add('open');
-      document.getElementById('editModal').classList.add('open');
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      document.getElementById('modalUsername').innerText = u.name || 'Admin';
+
+      // Reset progress UI
+      document.getElementById('modalProgressWrapper').style.display = 'none';
+      document.getElementById('modalProgressBar').style.width = '0%';
+      document.getElementById('modalStatus').innerHTML = '';
+      document.getElementById('modalShareBtnText').innerText = 'Paylaş';
+      document.getElementById('modalShareBtnText').disabled = false;
     }
 
-    function closeEditModal() {
+    function closeEditModal(e) {
+      if (e && e.target !== document.getElementById('editModalOverlay')) return;
       document.getElementById('editModalOverlay').classList.remove('open');
-      document.getElementById('editModal').classList.remove('open');
+      activeItemId = null;
+      activeCustomMedia = null;
       setTimeout(() => {
         document.getElementById('modalMediaPreview').innerHTML = ''; // Cleanup video
       }, 300);
@@ -917,17 +1054,20 @@
     }
 
     async function shareFromModal() {
-      const btn = document.getElementById('modalShareBtn');
+      const btn = document.getElementById('modalShareBtnText');
       const status = document.getElementById('modalStatus');
       const caption = document.getElementById('modalCaption').value;
+      const progressWrap = document.getElementById('modalProgressWrapper');
+      const progressBar = document.getElementById('modalProgressBar');
 
       btn.disabled = true;
+      btn.innerText = 'Bekleyin...';
       status.innerHTML = '🚀 Paylaşılıyor...';
+      progressWrap.style.display = 'block';
+      progressBar.style.width = '20%';
 
       try {
-        // If it's a library item
         if (activeItemId) {
-          // First save the caption updates if any
           await fetch('/api/library/update-caption', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -935,10 +1075,11 @@
           });
         }
 
-        // Then share
+        progressBar.style.width = '50%';
+
         const payload = activeItemId
           ? { itemId: activeItemId, caption: caption }
-          : { customMedia: activeCustomMedia, caption: caption }; // Logic for custom flow if we merge them
+          : { customMedia: activeCustomMedia, caption: caption };
 
         const res = await fetch('/api/share', {
           method: 'POST',
@@ -946,17 +1087,24 @@
           body: JSON.stringify(payload)
         });
 
+        progressBar.style.width = '80%';
+
         if (res.ok) {
-          status.innerHTML = '<span style="color:var(--success)">✅ Başarıyla Paylaşıldı!</span>';
-          setTimeout(closeEditModal, 2000);
+          progressBar.style.width = '100%';
+          status.innerHTML = '<span style="color:var(--success)">✅ Paylaşıldı!</span>';
+          btn.innerText = 'Tamamlandı';
+          setTimeout(closeEditModal, 1500);
         } else {
           const d = await res.json();
           throw new Error(d.error);
         }
       } catch (e) {
+        progressBar.style.width = '100%';
+        progressBar.style.background = 'var(--danger)';
         status.innerHTML = `<span style="color:var(--danger)">❌ ${e.message}</span>`;
+        btn.innerText = 'Hata';
       } finally {
-        btn.disabled = false;
+        setTimeout(() => { btn.disabled = false; }, 2000);
       }
     }
 
@@ -988,20 +1136,64 @@
     }
 
     document.getElementById('quickShareBtn').onclick = async () => {
-      if (quickFiles.length === 0) { alert('Lütfen önce dosya yükleyin!'); return; }
-      // Re-use API logic from previous implementation but matched to new ID's
+      const status = document.getElementById('quickStatus');
+      const progressWrap = document.getElementById('quickProgressWrapper');
+      const progressBar = document.getElementById('quickProgressBar');
+      const btn = document.getElementById('quickShareBtn');
+
+      if (quickFiles.length === 0) {
+        status.innerHTML = '<span style="color:var(--danger)">Lütfen önce dosya yükleyin!</span>';
+        return;
+      }
+
       const caption = document.getElementById('quickCaption').value;
       const format = document.querySelector('input[name="format"]:checked').value;
-      // ... fetch call ...
-      // Simplified for brevity, same backend endpoint
+
+      btn.disabled = true;
+      btn.innerText = 'Bekleyin...';
+      status.innerHTML = '🚀 Paylaşılıyor...';
+      progressWrap.style.display = 'block';
+      progressBar.style.width = '20%';
+
       try {
+        progressBar.style.width = '60%';
         const res = await fetch('/api/share', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ customMedia: quickFiles, caption, format })
         });
-        if (res.ok) { alert('Paylaşıldı'); quickFiles = []; renderQuickPreview(); }
-      } catch (e) { alert('Hata'); }
+
+        progressBar.style.width = '80%';
+
+        if (res.ok) {
+          progressBar.style.width = '100%';
+          status.innerHTML = '<span style="color:var(--success)">✅ Başarıyla Paylaşıldı!</span>';
+          btn.innerText = 'Tamamlandı';
+          setTimeout(() => {
+            quickFiles = [];
+            renderQuickPreview();
+            document.getElementById('quickCaption').value = '';
+            progressWrap.style.display = 'none';
+            progressBar.style.width = '0%';
+            btn.innerText = 'Paylaş';
+            btn.disabled = false;
+            status.innerHTML = '';
+          }, 2000);
+        } else {
+          const d = await res.json();
+          throw new Error(d.error || 'Bilinmeyen Hata');
+        }
+      } catch (e) {
+        progressBar.style.width = '100%';
+        progressBar.style.background = 'var(--danger)';
+        status.innerHTML = `<span style="color:var(--danger)">❌ ${e.message}</span>`;
+        btn.innerText = 'Hata';
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerText = 'Tekrar Dene';
+          progressBar.style.background = ''; // reset to gradient
+        }, 2000);
+      }
     };
 
     // --- AUTH & OTHER TABS ---
