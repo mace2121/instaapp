@@ -286,6 +286,7 @@ app.post("/api/upload", verifyToken, upload.array('files', 10), async (req, res)
   for (const f of req.files) {
     let finalFilename = f.filename;
     let finalMime = f.mimetype;
+    let finalPath = f.path;
 
     // Robust check: Is it an image that needs conversion?
     // Check mimetype OR extension
@@ -296,24 +297,29 @@ app.post("/api/upload", verifyToken, upload.array('files', 10), async (req, res)
         const image = await Jimp.read(f.path);
         const newFilename = f.filename.replace(/\.[^/.]+$/, "") + "_c.jpg";
         const newPath = path.join(f.destination, newFilename);
-
-        // Use write() with callback, wrapped in Promise
         await image.write(newPath);
-
-        // Optional: delete original
-        try { fs.unlinkSync(f.path); } catch (e) { }
-
         finalFilename = newFilename;
+        finalPath = newPath;
         finalMime = 'image/jpeg';
       } catch (e) {
         console.error("[Upload Debug] Image conversion failed:", e);
-        // Verify if conversion failed but we can still use original? 
-        // Meta might reject it, but best effort.
       }
     }
 
+    let publicUrl = `http://168.231.125.93:3000/uploads/${finalFilename}`;
+    try {
+      const util = require('util');
+      const exec = util.promisify(require('child_process').exec);
+      console.log(`[Catbox] Uploading ${finalPath} ...`);
+      const { stdout } = await exec(`curl -s -F "reqtype=fileupload" -F "fileToUpload=@${finalPath}" https://catbox.moe/user/api.php`);
+      if (stdout.startsWith('http')) publicUrl = stdout.trim();
+      console.log(`[Catbox] Success: ${publicUrl}`);
+    } catch (err) {
+      console.error("[Catbox] Failed to upload to catbox:", err);
+    }
+
     results.push({
-      url: `http://168.231.125.93:3000/uploads/${finalFilename}`,
+      url: publicUrl,
       filename: finalFilename,
       kind: finalMime.startsWith('video') || finalFilename.match(/\.(mp4|mov|avi|mkv)$/i) ? 'video' : 'photo'
     });
@@ -470,6 +476,14 @@ app.post("/api/share", verifyToken, async (req, res) => {
       if (isVideo) await waitForVideo(container.id);
       finalContainerId = container.id;
     }
+
+    if (!finalContainerId) {
+      throw new Error("Container oluşturulamadı.");
+    }
+
+    // Always wait a few seconds before publishing (Meta bug prevention)
+    console.log(`[Share Debug] Container Created: ${finalContainerId}, waiting 4s before publish...`);
+    await new Promise(r => setTimeout(r, 4000));
 
     const publish = await metaRequest(`${bid}/media_publish`, { creation_id: finalContainerId });
 
