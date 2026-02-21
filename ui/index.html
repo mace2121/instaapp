@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Panel | InstaApp</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
   <style>
     :root {
       /* AdminJS Inspired Palette */
@@ -24,6 +25,20 @@
       --danger: #EF4444;
       --success: #10B981;
       --overlay: rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-mode {
+      --primary: #4268F6;
+      --primary-hover: #5a7bfa;
+      --bg: #111827;
+      --sidebar-bg: #1F2937;
+      --sidebar-text: #F9FAFB;
+      --sidebar-hover: #374151;
+      --card-bg: #1F2937;
+      --text-main: #F9FAFB;
+      --text-muted: #9CA3AF;
+      --border: #374151;
+      --overlay: rgba(0, 0, 0, 0.7);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -557,23 +572,23 @@
 
   <div class="sidebar" id="sidebar">
     <div class="logo">
-      <span style="font-size:1.5rem;">💠</span> InstaApp
+      <i class="ri-instagram-line" style="font-size:1.5rem;"></i> InstaApp
     </div>
     <div class="nav">
       <div class="nav-item active" onclick="showTab('library'); toggleSidebar(false)">
-        <span>📚</span> Kütüphane
+        <i class="ri-book-open-line"></i> Kütüphane
       </div>
       <div class="nav-item" onclick="showTab('quickshare'); toggleSidebar(false)">
-        <span>🚀</span> Hızlı Paylaş
+        <i class="ri-rocket-line"></i> Hızlı Paylaş
       </div>
       <div class="nav-item" data-role="super_admin" onclick="showTab('users'); toggleSidebar(false)">
-        <span>👥</span> Kullanıcılar
+        <i class="ri-user-settings-line"></i> Kullanıcılar
       </div>
       <div class="nav-item" data-role="super_admin" onclick="showTab('settings'); toggleSidebar(false)">
-        <span>⚙️</span> Ayarlar
+        <i class="ri-settings-3-line"></i> Ayarlar
       </div>
       <div class="nav-item" data-role="super_admin" onclick="showTab('logs'); toggleSidebar(false)">
-        <span>📜</span> Kayıtlar
+        <i class="ri-file-list-3-line"></i> Kayıtlar
       </div>
     </div>
     <div class="user-info">
@@ -581,9 +596,10 @@
         <div id="u-name" style="font-weight:600;">...</div>
         <div id="u-role" style="font-size: 0.8rem; color: var(--text-muted);">...</div>
       </div>
-      <div style="display:flex; gap:0.5rem;">
-        <span onclick="showTab('profile'); toggleSidebar(false)" style="cursor:pointer;" title="Profil">👤</span>
-        <span class="logout" id="logoutBtn" title="Çıkış Yap">⏻</span>
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <span onclick="showTab('profile'); toggleSidebar(false)" style="cursor:pointer; font-size:1.2rem;"
+          title="Profil"><i class="ri-user-line"></i></span>
+        <span class="logout" id="logoutBtn" title="Çıkış Yap"><i class="ri-logout-box-r-line"></i></span>
       </div>
     </div>
   </div>
@@ -599,12 +615,11 @@
         <div class="header-title" id="pageTitle">Kütüphane</div>
       </div>
       <div>
-        <button class="btn btn-primary" onclick="document.getElementById('quickUploadInput').click()">
-          <span>+</span> <span style="display:none; @media(min-width:600px){display:inline;}">Yükle</span>
+        <button class="btn btn-secondary" onclick="toggleTheme()"
+          style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px;">
+          <i id="themeIcon" class="ri-moon-line" style="font-size: 1.2rem;"></i>
         </button>
       </div>
-      <input type="file" id="quickUploadInput" style="display:none;" accept="image/*,video/*"
-        onchange="handleQuickUpload(this)">
     </header>
 
     <div class="content-area">
@@ -817,8 +832,9 @@
               <small style="color:#666">Eğer girilirse, paylaşım bu adrese gönderilir.</small>
             </div>
             <div style="display:flex; gap:1rem;">
-              <button type="button" class="btn btn-secondary" onclick="testConnection()">🔌 Bağlantıyı Test Et</button>
-              <button type="submit" class="btn btn-primary">💾 Kaydet</button>
+              <button type="button" class="btn btn-secondary" onclick="testConnection()"><i class="ri-plug-line"></i>
+                Bağlantıyı Test Et</button>
+              <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Kaydet</button>
             </div>
           </form>
           <div id="settingsStatus" style="margin-top: 1rem;"></div>
@@ -833,7 +849,7 @@
           const bid = document.getElementById('INSTAGRAM_BUSINESS_ACCOUNT_ID').value;
 
           if (!token || !bid) {
-            status.innerHTML = '<span style="color:var(--danger)">⚠️ Önce Token ve ID giriniz.</span>';
+            status.innerHTML = '<span style="color:var(--danger)"><i class="ri-alert-line"></i> Önce Token ve ID giriniz.</span>';
             return;
           }
 
@@ -849,7 +865,7 @@
             const d = await res.json();
             if (d.ok) {
               status.innerHTML = `<div style="color:var(--success); background:#ecfdf5; padding:1rem; border-radius:0.5rem; border:1px solid #10b981;">
-                        <strong>✅ Bağlantı Başarılı!</strong><br>
+                        <strong><i class="ri-checkbox-circle-line"></i> Bağlantı Başarılı!</strong><br>
                         Hesap: ${d.data.name} (@${d.data.username})<br>
                         ID: ${d.data.id}
                     </div>`;
@@ -858,7 +874,7 @@
             }
           } catch (e) {
             status.innerHTML = `<div style="color:var(--danger); background:#fef2f2; padding:1rem; border-radius:0.5rem; border:1px solid #ef4444;">
-                    <strong>❌ Hata:</strong> ${e.message}
+                    <strong><i class="ri-close-circle-line"></i> Hata:</strong> ${e.message}
                 </div>`;
           } finally {
             btn.disabled = false;
@@ -919,8 +935,8 @@
           </div>
           <div class="ig-footer">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;" onclick="saveCaption()">💾
-                Kaydet</button>
+              <button class="btn btn-secondary" style="padding:0.4rem 0.8rem;" onclick="saveCaption()">
+                <i class="ri-save-line"></i> Kaydet</button>
               <div id="modalStatus" style="font-size:0.85rem; font-weight:500;"></div>
             </div>
 
@@ -1247,7 +1263,7 @@
 
         if (res.ok) {
           progressBar.style.width = '100%';
-          status.innerHTML = '<span style="color:var(--success)">✅ Başarıyla Paylaşıldı!</span>';
+          status.innerHTML = '<span style="color:var(--success)"><i class="ri-checkbox-circle-line"></i> Başarıyla Paylaşıldı!</span>';
           btn.innerText = 'Tamamlandı';
           setTimeout(() => {
             quickFiles = [];
@@ -1266,7 +1282,7 @@
       } catch (e) {
         progressBar.style.width = '100%';
         progressBar.style.background = 'var(--danger)';
-        status.innerHTML = `<span style="color:var(--danger)">❌ ${e.message}</span>`;
+        status.innerHTML = `<span style="color:var(--danger)"><i class="ri-close-circle-line"></i> ${e.message}</span>`;
         btn.innerText = 'Hata';
         setTimeout(() => {
           btn.disabled = false;
@@ -1278,6 +1294,26 @@
 
     // --- AUTH & OTHER TABS ---
     document.getElementById('logoutBtn').onclick = () => { localStorage.clear(); window.location.href = '/login'; };
+
+    // --- THEME TOGGLE ---
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateThemeIcon(isDark);
+    }
+
+    function updateThemeIcon(isDark) {
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.className = isDark ? 'ri-sun-line' : 'ri-moon-line';
+      }
+    }
+
+    // Apply saved theme on load
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+      updateThemeIcon(true);
+    }
 
     // Load default
     showTab('library');
