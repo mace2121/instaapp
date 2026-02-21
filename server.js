@@ -365,12 +365,15 @@ app.post("/api/share", verifyToken, async (req, res) => {
   const { itemId, caption, customMedia, format } = req.body;
   let mediaList = [];
 
+  let itemType = 'POST';
+
   if (customMedia && customMedia.length > 0) {
     mediaList = customMedia;
   } else if (itemId) {
     const item = buildLibrary().find(i => i.id === itemId);
     if (!item) return res.status(404).json({ error: "İçerik bulunamadı" });
     mediaList = item.media;
+    itemType = item.type;
   } else {
     return res.status(400).json({ error: "Lütfen paylaşılacak içerik seçin" });
   }
@@ -404,12 +407,17 @@ app.post("/api/share", verifyToken, async (req, res) => {
     const isVideo = m.kind === 'video' || (typeof m.url === 'string' && m.url.match(/\.(mp4|mov|avi|mkv)$/i));
 
     // DIRECT CURL IMPLEMENTATION (Bypassing n8n and node-fetch)
+    let mType = isVideo ? 'VIDEO' : 'IMAGE';
+    if (isVideo && itemType === 'REEL') mType = 'REELS';
+    if (itemType === 'STORY') mType = 'STORIES';
+
     const containerParams = {
       access_token: settings.META_ACCESS_TOKEN,
       caption: caption || "",
       [isVideo ? 'video_url' : 'image_url']: m.url,
-      media_type: isVideo ? 'VIDEO' : 'IMAGE'
+      media_type: mType
     };
+    if (mType === 'REELS') containerParams.share_to_feed = true;
 
     // Step 1: Create Container
     const urlCreate = `https://graph.facebook.com/v24.0/${bid}/media`;
@@ -513,12 +521,16 @@ app.post("/api/share", verifyToken, async (req, res) => {
     } else {
       const m = mediaList[0];
       const isVideo = m.kind === 'video' || (typeof m.url === 'string' && m.url.match(/\.(mp4|mov|avi|mkv)$/i));
+      let mType = isVideo ? 'VIDEO' : 'IMAGE';
+      if (isVideo && (itemType === 'REEL' || (caption || "").toLowerCase().includes("#reel"))) mType = 'REELS';
+      if (itemType === 'STORY') mType = 'STORIES';
+
       const params = {
         caption: caption || "",
         [isVideo ? 'video_url' : 'image_url']: m.url,
-        media_type: isVideo ? 'VIDEO' : 'IMAGE'
+        media_type: mType
       };
-      if (isVideo && (caption || "").toLowerCase().includes("#reel")) params.media_type = 'REELS';
+      if (mType === 'REELS') params.share_to_feed = true;
 
       const container = await metaRequest(`${bid}/media`, params);
       if (isVideo) await waitForVideo(container.id);
