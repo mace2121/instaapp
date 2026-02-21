@@ -341,6 +341,25 @@ app.post("/api/share", verifyToken, async (req, res) => {
     return res.status(400).json({ error: "Lütfen paylaşılacak içerik seçin" });
   }
 
+  // CATBOX PROXY: Fix old library URLs on-the-fly
+  for (let m of mediaList) {
+    if ((m.url.includes('168.231.125.93') || m.url.includes('localhost')) && !m.url.includes('catbox.moe')) {
+      const filename = m.url.split('/').pop();
+      const localPath = path.join(__dirname, 'uploads', filename);
+      if (fs.existsSync(localPath)) {
+        try {
+          const util = require('util');
+          const exec = util.promisify(require('child_process').exec);
+          console.log(`[Catbox Proxy] Rehosing ${filename}...`);
+          const { stdout } = await exec(`curl -s -F "reqtype=fileupload" -F "fileToUpload=@${localPath}" https://catbox.moe/user/api.php`);
+          if (stdout.startsWith('http')) m.url = stdout.trim();
+        } catch (e) {
+          console.error("[Catbox Proxy Error]", e);
+        }
+      }
+    }
+  }
+
   const settings = await getSettings();
   const bid = settings.INSTAGRAM_BUSINESS_ACCOUNT_ID;
   if (!bid) return res.status(400).json({ error: "Business ID eksik" });
@@ -350,16 +369,11 @@ app.post("/api/share", verifyToken, async (req, res) => {
     const m = mediaList[0];
     const isVideo = m.kind === 'video' || (typeof m.url === 'string' && m.url.match(/\.(mp4|mov|avi|mkv)$/i));
 
-    // URL Sanity Check: Ensure localhost is replaced with Public IP
-    let finalUrl = m.url;
-    if (finalUrl.includes('localhost')) finalUrl = finalUrl.replace('localhost', '168.231.125.93');
-    if (finalUrl.includes('127.0.0.1')) finalUrl = finalUrl.replace('127.0.0.1', '168.231.125.93');
-
     // DIRECT CURL IMPLEMENTATION (Bypassing n8n and node-fetch)
     const containerParams = {
       access_token: settings.META_ACCESS_TOKEN,
       caption: caption || "",
-      [isVideo ? 'video_url' : 'image_url']: finalUrl,
+      [isVideo ? 'video_url' : 'image_url']: m.url,
       media_type: isVideo ? 'VIDEO' : 'IMAGE'
     };
 
