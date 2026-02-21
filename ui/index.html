@@ -318,6 +318,8 @@
 
     .ig-card {
       width: 100%;
+      height: 80vh;
+      min-height: 500px;
       margin: 0 auto;
       transform: none;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -636,19 +638,43 @@
           <div class="ig-modal-body">
 
             <!-- Left: Image Preview & Dropzone -->
-            <div class="ig-preview-pane"
-              style="flex-direction: column; align-items: stretch; justify-content: flex-start; padding: 1rem;">
-              <div id="dropZone" onclick="document.getElementById('multiUploadInput').click()"
-                style="border: 2px dashed var(--border); padding: 2rem; border-radius: 1rem; cursor: pointer; text-align: center; transition: border-color 0.2s;">
-                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📂</div>
-                <div style="color: var(--text-muted);">Sürükle bırak veya tıkla</div>
+            <div class="ig-preview-pane" id="quickPreviewPane"
+              style="flex-direction: column; align-items: center; justify-content: center; padding: 0;">
+
+              <!-- Empty State -->
+              <div id="quickEmptyState"
+                style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div id="dropZone"
+                  style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; transition: background 0.2s;">
+                  <svg aria-label="Simge: Görsel veya video" color="#262626" fill="#262626" height="77" role="img"
+                    viewBox="0 0 97.6 77.3" width="96">
+                    <path
+                      d="M16.3 24h.3c2.8-.2 4.9-2.6 4.8-5.4-.2-2.8-2.6-4.9-5.4-4.8s-4.9 2.6-4.8 5.4c.1 2.7 2.4 4.8 5.1 4.8zm-2.4-7.2c.5-.6 1.3-1 2.1-1h.2c1.7 0 3.1 1.4 3.1 3.1 0 1.7-1.4 3.1-3.1 3.1-1.7 0-3.1-1.4-3.1-3.1 0-.8.3-1.5.8-2.1z"
+                      fill="currentColor"></path>
+                    <path
+                      d="M84.7 18.4L58 16.9l-.2-3c-.3-5.7-5.2-10.1-11-9.8L12.9 6c-5.7.3-10.1 5.3-9.8 11L5 51v.8c.7 5.2 5.1 9.1 10.3 9.1h.6l21.7-1.2v.6c0 5.7 4.6 10.2 10.3 10.2h51.6c5.7 0 10.2-4.6 10.2-10.2V30.8c0-5.6-4.5-10.3-10.2-10.4zm-8.2-2.1l-26.6-2.3c-2.3-.2-4.3 1.6-4.5 3.9l-.2 3.1-26.6-2.3c-2.3-.2-4.3 1.6-4.5 3.9L2 46.1c-.2 2.3 1.6 4.3 3.9 4.5l26.6 2.3c2.3.2 4.3-1.6 4.5-3.9l.2-3.1 26.6 2.3c2.3.2 4.3-1.6 4.5-3.9l2.1-31.9c.2-2.3-1.6-4.3-3.9-4.5zm8.9 31c0 4.6-3.8 8.3-8.4 8.3h-51c-4.6 0-8.4-3.8-8.4-8.3v-3.7l9.4-11c.7-.8 2-1 3.1-.3l11 8.2c1 1.1 2.5 1.1 3.5 0l16-18c.9-.9 2.4-1.1 3.5-.3l14.4 12V47.3h6.9v-7.2l-14-11.4c-.9-.8-2.3-.9-3.4-.2l-15.8 18c-.8.8-2.2.8-3 .1l-10.8-8c-.8-.7-2-.6-2.7.2L7 49V30.8c0-4.6 3.8-8.3 8.4-8.3h51.6c4.6 0 8.4 3.8 8.4 8.3v16.5z"
+                      fill="currentColor"></path>
+                  </svg>
+                  <div
+                    style="font-size: 1.25rem; margin-top: 1rem; margin-bottom: 2rem; font-weight: 300; color: #000;">
+                    Fotoğrafları ve videoları buraya sürükle</div>
+                  <button class="btn btn-primary" onclick="document.getElementById('multiUploadInput').click()"
+                    style="padding: 0.5rem 1rem; border-radius: 0.5rem;">Bilgisayardan seç</button>
+                </div>
               </div>
+
+              <!-- Filled State -->
+              <div id="quickFilledState"
+                style="display: none; width: 100%; height: 100%; background: #000; position: relative;">
+                <div id="uploadPreview"
+                  style="display:flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;">
+                  <!-- Images will go here -->
+                </div>
+              </div>
+
               <input type="file" id="multiUploadInput" multiple style="display:none;" accept="image/*,video/*"
                 onchange="handleMultiUpload(this)">
 
-              <div id="uploadPreview"
-                style="display:grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; margin-top: 1rem; overflow-y:auto;">
-              </div>
             </div>
 
             <!-- Right: Details/Caption -->
@@ -1173,10 +1199,20 @@
     function renderQuickPreview() {
       const div = document.getElementById('uploadPreview');
       div.innerHTML = quickFiles.map(f => `
-                <div style="width:100%; aspect-ratio:1; background:#eee; position:relative;">
-                    <img src="${f.url}" style="width:100%; height:100%; object-fit:cover;">
+                <div style="width:100%; height:100%; flex-shrink: 0; scroll-snap-align: start; display:flex; align-items:center; justify-content:center;">
+                    ${f.kind === 'video'
+          ? `<video src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;" controls></video>`
+          : `<img src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;">`}
                 </div>
             `).join('');
+
+      if (quickFiles.length > 0) {
+        document.getElementById('quickEmptyState').style.display = 'none';
+        document.getElementById('quickFilledState').style.display = 'block';
+      } else {
+        document.getElementById('quickFilledState').style.display = 'none';
+        document.getElementById('quickEmptyState').style.display = 'flex';
+      }
     }
 
     document.getElementById('quickShareBtn').onclick = async () => {
