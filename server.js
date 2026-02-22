@@ -366,12 +366,15 @@ app.post("/api/upload", verifyToken, upload.array('files', 10), async (req, res)
     try {
       const util = require('util');
       const exec = util.promisify(require('child_process').exec);
-      console.log(`[Catbox] Uploading ${finalPath} ...`);
-      const { stdout } = await exec(`curl -s -F "reqtype=fileupload" -F "fileToUpload=@${finalPath}" https://catbox.moe/user/api.php`);
-      if (stdout.startsWith('http')) publicUrl = stdout.trim();
-      console.log(`[Catbox] Success: ${publicUrl}`);
+      console.log(`[Proxy] Uploading ${finalPath} to uguu.se ...`);
+      const { stdout } = await exec(`curl -s -F "files[]=@${finalPath}" https://uguu.se/upload.php`);
+      const data = JSON.parse(stdout);
+      if (data.success && data.files && data.files[0]) {
+        publicUrl = data.files[0].url;
+      }
+      console.log(`[Proxy] Success: ${publicUrl}`);
     } catch (err) {
-      console.error("[Catbox] Failed to upload to catbox:", err);
+      console.error("[Proxy] Failed to upload proxy:", err.message || err);
     }
 
     results.push({
@@ -397,20 +400,23 @@ app.post("/api/share", verifyToken, async (req, res) => {
     return res.status(400).json({ error: "Lütfen paylaşılacak içerik seçin" });
   }
 
-  // CATBOX PROXY: Fix old library URLs on-the-fly
+  // UGUU PROXY: Fix old library URLs on-the-fly
   for (let m of mediaList) {
-    if ((m.url.includes('168.231.125.93') || m.url.includes('localhost')) && !m.url.includes('catbox.moe')) {
+    if ((m.url.includes('168.231.125.93') || m.url.includes('localhost')) && !m.url.includes('uguu.se')) {
       const filename = m.url.split('/').pop();
       const localPath = path.join(__dirname, 'uploads', filename);
       if (fs.existsSync(localPath)) {
         try {
           const util = require('util');
           const exec = util.promisify(require('child_process').exec);
-          console.log(`[Catbox Proxy] Rehosing ${filename}...`);
-          const { stdout } = await exec(`curl -s -F "reqtype=fileupload" -F "fileToUpload=@${localPath}" https://catbox.moe/user/api.php`);
-          if (stdout.startsWith('http')) m.url = stdout.trim();
+          console.log(`[Proxy] Rehosing ${filename} to uguu.se...`);
+          const { stdout } = await exec(`curl -s -F "files[]=@${localPath}" https://uguu.se/upload.php`);
+          const data = JSON.parse(stdout);
+          if (data.success && data.files && data.files[0]) {
+            m.url = data.files[0].url;
+          }
         } catch (e) {
-          console.error("[Catbox Proxy Error]", e);
+          console.error("[Proxy Error]", e.message || e);
         }
       }
     }
