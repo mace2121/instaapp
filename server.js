@@ -142,6 +142,28 @@ function buildLibrary() {
 }
 
 // ---------------- API Endpoints ----------------
+app.get("/api/download", verifyToken, async (req, res) => {
+  const { url } = req.query;
+  if (!url) return res.status(400).send("URL required");
+  try {
+    const fileRes = await fetch(url);
+    if (!fileRes.ok) throw new Error("Could not fetch file");
+
+    const contentType = fileRes.headers.get('content-type') || 'application/octet-stream';
+    const ext = contentType.includes('video') ? 'mp4' : 'jpg';
+    const filename = url.split('/').pop().split('?')[0] || `instaapp_download.${ext}`;
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    const { Readable } = require('stream');
+    Readable.fromWeb(fileRes.body).pipe(res);
+  } catch (err) {
+    console.error("Download Error:", err);
+    res.status(500).send("İndirme başarısız oldu.");
+  }
+});
+
 app.get("/api/library", verifyToken, async (req, res) => {
   const { type, page, limit } = req.query;
   let items = buildLibrary();

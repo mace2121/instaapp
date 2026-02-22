@@ -1149,6 +1149,56 @@
       } catch (err) { grid.innerHTML = 'Hata oluştu.'; if (document.getElementById('paginationControls')) document.getElementById('paginationControls').innerHTML = ''; }
     }
 
+    async function downloadLibraryItem(itemId, btn) {
+      if (!window._libraryItems || !itemId) return;
+
+      const item = window._libraryItems.find(i => i.id === itemId);
+      if (!item || !item.media || !item.media[0]) return;
+
+      const url = item.media[0].url;
+      const originalText = btn ? btn.innerHTML : 'İndir';
+      if (btn) {
+        btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> ...';
+        btn.disabled = true;
+      }
+
+      try {
+        const tokenStr = localStorage.getItem('token');
+        const downloadUrl = `/api/download?url=${encodeURIComponent(url)}`;
+
+        const response = await fetch(downloadUrl, {
+          headers: { 'Authorization': `Bearer ${tokenStr}` }
+        });
+
+        if (!response.ok) throw new Error("İndirme başarısız");
+
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const contentDisp = response.headers.get('content-disposition');
+        let filename = 'download.mp4';
+        if (contentDisp && contentDisp.includes('filename="')) {
+          filename = contentDisp.split('filename="')[1].split('"')[0];
+        }
+
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(blobUrl);
+
+      } catch (e) {
+        alert("Dosya indirilemedi: " + e.message);
+      } finally {
+        if (btn) {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
+    }
+
     function filterType(type) {
       currentType = type;
       currentPage = 1;
