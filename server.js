@@ -552,4 +552,28 @@ app.post("/api/share", verifyToken, async (req, res) => {
   }
 });
 
+app.get("/api/download", verifyToken, async (req, res) => {
+  const { url, filename } = req.query;
+  if (!url) return res.status(400).json({ error: "URL eksik" });
+  try {
+    const fetchRes = await fetch(url);
+    if (!fetchRes.ok) throw new Error(`HTTP error! status: ${fetchRes.status}`);
+    const contentType = fetchRes.headers.get('content-type');
+    let ext = '.mp4';
+    if (contentType && contentType.includes('image')) ext = '.jpg';
+    else if (url.match(/\.(jpg|jpeg|png|webp)/i)) ext = '.jpg';
+
+    const safeFilename = (filename || 'insta_media').replace(/[^a-z0-9_-]/gi, '_') + ext;
+    res.setHeader('Content-Disposition', `attachment; filename="${safeFilename}"`);
+    if (contentType) res.setHeader('Content-Type', contentType);
+
+    const arrayBuffer = await fetchRes.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    res.send(buffer);
+  } catch (err) {
+    console.error('Download proxy error:', err);
+    res.status(500).send("İndirme başarısız");
+  }
+});
+
 app.listen(PORT, () => console.log(`InstaApp: http://localhost:${PORT}`));

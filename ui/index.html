@@ -610,6 +610,9 @@
       <div class="nav-item" data-role="super_admin" onclick="showTab('settings'); toggleSidebar(false)">
         <i class="ri-settings-3-line"></i> Ayarlar
       </div>
+      <div class="nav-item" data-role="super_admin" onclick="showTab('logs'); toggleSidebar(false)">
+        <i class="ri-file-list-3-line"></i> Kayıtlar
+      </div>
     </div>
     <div class="user-info"
       style="display:flex; align-items:center; gap:0.75rem; padding:1rem; border-top:1px solid var(--border);">
@@ -1098,6 +1101,9 @@
         const items = data.items || data;
         const pagination = data.pagination || null;
         if (items.length === 0) { grid.innerHTML = '<div style="padding:1rem; color:var(--text-muted)">İçerik bulunamadı.</div>'; if (paginationControls) paginationControls.innerHTML = ''; return; }
+
+        window._libraryItems = items;
+
         grid.innerHTML = items.map(item => {
           // Safe caption escape
           const safeCaption = (item.caption || '').replace(/"/g, '&quot;');
@@ -1111,10 +1117,16 @@
                         </div>
                         <div class="item-content">
                             <div class="item-caption">${item.caption || '<em style="color:#ccc">Açıklama yok</em>'}</div>
-                            <button class="btn btn-secondary" style="width:100%" 
-                                onclick="openEditModal('${item.id}', '${item.media[0].url}', '${item.media[0].kind}')">
-                                <i class="ri-edit-box-line"></i> Düzenle / Paylaş
-                            </button>
+                            <div style="display: flex; gap: 0.5rem; width: 100%;">
+                                <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem;" 
+                                    onclick="openEditModal('${item.id}', '${item.media[0].url}', '${item.media[0].kind}')">
+                                    <i class="ri-edit-box-line"></i> Düzenle
+                                </button>
+                                <button class="btn btn-primary" style="flex: 1; padding: 0.5rem;" 
+                                    onclick="downloadLibraryItem('${item.id}', this)">
+                                    <i class="ri-download-2-line"></i> İndir
+                                </button>
+                            </div>
                         </div>
                         <input type="hidden" id="cap_${item.id}" value="${safeCaption}">
                     </div>
@@ -1146,6 +1158,53 @@
       loadLibrary(1);
     }
 
+    async function downloadLibraryItem(id, btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i>...';
+      try {
+        const item = window._libraryItems.find(i => i.id === id);
+        if (!item) throw new Error('İçerik bulunamadı');
+
+        for (let i = 0; i < item.media.length; i++) {
+          const mediaUrl = item.media[i].url;
+          const fetchUrl = `/api/download?url=${encodeURIComponent(mediaUrl)}&filename=media_${id}_${i}`;
+          const res = await fetch(fetchUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) throw new Error('İndirme başarısız');
+
+          const blob = await res.blob();
+          const blobUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = blobUrl;
+
+          let filename = \`media_\${id}_\${i}\`;
+                const contentDisposition = res.headers.get('content-disposition');
+                if (contentDisposition) {
+                   const match = contentDisposition.match(/filename="(.+)"/);
+                   if (match && match[1]) filename = match[1];
+                } else {
+                   const contentType = res.headers.get('content-type');
+                   if (contentType && contentType.includes('image')) filename += '.jpg';
+                   else filename += '.mp4';
+                }
+                
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                await new Promise(r => setTimeout(r, 500));
+                window.URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(a);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('İndirme hatası: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="ri-download-2-line"></i> İndir';
+        }
+    }
+
     // --- PROFILE MANAGEMENT ---
     async function uploadAvatar(input) {
       if (!input.files || !input.files[0]) return;
@@ -1158,7 +1217,7 @@
       try {
         const res = await fetch('/api/profile/avatar', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` },
+          headers: { 'Authorization': `Bearer ${ token } ` },
           body: formData
         });
         const d = await res.json();
@@ -1171,7 +1230,7 @@
           throw new Error(d.error);
         }
       } catch (e) {
-        status.innerHTML = `<span style="color:var(--danger)">❌ Hata: ${e.message}</span>`;
+        status.innerHTML = `< span style = "color:var(--danger)" >❌ Hata: ${ e.message }</span > `;
       }
     }
 
@@ -1183,7 +1242,7 @@
       try {
         const res = await fetch('/api/profile/update', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          headers: { 'Authorization': `Bearer ${ token } `, 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: newName })
         });
         const d = await res.json();
@@ -1196,7 +1255,7 @@
           throw new Error(d.error);
         }
       } catch (e) {
-        status.innerHTML = `<span style="color:var(--danger)">❌ Hata: ${e.message}</span>`;
+        status.innerHTML = `< span style = "color:var(--danger)" >❌ Hata: ${ e.message }</span > `;
       }
     };
 
@@ -1207,13 +1266,13 @@
     function openEditModal(itemId, url, kind) {
       activeItemId = itemId;
       activeCustomMedia = null; // Reset custom upload state
-      const currentCaption = document.getElementById(`cap_${itemId}`).value;
+      const currentCaption = document.getElementById(`cap_${ itemId } `).value;
 
       // UI Update
       const preview = document.getElementById('modalMediaPreview');
       preview.innerHTML = kind === 'video'
-        ? `<video src="${url}" controls style="max-height:100%; max-width:100%"></video>`
-        : `<img src="${url}" style="max-height:100%; max-width:100%">`;
+        ? `< video src = "${url}" controls style = "max-height:100%; max-width:100%" ></video > `
+        : `< img src = "${url}" style = "max-height:100%; max-width:100%" > `;
 
       document.getElementById('modalCaption').value = currentCaption;
       document.getElementById('modalStatus').innerHTML = '';
@@ -1247,14 +1306,14 @@
       try {
         const res = await fetch('/api/library/update-caption', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          headers: { 'Authorization': `Bearer ${ token } `, 'Content-Type': 'application/json' },
           body: JSON.stringify({ itemId: activeItemId, newCaption: newCap })
         });
         if (res.ok) {
           status.innerHTML = '<span style="color:var(--success)">✅ Kaydedildi</span>';
           // Update hidden input and grid if visible
-          if (document.getElementById(`cap_${activeItemId}`)) {
-            document.getElementById(`cap_${activeItemId}`).value = newCap;
+          if (document.getElementById(`cap_${ activeItemId } `)) {
+            document.getElementById(`cap_${ activeItemId } `).value = newCap;
           }
           loadLibrary(currentPage); // Refresh grid to show new caption
         }
@@ -1278,7 +1337,7 @@
         if (activeItemId) {
           await fetch('/api/library/update-caption', {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            headers: { 'Authorization': `Bearer ${ token } `, 'Content-Type': 'application/json' },
             body: JSON.stringify({ itemId: activeItemId, newCaption: caption })
           });
         }
@@ -1291,7 +1350,7 @@
 
         const res = await fetch('/api/share', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          headers: { 'Authorization': `Bearer ${ token } `, 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
@@ -1309,7 +1368,7 @@
       } catch (e) {
         progressBar.style.width = '100%';
         progressBar.style.background = 'var(--danger)';
-        status.innerHTML = `<span style="color:var(--danger)">❌ ${e.message}</span>`;
+        status.innerHTML = `< span style = "color:var(--danger)" >❌ ${ e.message }</span > `;
         btn.innerText = 'Hata';
       } finally {
         setTimeout(() => { btn.disabled = false; }, 2000);
@@ -1325,7 +1384,7 @@
       Array.from(input.files).forEach(f => formData.append('files', f));
 
       try {
-        const res = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+        const res = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${ token } ` }, body: formData });
         const data = await res.json();
         if (res.ok) {
           quickFiles = data.media;
@@ -1337,11 +1396,13 @@
     function renderQuickPreview() {
       const div = document.getElementById('uploadPreview');
       div.innerHTML = quickFiles.map(f => `
-                <div style="width:100%; height:100%; flex-shrink: 0; scroll-snap-align: start; display:flex; align-items:center; justify-content:center;">
-                    ${f.kind === 'video'
-          ? `<video src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;" controls></video>`
-          : `<img src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;">`}
-                </div>
+            < div style = "width:100%; height:100%; flex-shrink: 0; scroll-snap-align: start; display:flex; align-items:center; justify-content:center;" >
+              ${
+            f.kind === 'video'
+              ? `<video src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;" controls></video>`
+              : `<img src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;">`
+          }
+                </div >
             `).join('');
 
       if (quickFiles.length > 0) {
@@ -1377,7 +1438,7 @@
         progressBar.style.width = '60%';
         const res = await fetch('/api/share', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          headers: { 'Authorization': `Bearer ${ token } `, 'Content-Type': 'application/json' },
           body: JSON.stringify({ customMedia: quickFiles, caption, format })
         });
 
@@ -1404,7 +1465,7 @@
       } catch (e) {
         progressBar.style.width = '100%';
         progressBar.style.background = 'var(--danger)';
-        status.innerHTML = `<span style="color:var(--danger)"><i class="ri-close-circle-line"></i> ${e.message}</span>`;
+        status.innerHTML = `< span style = "color:var(--danger)" > <i class="ri-close-circle-line"></i> ${ e.message }</span > `;
         btn.innerText = 'Hata';
         setTimeout(() => {
           btn.disabled = false;
@@ -1450,7 +1511,7 @@
 
     // Simplified Admin Loaders (same as before but cleaner code organization possible)
     async function loadSettings() {
-      const res = await fetch('/api/admin/settings', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch('/api/admin/settings', { headers: { 'Authorization': `Bearer ${ token }` } });
       const data = await res.json();
       Object.keys(data).forEach(k => { if (document.getElementById(k)) document.getElementById(k).value = data[k]; });
     }
@@ -1463,27 +1524,27 @@
     async function loadUsers() {
       const tbody = document.getElementById('userTableBody');
       tbody.innerHTML = '<tr><td colspan="4">Yükleniyor...</td></tr>';
-      const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${ token } ` } });
       const users = await res.json();
-      tbody.innerHTML = users.map(u => `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td style="text-align:right"><button onclick="deleteUser(${u.id})" class="btn" style="color:red">Sil</button></td></tr>`).join('');
+      tbody.innerHTML = users.map(u => `< tr ><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td style="text-align:right"><button onclick="deleteUser(${u.id})" class="btn" style="color:red">Sil</button></td></tr > `).join('');
     }
-    async function deleteUser(id) { await fetch(`/api/admin/users/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } }); loadUsers(); }
+    async function deleteUser(id) { await fetch(`/ api / admin / users / ${ id } `, { method: 'DELETE', headers: { 'Authorization': `Bearer ${ token } ` } }); loadUsers(); }
     document.getElementById('addUserForm').onsubmit = async (e) => {
       e.preventDefault();
       const data = { name: document.getElementById('add_name').value, email: document.getElementById('add_email').value, password: document.getElementById('add_password').value, role: document.getElementById('add_role').value };
-      await fetch('/api/admin/users', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      await fetch('/api/admin/users', { method: 'POST', headers: { 'Authorization': `Bearer ${ token } `, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       loadUsers(); e.target.reset();
     }
     async function loadLogs() {
-      const res = await fetch('/api/admin/logs', { headers: { 'Authorization': `Bearer ${token}` } });
+      const res = await fetch('/api/admin/logs', { headers: { 'Authorization': `Bearer ${ token } ` } });
       const logs = await res.json();
-      document.getElementById('logTableBody').innerHTML = logs.map(l => `<tr><td>${new Date(l.created_at).toLocaleString('tr-TR')}</td><td>${l.user_name || '-'}</td><td>${l.action}</td><td>${l.details}</td><td>${l.status}</td></tr>`).join('');
+      document.getElementById('logTableBody').innerHTML = logs.map(l => `< tr ><td>${new Date(l.created_at).toLocaleString('tr-TR')}</td><td>${l.user_name || '-'}</td><td>${l.action}</td><td>${l.details}</td><td>${l.status}</td></tr > `).join('');
     }
     document.getElementById('settingsForm').onsubmit = async (e) => {
       e.preventDefault();
       const data = {};
       ['META_APP_ID', 'META_APP_SECRET', 'META_ACCESS_TOKEN', 'INSTAGRAM_BUSINESS_ACCOUNT_ID', 'N8N_WEBHOOK_URL'].forEach(k => data[k] = document.getElementById(k).value);
-      await fetch('/api/admin/settings', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      await fetch('/api/admin/settings', { method: 'POST', headers: { 'Authorization': `Bearer ${ token }`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       alert('Kaydedildi');
     }
   </script>
