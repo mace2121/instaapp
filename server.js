@@ -53,7 +53,12 @@ app.post("/api/admin/users", verifyToken, isSuperAdmin, async (req, res) => {
   } catch (err) { res.status(400).json({ error: err }); }
 });
 
-app.get("/api/auth/me", verifyToken, (req, res) => res.json(req.user));
+app.get("/api/auth/me", verifyToken, (req, res) => {
+  db.get('SELECT id, name, email, role, avatar_url, iban, earnings_balance, created_at FROM users WHERE id = ?', [req.user.id], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(row);
+  });
+});
 
 // ---------------- User Management API (Admin Only) ----------------
 app.get("/api/admin/users", verifyToken, isSuperAdmin, (req, res) => {
@@ -251,11 +256,19 @@ app.post("/api/auth/update-password", verifyToken, async (req, res) => {
 });
 
 app.post("/api/profile/update", verifyToken, async (req, res) => {
-  const { name } = req.body;
+  const { name, iban } = req.body;
   if (!name) return res.status(400).json({ error: "İsim gerekli" });
   try {
     const { updateProfile } = require('./auth');
     await updateProfile(req.user.id, { name });
+
+    // Update IBAN in DB directly if provided
+    if (iban !== undefined) {
+      await new Promise((resolve, reject) => {
+        db.run('UPDATE users SET iban = ? WHERE id = ?', [iban, req.user.id], err => err ? reject(err) : resolve());
+      });
+    }
+
     res.json({ ok: true });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -572,6 +585,23 @@ app.post("/api/share", verifyToken, async (req, res) => {
       });
     }
 
+    // --- EARNINGS LOGIC ---
+    if (req.user.role === 'editor') {
+      const feeStr = settings.fee_per_post || "1";
+      const fee = parseFloat(feeStr);
+      if (fee > 0) {
+        await new Promise((resolve) => {
+          db.run(`UPDATE users SET earnings_balance = earnings_balance + ? WHERE id = ?`, [fee, req.user.id], function (err) {
+            if (!err) {
+              db.run(`INSERT INTO wallet_transactions (user_id, amount, type, description, post_id) VALUES (?, ?, ?, ?, ?)`,
+                [req.user.id, fee, 'EARNING', 'Gönderi Paylaşımı', publish.id]);
+            }
+            resolve();
+          });
+        });
+      }
+    }
+
     logAction(req.user.id, 'SHARE_SUCCESS', `IG: ${publish.id}`, req.ip, 'SUCCESS');
     res.json({ ok: true, id: publish.id });
   } catch (err) {
@@ -602,6 +632,86 @@ app.get("/api/download", verifyToken, async (req, res) => {
     console.error('Download proxy error:', err);
     res.status(500).send("İndirme başarısız");
   }
+});
+
+// ---------------- Earnings & Payments API ----------------
+app.get("/api/earnings/me", verifyToken, (req, res) => {
+  db.get('SELECT earnings_balance FROM users WHERE id = ?', [req.user.id], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    const balance = row ? row.earnings_balance : 0;
+
+    db.all('SELECT * FROM payment_requests WHERE user_id = ? ORDER BY created_at DESC', [req.user.id], (err2, requests) => {
+      if (err2) return res.status(500).json({ error: err2.message });
+
+      db.all('SELECT * FROM wallet_transactions WHERE user_id = ? ORDER BY created_at DESC LIMIT 50', [req.user.id], (err3, txs) => {
+        if (err3) return res.status(500).json({ error: err3.message });
+        res.json({ ok: true, balance, requests, transactions: txs });
+      });
+    });
+  });
+});
+
+app.post("/api/earnings/request", verifyToken, async (req, res) => {
+  try {
+    const settings = await getSettings();
+    const minLimit = parseFloat(settings.min_withdrawal_limit || 200);
+
+    db.get('SELECT earnings_balance, iban FROM users WHERE id = ?', [req.user.id], (err, row) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!row) return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+
+      if (!row.iban || row.iban.trim() === '') {
+        return res.status(400).json({ error: "Ödeme talep edebilmek için önce IBAN bilginizi profilinizden eklemelisiniz." });
+      }
+
+      if (row.earnings_balance < minLimit) {
+        return res.status(400).json({ error: `Minimum çekim limiti ${minLimit}₺'dir. Mevcut bakiye: ${row.earnings_balance}₺` });
+      }
+
+      const amount = row.earnings_balance;
+
+      db.serialize(() => {
+        db.run('BEGIN TRANSACTION');
+        db.run('UPDATE users SET earnings_balance = 0 WHERE id = ?', [req.user.id]);
+        db.run(`INSERT INTO payment_requests (user_id, amount) VALUES (?, ?)`, [req.user.id, amount]);
+        db.run(`INSERT INTO wallet_transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)`,
+          [req.user.id, amount, 'WITHDRAWAL', 'Ödeme Talebi']);
+        db.run('COMMIT', errTx => {
+          if (errTx) {
+            db.run('ROLLBACK');
+            return res.status(500).json({ error: "İşlem sırasında hata oluştu" });
+          }
+          logAction(req.user.id, 'PAYMENT_REQUESTED', `${amount}₺ tutarında ödeme talep edildi`, req.ip, 'SUCCESS');
+          res.json({ ok: true, requested_amount: amount });
+        });
+      });
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/admin/payments", verifyToken, isSuperAdmin, (req, res) => {
+  const query = `
+    SELECT pr.*, u.name, u.email, u.iban, u.role
+    FROM payment_requests pr
+    LEFT JOIN users u ON pr.user_id = u.id
+    ORDER BY pr.created_at DESC
+  `;
+  db.all(query, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+app.post("/api/admin/payments/:id/complete", verifyToken, isSuperAdmin, (req, res) => {
+  const { id } = req.params;
+  db.run(`UPDATE payment_requests SET status = 'completed', completed_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'`, [id], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    if (this.changes === 0) return res.status(400).json({ error: "Kayıt bulunamadı veya zaten tamamlanmış" });
+    logAction(req.user.id, 'PAYMENT_COMPLETED', `Ödeme tamamlandı (Talep ID: ${id})`, req.ip, 'SUCCESS');
+    res.json({ ok: true });
+  });
 });
 
 app.listen(PORT, () => console.log(`InstaApp: http://localhost:${PORT}`));

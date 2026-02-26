@@ -607,6 +607,9 @@
       <div class="nav-item" data-role="super_admin" onclick="showTab('users'); toggleSidebar(false)">
         <i class="ri-user-settings-line"></i> Kullanıcılar
       </div>
+      <div class="nav-item" data-role="super_admin" onclick="showTab('payments'); toggleSidebar(false)">
+        <i class="ri-wallet-3-line"></i> Ödemeler
+      </div>
       <div class="nav-item" data-role="super_admin" onclick="showTab('settings'); toggleSidebar(false)">
         <i class="ri-settings-3-line"></i> Ayarlar
       </div>
@@ -809,8 +812,27 @@
               <label>E-posta (Salt Okunur)</label>
               <input type="email" id="profile_email" readonly style="opacity: 0.7; cursor: not-allowed;">
             </div>
+            <div style="margin-bottom: 1rem;">
+              <label>Kayıtlı IBAN Bilgisi</label>
+              <input type="text" id="profile_iban" placeholder="TR00 0000 0000 0000 0000 0000 00">
+            </div>
             <button type="submit" class="btn btn-primary" style="width: 100%;">Değişiklikleri Kaydet</button>
           </form>
+
+          <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3>Kazanç ve Ödemeler</h3>
+              <div style="font-size: 1.2rem; font-weight: bold; color: var(--success);" id="profile_balance">... ₺</div>
+            </div>
+            <button id="requestPaymentBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;"
+              onclick="requestPayment()">Ödeme Talep Et</button>
+            <div id="paymentStatusBox" style="font-size: 0.9rem; margin-bottom: 1rem;"></div>
+
+            <h4>Son 5 İşlem</h4>
+            <div
+              style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 5px; margin-top: 0.5rem;"
+              id="profile_transactions"></div>
+          </div>
 
           <form id="updatePasswordForm"
             style="margin-top: 2rem; text-align: left; border-top: 1px solid var(--border); padding-top: 1.5rem;">
@@ -863,6 +885,31 @@
         </div>
       </div>
 
+      <!-- PAYMENTS TAB (Admin) -->
+      <div id="payments" class="tab-content">
+        <div class="card" style="overflow-x: auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3>Ödeme Talepleri</h3>
+            <button class="btn btn-secondary" onclick="loadAdminPayments()"><i class="ri-refresh-line"></i>
+              Yenile</button>
+          </div>
+          <table style="min-width: 800px;">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Editör</th>
+                <th>E-posta</th>
+                <th>IBAN</th>
+                <th>Tutar</th>
+                <th>Durum</th>
+                <th style="text-align:right">İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="paymentTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- SETTINGS TAB (Admin) -->
       <div id="settings" class="tab-content">
         <div class="card" style="max-width: 800px; margin: 0 auto;">
@@ -875,6 +922,14 @@
             </div>
             <div style="margin-bottom:1rem;"><label>Business Account ID</label><input type="text"
                 id="INSTAGRAM_BUSINESS_ACCOUNT_ID"></div>
+            <div style="margin-bottom:1rem; border-top:1px solid #eee; padding-top:1rem;">
+              <label>Paylaşım Başına Editör Ücreti (₺)</label>
+              <input type="number" step="0.01" id="fee_per_post" value="1">
+            </div>
+            <div style="margin-bottom:1rem;">
+              <label>Minimum Ödeme Çekim Limiti (₺)</label>
+              <input type="number" step="0.01" id="min_withdrawal_limit" value="200">
+            </div>
             <div style="margin-bottom:1rem; border-top:1px solid #eee; padding-top:1rem;">
               <label>n8n Webhook URL (Opsiyonel)</label>
               <input type="text" id="N8N_WEBHOOK_URL" placeholder="https://primary.n8n.com/webhook/..."
@@ -1038,9 +1093,13 @@
       // Update Profile Tab
       if (document.getElementById('profile_name')) document.getElementById('profile_name').value = userData.name || '';
       if (document.getElementById('profile_email')) document.getElementById('profile_email').value = userData.email || '';
+      if (document.getElementById('profile_iban')) document.getElementById('profile_iban').value = userData.iban || '';
       if (document.getElementById('profileAvatarPreview')) document.getElementById('profileAvatarPreview').innerHTML = avatarHtml;
 
       document.getElementById('u-role').textContent = userData.role === 'super_admin' ? 'Süper Admin' : 'Editör';
+
+      // Load earnings logic
+      loadEarningsData();
     }
 
     updateUIWithUser(user);
@@ -1080,6 +1139,7 @@
       if (t === 'settings') loadSettings();
       if (t === 'logs') loadLogs();
       if (t === 'users') loadUsers();
+      if (t === 'payments') loadAdminPayments();
 
       // Special cases
       if (t === 'profile') document.getElementById('pageTitle').textContent = 'Profil Ayarları';
@@ -1242,25 +1302,27 @@
     document.getElementById('profileUpdateForm').onsubmit = async (e) => {
       e.preventDefault();
       const newName = document.getElementById('profile_name').value;
+      const newIban = document.getElementById('profile_iban').value;
       const status = document.getElementById('profileStatus');
 
       try {
         const res = await fetch('/api/profile/update', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: newName })
+          body: JSON.stringify({ name: newName, iban: newIban })
         });
         const d = await res.json();
         if (res.ok) {
           status.innerHTML = '<span style="color:var(--success)">✅ Profil güncellendi!</span>';
           user.name = newName;
+          user.iban = newIban;
           localStorage.setItem('user', JSON.stringify(user));
           updateUIWithUser(user);
         } else {
           throw new Error(d.error);
         }
       } catch (e) {
-        status.innerHTML = `< span style = "color:var(--danger)" >❌ Hata: ${e.message}</span > `;
+        status.innerHTML = `<span style="color:var(--danger)">❌ Hata: ${escapeHTML(e.message)}</span>`;
       }
     };
 
@@ -1524,13 +1586,18 @@
 
   <!-- Restore full functionality of Users/Logs/Settings from previous file if needed or keep minimal -->
   <script>
+    // Utilty func for HTML escaping
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
     // Restoring critical admin functions
     async function loadUsers() {
       const tbody = document.getElementById('userTableBody');
       tbody.innerHTML = '<tr><td colspan="4">Yükleniyor...</td></tr>';
       const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token} ` } });
       const users = await res.json();
-      tbody.innerHTML = users.map(u => `< tr ><td>${u.name}</td><td>${u.email}</td><td>${u.role}</td><td style="text-align:right"><button onclick="deleteUser(${u.id})" class="btn" style="color:red">Sil</button></td></tr > `).join('');
+      tbody.innerHTML = users.map(u => `<tr><td>${escapeHTML(u.name)}</td><td>${escapeHTML(u.email)}</td><td>${escapeHTML(u.role)}</td><td style="text-align:right"><button onclick="deleteUser(${u.id})" class="btn" style="color:red">Sil</button></td></tr>`).join('');
     }
     async function deleteUser(id) { await fetch(`/ api / admin / users / ${id} `, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token} ` } }); loadUsers(); }
     document.getElementById('addUserForm').onsubmit = async (e) => {
@@ -1542,14 +1609,111 @@
     async function loadLogs() {
       const res = await fetch('/api/admin/logs', { headers: { 'Authorization': `Bearer ${token} ` } });
       const logs = await res.json();
-      document.getElementById('logTableBody').innerHTML = logs.map(l => `< tr ><td>${new Date(l.created_at).toLocaleString('tr-TR')}</td><td>${l.user_name || '-'}</td><td>${l.action}</td><td>${l.details}</td><td>${l.status}</td></tr > `).join('');
+      document.getElementById('logTableBody').innerHTML = logs.map(l => `<tr><td>${new Date(l.created_at).toLocaleString('tr-TR')}</td><td>${escapeHTML(l.user_name || '-')}</td><td>${escapeHTML(l.action)}</td><td>${escapeHTML(l.details)}</td><td>${escapeHTML(l.status)}</td></tr>`).join('');
     }
     document.getElementById('settingsForm').onsubmit = async (e) => {
       e.preventDefault();
       const data = {};
-      ['META_APP_ID', 'META_APP_SECRET', 'META_ACCESS_TOKEN', 'INSTAGRAM_BUSINESS_ACCOUNT_ID', 'N8N_WEBHOOK_URL'].forEach(k => data[k] = document.getElementById(k).value);
+      ['META_APP_ID', 'META_APP_SECRET', 'META_ACCESS_TOKEN', 'INSTAGRAM_BUSINESS_ACCOUNT_ID', 'N8N_WEBHOOK_URL', 'fee_per_post', 'min_withdrawal_limit'].forEach(k => data[k] = document.getElementById(k).value);
       await fetch('/api/admin/settings', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       alert('Kaydedildi');
+    }
+
+    // --- NEW EARNINGS LOGIC ---
+    async function loadEarningsData() {
+      try {
+        const res = await fetch('/api/earnings/me', { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('profile_balance').textContent = `${data.balance} ₺`;
+
+          let txHtml = '<table style="font-size:0.85rem;">';
+          if (data.transactions && data.transactions.length > 0) {
+            data.transactions.slice(0, 5).forEach(tx => {
+              const color = tx.type === 'EARNING' ? 'var(--success)' : (tx.type === 'WITHDRAWAL' ? 'var(--danger)' : 'black');
+              const sign = tx.type === 'WITHDRAWAL' ? '-' : '+';
+              txHtml += `<tr>
+                <td style="padding:0.4rem;">${new Date(tx.created_at).toLocaleDateString('tr-TR')}</td>
+                <td style="padding:0.4rem;">${escapeHTML(tx.description)}</td>
+                <td style="padding:0.4rem; color:${color}; font-weight:bold;">${sign}${tx.amount}₺</td>
+              </tr>`;
+            });
+          } else {
+            txHtml += '<tr><td style="padding:1rem; color:#888;">Henüz işlem yok.</td></tr>';
+          }
+          txHtml += '</table>';
+          document.getElementById('profile_transactions').innerHTML = txHtml;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function requestPayment() {
+      const btn = document.getElementById('requestPaymentBtn');
+      const box = document.getElementById('paymentStatusBox');
+      btn.disabled = true;
+      box.innerHTML = "Talep ediliyor...";
+      try {
+        const res = await fetch('/api/earnings/request', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+        const d = await res.json();
+        if (d.ok) {
+          box.innerHTML = `<span style="color:var(--success)">✅ ${d.requested_amount}₺ ödeme talep edildi!</span>`;
+          loadEarningsData();
+        } else {
+          box.innerHTML = `<span style="color:var(--danger)">❌ Hata: ${escapeHTML(d.error)}</span>`;
+        }
+      } catch (e) {
+        box.innerHTML = `<span style="color:var(--danger)">❌ Sunucu hatası</span>`;
+      } finally {
+        setTimeout(() => { btn.disabled = false; }, 2000);
+      }
+    }
+
+    async function loadAdminPayments() {
+      const tbody = document.getElementById('paymentTableBody');
+      tbody.innerHTML = '<tr><td colspan="7">Yükleniyor...</td></tr>';
+      try {
+        const res = await fetch('/api/admin/payments', { headers: { 'Authorization': `Bearer ${token}` } });
+        const rows = await res.json();
+        if (rows.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Talep bulunamadı</td></tr>';
+          return;
+        }
+        tbody.innerHTML = rows.map(r => {
+          let actionBtn = r.status === 'pending'
+            ? `<button class="btn btn-primary" onclick="completePayment(${r.id})" style="font-size:0.75rem;"><i class="ri-check-line"></i> Tamamlandı İşaretle</button>`
+            : `<span style="color:var(--success); font-weight:bold;">Ödendi</span>`;
+          let statusBadge = r.status === 'pending' ? '<span style="color:var(--danger); font-weight:bold;">Bekliyor</span>' : '<span style="color:var(--success); font-weight:bold;">Tamamlandı</span>';
+
+          return `<tr>
+             <td>${new Date(r.created_at).toLocaleString('tr-TR')}</td>
+             <td>${escapeHTML(r.name)}</td>
+             <td>${escapeHTML(r.email)}</td>
+             <td><code style="background:#eee; padding:2px 4px; border-radius:3px;">${escapeHTML(r.iban || 'Belirtilmedi')}</code></td>
+             <td style="font-weight:bold;">${r.amount} ₺</td>
+             <td>${statusBadge}</td>
+             <td style="text-align:right;">${actionBtn}</td>
+          </tr>`;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="7" style="color:red;">Hata oluştu.</td></tr>';
+      }
+    }
+
+    async function completePayment(id) {
+      if (!confirm("Bu ödemeyi yaptığınıza emin misiniz? (Kullanıcıya ödeme yapıldı olarak işaretlenecektir)")) return;
+      try {
+        const res = await fetch(`/api/admin/payments/${id}/complete`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+        if (res.ok) {
+          loadAdminPayments();
+        } else {
+          const e = await res.json();
+          alert(e.error || "Bir hata oluştu");
+        }
+      } catch (err) {
+        alert("Sunucu hatası.");
+      }
     }
   </script>
 </body>

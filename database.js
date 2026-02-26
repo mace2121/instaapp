@@ -22,10 +22,12 @@ db.serialize(() => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 
-  // Migration: Add avatar_url if it doesn't exist
+  // Migration: Add avatar_url, iban, earnings_balance if they don't exist
   db.all("PRAGMA table_info(users)", (err, columns) => {
-    if (!err && !columns.some(c => c.name === 'avatar_url')) {
-      db.run("ALTER TABLE users ADD COLUMN avatar_url TEXT");
+    if (!err && columns) {
+      if (!columns.some(c => c.name === 'avatar_url')) db.run("ALTER TABLE users ADD COLUMN avatar_url TEXT");
+      if (!columns.some(c => c.name === 'iban')) db.run("ALTER TABLE users ADD COLUMN iban TEXT");
+      if (!columns.some(c => c.name === 'earnings_balance')) db.run("ALTER TABLE users ADD COLUMN earnings_balance REAL DEFAULT 0");
     }
   });
 
@@ -46,6 +48,33 @@ db.serialize(() => {
         key TEXT PRIMARY KEY,
         value TEXT,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+  // Default values for new settings if they don't exist
+  db.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('fee_per_post', '1')`);
+  db.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('min_withdrawal_limit', '200')`);
+
+  // Ödeme Talepleri
+  db.run(`CREATE TABLE IF NOT EXISTS payment_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        amount REAL NOT NULL,
+        status TEXT CHECK(status IN ('pending', 'completed')) DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        completed_at DATETIME,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )`);
+
+  // Cüzdan İşlem Geçmişi
+  db.run(`CREATE TABLE IF NOT EXISTS wallet_transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        amount REAL NOT NULL,
+        type TEXT NOT NULL, -- 'EARNING', 'WITHDRAWAL'
+        description TEXT,
+        post_id TEXT, -- If related to a specific shared post
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
 });
 
