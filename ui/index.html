@@ -599,8 +599,8 @@
       <i class="ri-instagram-line" style="font-size:1.5rem;"></i> InstaApp
     </div>
     <div class="nav">
-      <div class="nav-item active" onclick="showTab('library'); toggleSidebar(false)">
-        <i class="ri-book-open-line"></i> Kütüphane
+      <div class="nav-item active" onclick="showTab('dashboard'); toggleSidebar(false)">
+        <i class="ri-dashboard-line"></i> Ana Sayfa
       </div>
       <div class="nav-item" onclick="showTab('quickshare'); toggleSidebar(false)">
         <i class="ri-rocket-line"></i> Hızlı Paylaş
@@ -656,8 +656,90 @@
 
     <div class="content-area">
 
+      <!-- DASHBOARD TAB -->
+      <div id="dashboard" class="tab-content active">
+        <!-- Editor View -->
+        <div id="editorDashboard" style="display:none; gap:1.5rem; flex-direction:column;">
+          <div class="card"
+            style="background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white;">
+            <h2 style="margin-bottom: 0.5rem; color: white;">Hoş Geldiniz, <span id="dashEditorName"></span>!</h2>
+            <p style="opacity: 0.9;">Bugün harika görünüyorsun. Hadi yeni bir şeyler paylaşalım.</p>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1.5rem;">
+            <div class="card"
+              style="display:flex; flex-direction:column; justify-content:center; align-items:center; padding:2rem;">
+              <i class="ri-wallet-3-line" style="font-size:3rem; color:var(--success); margin-bottom:1rem;"></i>
+              <div style="font-size:1rem; color:var(--text-muted); margin-bottom:0.5rem;">Güncel Bakiye</div>
+              <div style="font-size:2.5rem; font-weight:700; color:var(--text-main);" id="dashEditorBalance">0 ₺</div>
+            </div>
+            <div class="card"
+              style="display:flex; flex-direction:column; justify-content:center; align-items:center; padding:2rem;">
+              <i class="ri-upload-cloud-line" style="font-size:3rem; color:var(--primary); margin-bottom:1rem;"></i>
+              <div style="font-size:1rem; color:var(--text-muted); margin-bottom:0.5rem;">Toplam Paylaşım</div>
+              <div style="font-size:2.5rem; font-weight:700; color:var(--text-main);" id="dashEditorPosts">0</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Son Cüzdan İşlemleri</h3>
+            <div id="dashEditorTx" style="margin-top:1rem;">Yükleniyor...</div>
+          </div>
+        </div>
+
+        <!-- Admin View -->
+        <div id="adminDashboard" style="display:none; gap:1.5rem; flex-direction:column;">
+          <div class="card" style="background: linear-gradient(135deg, #1f2937, #374151); color: white;">
+            <h2 style="margin-bottom: 0.5rem; color: white;">Sistem Özeti</h2>
+            <p style="opacity: 0.9;">Tüm editör aktivitelerine ve finansal duruma genel bakış.</p>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem;">
+            <div class="card" style="border-left: 4px solid var(--primary);">
+              <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600; text-transform:uppercase;">Aktif
+                Editörler</div>
+              <div style="font-size:2rem; font-weight:700; margin-top:0.5rem;" id="dashAdminEditors">0</div>
+            </div>
+            <div class="card" style="border-left: 4px solid #f59e0b;">
+              <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600; text-transform:uppercase;">
+                Ödenmemiş Kasa (₺)</div>
+              <div style="font-size:2rem; font-weight:700; margin-top:0.5rem; color:#f59e0b;" id="dashAdminUnpaid">0 ₺
+              </div>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--danger);">
+              <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600; text-transform:uppercase;">
+                Bekleyen Ödemeler</div>
+              <div style="font-size:2rem; font-weight:700; margin-top:0.5rem; color:var(--danger);"
+                id="dashAdminPending">0</div>
+            </div>
+            <div class="card" style="border-left: 4px solid var(--success);">
+              <div style="color:var(--text-muted); font-size:0.9rem; font-weight:600; text-transform:uppercase;">Bugünün
+                Paylaşımları</div>
+              <div style="font-size:2rem; font-weight:700; margin-top:0.5rem; color:var(--success);"
+                id="dashAdminTodayPosts">0</div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem;">
+            <div class="card">
+              <h3>En İyi 5 Kazanan Editör</h3>
+              <div id="dashAdminTopEditors" style="margin-top:1rem;">Yükleniyor...</div>
+            </div>
+            <div class="card">
+              <h3>Hızlı İşlemler</h3>
+              <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem;">
+                <button class="btn btn-primary" onclick="showTab('users')"><i class="ri-user-add-line"></i> Yeni Editör
+                  Ekle</button>
+                <button class="btn btn-secondary" onclick="showTab('payments')"><i class="ri-wallet-line"></i> Ödeme
+                  Taleplerine Git</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- LIBRARY TAB -->
-      <div id="library" class="tab-content active">
+      <div id="library" class="tab-content">
         <div class="filters">
           <div class="filter-pill active" onclick="filterType(null)">Tümü</div>
           <div class="filter-pill" onclick="filterType('REEL')">Reels</div>
@@ -1133,6 +1215,7 @@
         }
       });
 
+      if (t === 'dashboard') loadDashboard();
       if (t === 'library') loadLibrary();
       if (t === 'settings') loadSettings();
       if (t === 'logs') loadLogs();
@@ -1563,7 +1646,7 @@
     }
 
     // Load default
-    showTab('library');
+    showTab('dashboard');
 
     // Format selector toggle
     document.querySelectorAll('input[name="format"]').forEach(radio => {
@@ -1649,6 +1732,64 @@
 
     if (user && user.id) {
       loadEarningsData();
+    }
+
+    // --- DASHBOARD LOGIC ---
+    async function loadDashboard() {
+      if (user.role === 'super_admin') {
+        document.getElementById('adminDashboard').style.display = 'flex';
+        document.getElementById('editorDashboard').style.display = 'none';
+        try {
+          const res = await fetch('/api/dashboard/admin', { headers: { 'Authorization': `Bearer ${token}` } });
+          const d = await res.json();
+          if (d.ok) {
+            document.getElementById('dashAdminEditors').textContent = d.data.total_editors;
+            document.getElementById('dashAdminUnpaid').textContent = d.data.total_unpaid + ' ₺';
+            document.getElementById('dashAdminPending').textContent = d.data.pending_count;
+            document.getElementById('dashAdminTodayPosts').textContent = d.data.today_posts;
+
+            let topHtml = '<table style="font-size:0.85rem;">';
+            if (d.data.top_editors.length > 0) {
+              d.data.top_editors.forEach(te => {
+                topHtml += `<tr><td style="padding:0.4rem;">${escapeHTML(te.name)}</td><td style="padding:0.4rem; font-weight:bold; color:var(--success); text-align:right;">${te.total_earned} ₺</td></tr>`;
+              });
+            } else {
+              topHtml += '<tr><td style="padding:1rem; color:#888;">Henüz kazanç yok.</td></tr>';
+            }
+            topHtml += '</table>';
+            document.getElementById('dashAdminTopEditors').innerHTML = topHtml;
+          }
+        } catch (e) { }
+      } else {
+        document.getElementById('adminDashboard').style.display = 'none';
+        document.getElementById('editorDashboard').style.display = 'flex';
+        document.getElementById('dashEditorName').textContent = user.name || 'Editör';
+        try {
+          const res = await fetch('/api/dashboard/editor', { headers: { 'Authorization': `Bearer ${token}` } });
+          const d = await res.json();
+          if (d.ok) {
+            document.getElementById('dashEditorBalance').textContent = d.data.balance + ' ₺';
+            document.getElementById('dashEditorPosts').textContent = d.data.total_posts;
+
+            let txHtml = '<table style="font-size:0.85rem;">';
+            if (d.data.recent_transactions.length > 0) {
+              d.data.recent_transactions.forEach(tx => {
+                const color = tx.type === 'EARNING' ? 'var(--success)' : (tx.type === 'WITHDRAWAL' ? 'var(--danger)' : 'black');
+                const sign = tx.type === 'WITHDRAWAL' ? '-' : '+';
+                txHtml += `<tr>
+                  <td style="padding:0.4rem;">${new Date(tx.created_at).toLocaleDateString('tr-TR')}</td>
+                  <td style="padding:0.4rem;">${escapeHTML(tx.description)}</td>
+                  <td style="padding:0.4rem; color:${color}; font-weight:bold;">${sign}${tx.amount}₺</td>
+                </tr>`;
+              });
+            } else {
+              txHtml += '<tr><td style="padding:1rem; color:#888;">Henüz işlem yok.</td></tr>';
+            }
+            txHtml += '</table>';
+            document.getElementById('dashEditorTx').innerHTML = txHtml;
+          }
+        } catch (e) { }
+      }
     }
 
     async function requestPayment() {

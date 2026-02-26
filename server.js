@@ -634,6 +634,48 @@ app.get("/api/download", verifyToken, async (req, res) => {
   }
 });
 
+// ---------------- Dashboard API ----------------
+app.get("/api/dashboard/editor", verifyToken, async (req, res) => {
+  try {
+    const data = {};
+    const balanceRow = await new Promise((res, rej) => db.get('SELECT earnings_balance FROM users WHERE id = ?', [req.user.id], (err, row) => err ? rej(err) : res(row)));
+    data.balance = balanceRow ? balanceRow.earnings_balance || 0 : 0;
+
+    const countRow = await new Promise((res, rej) => db.get('SELECT COUNT(*) as t FROM wallet_transactions WHERE user_id = ? AND type = "EARNING"', [req.user.id], (err, row) => err ? rej(err) : res(row)));
+    data.total_posts = countRow ? countRow.t : 0;
+
+    const txRows = await new Promise((res, rej) => db.all('SELECT * FROM wallet_transactions WHERE user_id = ? ORDER BY created_at DESC LIMIT 5', [req.user.id], (err, rows) => err ? rej(err) : res(rows)));
+    data.recent_transactions = txRows || [];
+
+    res.json({ ok: true, data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/dashboard/admin", verifyToken, isSuperAdmin, async (req, res) => {
+  try {
+    const data = {};
+    const usersRow = await new Promise((res, rej) => db.get('SELECT COUNT(*) as total_editors, SUM(earnings_balance) as total_unpaid FROM users WHERE role = "editor"', [], (err, row) => err ? rej(err) : res(row)));
+    data.total_editors = usersRow ? usersRow.total_editors || 0 : 0;
+    data.total_unpaid = usersRow ? usersRow.total_unpaid || 0 : 0;
+
+    const pendingRow = await new Promise((res, rej) => db.get('SELECT COUNT(*) as pending_count, SUM(amount) as pending_sum FROM payment_requests WHERE status = "pending"', [], (err, row) => err ? rej(err) : res(row)));
+    data.pending_count = pendingRow ? pendingRow.pending_count || 0 : 0;
+    data.pending_sum = pendingRow ? pendingRow.pending_sum || 0 : 0;
+
+    const todayPostsRow = await new Promise((res, rej) => db.get("SELECT COUNT(*) as today_posts FROM wallet_transactions WHERE type = 'EARNING' AND date(created_at) = date('now')", [], (err, row) => err ? rej(err) : res(row)));
+    data.today_posts = todayPostsRow ? todayPostsRow.today_posts || 0 : 0;
+
+    const topEditors = await new Promise((res, rej) => db.all("SELECT u.name, SUM(w.amount) as total_earned FROM wallet_transactions w JOIN users u ON w.user_id = u.id WHERE w.type = 'EARNING' GROUP BY w.user_id ORDER BY total_earned DESC LIMIT 5", [], (err, rows) => err ? rej(err) : res(rows)));
+    data.top_editors = topEditors || [];
+
+    res.json({ ok: true, data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ---------------- Earnings & Payments API ----------------
 app.get("/api/earnings/me", verifyToken, (req, res) => {
   db.get('SELECT earnings_balance FROM users WHERE id = ?', [req.user.id], (err, row) => {
