@@ -53,12 +53,18 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    html {
+      height: 100%;
+      height: 100dvh;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: var(--bg);
       color: var(--text-main);
       display: flex;
-      height: 100vh;
+      height: 100%;
+      height: 100dvh;
       overflow: hidden;
       font-size: 14px;
     }
@@ -129,10 +135,10 @@
       padding: 0.5rem;
     }
 
-    /* --- Main Content --- */
     .main {
       flex: 1;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       display: flex;
       flex-direction: column;
       position: relative;
@@ -1645,8 +1651,7 @@
       updateThemeIcon(true);
     }
 
-    // Load default
-    showTab('dashboard');
+    // Load default deferred to end of file
 
     // Format selector toggle
     document.querySelectorAll('input[name="format"]').forEach(radio => {
@@ -1858,6 +1863,9 @@
         alert("Sunucu hatası.");
       }
     }
+
+    // Call initial render here, so all functions (including loadDashboard) are in scope
+    showTab('dashboard');
   </script>
 </body>
 
