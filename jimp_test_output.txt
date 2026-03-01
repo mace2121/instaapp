@@ -1,0 +1,30 @@
+Reading: /home/mahsum/instaapp/app/uploads/0c5f3bd1bf845f9b0d3c6f5f1da926a7.png
+Image object keys: [
+  'bitmap',    'background', 'formats',
+  'mime',      'blit',       'blur',
+  'gaussian',  'circle',     'normalize',
+  'invert',    'brightness', 'contrast',
+  'posterize', 'greyscale',  'opacity',
+  'sepia',     'fade',       'convolution',
+  'opaque',    'pixelate',   'convolute',
+  'color',     'contain',    'cover',
+  'crop',      'autocrop',   'displace',
+  'dither',    'fisheye',    'flip',
+  'pHash',     'hash',       'distanceFromHash',
+  'mask',      'print',      'resize',
+  'scale',     'scaleToFit', 'rotate',
+  'threshold', 'quantize'
+]
+Image object prototype keys: [
+  'constructor',   'inspect',
+  'toString',      'width',
+  'height',        'getBuffer',
+  'getBase64',     'write',
+  'clone',         'getPixelIndex',
+  'getPixelColor', 'setPixelColor',
+  'hasAlpha',      'composite',
+  'scan',          'scanIterator'
+]
+Missing .quality()
+Missing .writeAsync()
+Has .write()

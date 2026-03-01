@@ -12,6 +12,7 @@ const { login, register, logAction, verifyToken, isSuperAdmin, getSettings } = r
 const db = require('./database');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 
 const uploadDir = path.join(__dirname, 'uploads');
@@ -80,7 +81,8 @@ app.delete("/api/admin/users/:id", verifyToken, isSuperAdmin, (req, res) => {
 });
 
 const ACT = "/home/mahsum/instaapp/your_instagram_activity";
-const MEDIA_BASE_URL = "http://168.231.125.93:8080/media";
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "http://localhost:3000";
+const MEDIA_BASE_URL = `${PUBLIC_BASE_URL}/media`;
 
 // ---------------- Utils & Data Processing ----------------
 function readJsonSafe(p) { try { return JSON.parse(fs.readFileSync(p, { encoding: "utf8" })); } catch (e) { return null; } }
@@ -277,7 +279,7 @@ app.post("/api/profile/avatar", verifyToken, upload.single('avatar'), async (req
   if (!req.file) return res.status(400).json({ error: "Dosya yüklenemedi" });
 
   const finalPath = req.file.path;
-  let publicUrl = `http://168.231.125.93:3000/uploads/${req.file.filename}`;
+  let publicUrl = `${PUBLIC_BASE_URL}/uploads/${req.file.filename}`;
 
   try {
     const util = require('util');
@@ -375,7 +377,7 @@ app.post("/api/upload", verifyToken, upload.array('files', 10), async (req, res)
       }
     }
 
-    let publicUrl = `http://168.231.125.93:3000/uploads/${finalFilename}`;
+    let publicUrl = `${PUBLIC_BASE_URL}/uploads/${finalFilename}`;
     try {
       const util = require('util');
       const exec = util.promisify(require('child_process').exec);

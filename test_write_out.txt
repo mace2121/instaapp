@@ -1,0 +1,4 @@
+Reading: /home/mahsum/instaapp/app/uploads/08d0d44ba9f43553949bfd9482331511.jpg
+Calling write() without callback...
+Result is: Promise
+Promise resolved! File written.
