@@ -371,21 +371,52 @@
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('fullname', fullname);
-            formData.append('title', title);
-            formData.append('description', description);
-
-            selectedFiles.forEach(file => {
-                formData.append('files', file);
-            });
-
             setLoading(true);
+            showStatus('Dosyalar yükleniyor, lütfen bekleyin...', '');
 
             try {
+                const uploadedMediaUrls = [];
+
+                // Upload files directly to uguu.se to prevent server load
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    const uploadFormData = new FormData();
+                    uploadFormData.append('files[]', file);
+
+                    const uploadRes = await fetch('https://uguu.se/upload.php', {
+                        method: 'POST',
+                        body: uploadFormData
+                    });
+
+                    if (!uploadRes.ok) throw new Error('Medya yükleme servisi (uguu.se) şu anda ulaşılamıyor. Lütfen daha sonra tekrar deneyin.');
+                    const data = await uploadRes.json();
+
+                    if (data.success && data.files && data.files.length > 0) {
+                        const uploadedFile = data.files[0];
+                        uploadedMediaUrls.push({
+                            url: uploadedFile.url,
+                            filename: file.name,
+                            kind: file.type.startsWith('video/') ? 'video' : 'photo'
+                        });
+                    } else {
+                        throw new Error('Dosya yüklenemedi.');
+                    }
+                }
+
+                showStatus('Haber bilgileri kaydediliyor...', '');
+
+                // Form Verisini Kendi Sunucumuza Gönderiyoruz
                 const res = await fetch('/api/public/haber-gonder', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fullname,
+                        title,
+                        description,
+                        media_urls: uploadedMediaUrls
+                    })
                 });
 
                 const data = await res.json();
@@ -399,7 +430,7 @@
                     showStatus(data.error || 'Bir hata oluştu.', 'error');
                 }
             } catch (err) {
-                showStatus('Bağlantı hatası oluştu. Lütfen tekrar deneyin.', 'error');
+                showStatus(err.message || 'Bağlantı hatası oluştu. Lütfen tekrar deneyin.', 'error');
             } finally {
                 setLoading(false);
             }
