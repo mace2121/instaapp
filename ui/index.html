@@ -623,6 +623,9 @@
       <div class="nav-item" data-role="super_admin" onclick="showTab('logs'); toggleSidebar(false)">
         <i class="ri-file-list-3-line"></i> Kayıtlar
       </div>
+      <div class="nav-item" onclick="showTab('submitted_news'); toggleSidebar(false)">
+        <i class="ri-mail-download-line"></i> Gelen Haberler
+      </div>
     </div>
     <div class="user-info"
       style="display:flex; align-items:center; gap:0.75rem; padding:1rem; border-top:1px solid var(--border);">
@@ -1035,6 +1038,71 @@
         </div>
       </div>
 
+      <!-- SUBMITTED NEWS TAB -->
+      <div id="submitted_news" class="tab-content">
+        <div class="card" style="overflow-x: auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3>Gelen Haberler</h3>
+            <button class="btn btn-secondary" onclick="loadSubmittedNews()"><i class="ri-refresh-line"></i>
+              Yenile</button>
+          </div>
+          <table style="min-width: 800px;">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Gönderen</th>
+                <th>Başlık</th>
+                <th>Açıklama</th>
+                <th>Medya</th>
+                <th>Durum</th>
+                <th style="text-align:right">İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="submittedNewsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUBMITTED NEWS EDIT MODAL -->
+      <div class="modal-overlay" id="newsEditModalOverlay" onclick="closeNewsEditModal()"></div>
+      <div class="bottom-sheet" id="newsEditModal"
+        style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:90%; max-width:600px; height:auto; background:var(--card-bg); z-index:1000; border-radius:1rem; padding:2rem; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+          <h3 style="margin:0;">Haberi Düzenle</h3>
+          <button onclick="closeNewsEditModal()"
+            style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-main);"><i
+              class="ri-close-line"></i></button>
+        </div>
+        <form id="newsEditForm">
+          <input type="hidden" id="news_edit_id">
+          <div style="margin-bottom:1rem;">
+            <label>Gönderen</label>
+            <input type="text" id="news_edit_fullname">
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label>Başlık</label>
+            <input type="text" id="news_edit_title">
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label>Açıklama</label>
+            <textarea id="news_edit_description" rows="5"></textarea>
+          </div>
+          <div style="margin-bottom:1.5rem;">
+            <label>Durum</label>
+            <select id="news_edit_status">
+              <option value="pending">Beklemede</option>
+              <option value="published">Yayınlandı</option>
+              <option value="rejected">Reddedildi</option>
+            </select>
+          </div>
+          <div style="display:flex; gap:1rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeNewsEditModal()"
+              style="flex:1;">İptal</button>
+            <button type="submit" class="btn btn-primary" style="flex:1;">Kaydet</button>
+          </div>
+        </form>
+      </div>
+
       <script>
         async function testConnection() {
           const btn = document.querySelector('button[onclick="testConnection()"]');
@@ -1217,7 +1285,7 @@
       navItems.forEach(item => {
         if (item.onclick && item.onclick.toString().includes(t)) {
           item.classList.add('active');
-          document.getElementById('pageTitle').textContent = item.textContent.trim(); // Removed substring since textContent ignores innerHTML
+          document.getElementById('pageTitle').textContent = item.innerText.trim(); // Remove icon
         }
       });
 
@@ -1227,6 +1295,7 @@
       if (t === 'logs') loadLogs();
       if (t === 'users') loadUsers();
       if (t === 'payments') loadAdminPayments();
+      if (t === 'submitted_news') loadSubmittedNews();
 
       // Special cases
       if (t === 'profile') document.getElementById('pageTitle').textContent = 'Profil Ayarları';
@@ -1700,9 +1769,134 @@
     document.getElementById('settingsForm').onsubmit = async (e) => {
       e.preventDefault();
       const data = {};
-      ['META_APP_ID', 'META_APP_SECRET', 'META_ACCESS_TOKEN', 'INSTAGRAM_BUSINESS_ACCOUNT_ID', 'N8N_WEBHOOK_URL', 'fee_per_post', 'min_withdrawal_limit'].forEach(k => data[k] = document.getElementById(k).value);
+      ['META_APP_ID', 'META_APP_SECRET', 'META_ACCESS_TOKEN', 'INSTAGRAM_BUSINESS_ACCOUNT_ID', 'N8N_WEBHOOK_URL', 'fee_per_post', 'min_withdrawal_limit'].forEach(k => {
+        if (document.getElementById(k)) {
+          data[k] = document.getElementById(k).value;
+        }
+      });
       await fetch('/api/admin/settings', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       alert('Kaydedildi');
+    };
+
+    // --- SUBMITTED NEWS LOGIC ---
+    let allNews = [];
+
+    async function loadSubmittedNews() {
+      const tbody = document.getElementById('submittedNewsTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Yükleniyor...</td></tr>';
+      try {
+        const res = await fetch('/api/admin/submitted-news', { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        allNews = data;
+
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Henüz gönderilmiş haber bulunmuyor.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.map(news => {
+          let mediaHtml = '';
+          if (news.media_urls && news.media_urls.length > 0) {
+            mediaHtml = news.media_urls.map(m => {
+              if (m.kind === 'video') return `<a href="${m.url}" target="_blank"><i class="ri-video-line"></i></a>`;
+              return `<a href="${m.url}" target="_blank"><i class="ri-image-line"></i></a>`;
+            }).join(' ');
+          } else {
+            mediaHtml = '-';
+          }
+
+          let statusHtml = '';
+          if (news.status === 'pending') statusHtml = `<span style="color:#D97706; background:#FEF3C7; padding:2px 8px; border-radius:12px;">Beklemede</span>`;
+          else if (news.status === 'published') statusHtml = `<span style="color:#059669; background:#D1FAE5; padding:2px 8px; border-radius:12px;">Yayınlandı</span>`;
+          else if (news.status === 'rejected') statusHtml = `<span style="color:#DC2626; background:#FEE2E2; padding:2px 8px; border-radius:12px;">Reddedildi</span>`;
+
+          const dateStr = new Date(news.created_at).toLocaleString('tr-TR');
+
+          let actionBtns = '';
+          if (user.role === 'super_admin') {
+            actionBtns = `
+              <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.8rem;" onclick="openNewsEditModal(${news.id})"><i class="ri-edit-line"></i></button>
+              <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.8rem; color:var(--danger);" onclick="deleteNews(${news.id})"><i class="ri-delete-bin-line"></i></button>
+            `;
+          }
+
+          return `<tr>
+            <td>${dateStr}</td>
+            <td><strong>${news.fullname}</strong></td>
+            <td>${news.title}</td>
+            <td style="max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${news.description}">${news.description}</td>
+            <td style="font-size:1.2rem; display:flex; gap:0.5rem;">${mediaHtml}</td>
+            <td>${statusHtml}</td>
+            <td style="text-align:right; display:flex; gap:0.5rem; justify-content:flex-end;">${actionBtns}</td>
+          </tr>`;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="7" style="color:var(--danger); text-align:center;">Yükleme Hatası</td></tr>';
+      }
+    }
+
+    function openNewsEditModal(id) {
+      const news = allNews.find(n => n.id === id);
+      if (!news) return;
+
+      document.getElementById('news_edit_id').value = news.id;
+      document.getElementById('news_edit_fullname').value = news.fullname;
+      document.getElementById('news_edit_title').value = news.title;
+      document.getElementById('news_edit_description').value = news.description;
+      document.getElementById('news_edit_status').value = news.status;
+
+      document.getElementById('newsEditModalOverlay').classList.add('open');
+      document.getElementById('newsEditModal').style.display = 'block';
+    }
+
+    function closeNewsEditModal() {
+      document.getElementById('newsEditModalOverlay').classList.remove('open');
+      document.getElementById('newsEditModal').style.display = 'none';
+    }
+
+    document.getElementById('newsEditForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('news_edit_id').value;
+      const data = {
+        fullname: document.getElementById('news_edit_fullname').value,
+        title: document.getElementById('news_edit_title').value,
+        description: document.getElementById('news_edit_description').value,
+        status: document.getElementById('news_edit_status').value
+      };
+
+      try {
+        const res = await fetch(`/api/admin/submitted-news/${id}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          closeNewsEditModal();
+          loadSubmittedNews();
+        } else {
+          const d = await res.json();
+          alert(d.error || 'Hata');
+        }
+      } catch (e) {
+        alert('Bağlantı hatası');
+      }
+    };
+
+    async function deleteNews(id) {
+      if (!confirm('Bu haberi silmek istediğinize emin misiniz?')) return;
+      try {
+        const res = await fetch(`/api/admin/submitted-news/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          loadSubmittedNews();
+        } else {
+          alert('Silinemedi');
+        }
+      } catch (e) {
+        alert('Bağlantı hatası');
+      }
     }
 
     // --- NEW EARNINGS LOGIC ---

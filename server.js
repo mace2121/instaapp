@@ -35,6 +35,7 @@ app.use("/uploads", express.static(uploadDir));
 app.get("/", (req, res) => res.redirect("/login"));
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, "ui", "login.html")));
 app.get("/panel", (req, res) => res.sendFile(path.join(__dirname, "ui", "index.html")));
+app.get("/haber-gonder", (req, res) => res.sendFile(path.join(__dirname, "ui", "haber_gonder.html")));
 
 // ---------------- Auth API ----------------
 app.post("/api/auth/login", async (req, res) => {
@@ -149,6 +150,112 @@ function buildLibrary() {
 }
 
 // ---------------- API Endpoints ----------------
+app.post("/api/public/haber-gonder", upload.array("files", 20), async (req, res) => {
+  const { fullname, title, description } = req.body;
+
+  if (!fullname || !title || !description) {
+    return res.status(400).json({ error: "Lütfen ad soyad, başlık ve açıklama alanlarını doldurun." });
+  }
+
+  const results = [];
+  if (req.files && req.files.length > 0) {
+    for (const f of req.files) {
+      let finalFilename = f.filename;
+      let finalMime = f.mimetype;
+      let finalPath = f.path;
+
+      // Ensure uploaded files are optimized if images
+      const isImage = f.mimetype.startsWith('image/') || f.filename.match(/\.(png|webp|bmp|tiff|gif|jpg|jpeg)$/i);
+      if (isImage) {
+        try {
+          const image = await Jimp.read(f.path);
+          const newFilename = f.filename.replace(/\.[^/.]+$/, "") + "_c.jpg";
+          const newPath = path.join(f.destination, newFilename);
+          await image.write(newPath);
+          finalFilename = newFilename;
+          finalPath = newPath;
+          finalMime = 'image/jpeg';
+        } catch (e) {
+          console.error("[Upload Debug] Image conversion failed in form submit:", e);
+        }
+      }
+
+      let publicUrl = `${PUBLIC_BASE_URL}/uploads/${finalFilename}`;
+      try {
+        const util = require('util');
+        const exec = util.promisify(require('child_process').exec);
+        const { stdout } = await exec(`curl -s -F "files[]=@${finalPath}" https://uguu.se/upload.php`);
+        const data = JSON.parse(stdout);
+        if (data.success && data.files && data.files[0]) {
+          publicUrl = data.files[0].url;
+        }
+      } catch (err) {
+        console.error("[Proxy] Failed to upload form proxy:", err.message || err);
+      }
+
+      results.push({
+        url: publicUrl,
+        filename: finalFilename,
+        kind: finalMime.startsWith('video') || finalFilename.match(/\.(mp4|mov|avi|mkv)$/i) ? 'video' : 'photo'
+      });
+    }
+  }
+
+  const mediaUrlsJson = JSON.stringify(results);
+
+  db.run(`INSERT INTO submitted_news (fullname, title, description, media_urls, status) VALUES (?, ?, ?, ?, 'pending')`,
+    [fullname, title, description, mediaUrlsJson], function (err) {
+      if (err) return res.status(500).json({ error: "Veritabanı hatası oluştu." });
+      res.json({ ok: true, message: "Haber başarıyla gönderildi." });
+    });
+});
+
+app.get("/api/admin/submitted-news", verifyToken, (req, res) => {
+  db.all(`SELECT * FROM submitted_news ORDER BY created_at DESC`, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    // Parse media_urls back into object arrays for frontend
+    rows.forEach(r => {
+      try {
+        r.media_urls = JSON.parse(r.media_urls || "[]");
+      } catch (e) {
+        r.media_urls = [];
+      }
+    });
+    res.json(rows);
+  });
+});
+
+app.post("/api/admin/submitted-news", verifyToken, isSuperAdmin, (req, res) => {
+  const { fullname, title, description, media_urls, status } = req.body;
+  const mediaJson = typeof media_urls === 'string' ? media_urls : JSON.stringify(media_urls || []);
+
+  db.run(`INSERT INTO submitted_news (fullname, title, description, media_urls, status) VALUES (?, ?, ?, ?, ?)`,
+    [fullname, title, description, mediaJson, status || 'pending'], function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ ok: true, id: this.lastID });
+    });
+});
+
+app.put("/api/admin/submitted-news/:id", verifyToken, isSuperAdmin, (req, res) => {
+  const { id } = req.params;
+  const { fullname, title, description, status } = req.body;
+  db.run(`UPDATE submitted_news SET fullname = ?, title = ?, description = ?, status = ? WHERE id = ?`,
+    [fullname, title, description, status, id], function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      if (this.changes === 0) return res.status(404).json({ error: "Haber bulunamadı" });
+      res.json({ ok: true });
+    });
+});
+
+app.delete("/api/admin/submitted-news/:id", verifyToken, isSuperAdmin, (req, res) => {
+  const { id } = req.params;
+  db.run(`DELETE FROM submitted_news WHERE id = ?`, [id], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    if (this.changes === 0) return res.status(404).json({ error: "Haber bulunamadı" });
+    res.json({ ok: true });
+  });
+});
+
 app.get("/api/download", verifyToken, async (req, res) => {
   const { url } = req.query;
   if (!url) return res.status(400).send("URL required");

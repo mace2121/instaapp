@@ -76,6 +76,17 @@ db.serialize(() => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
+
+  // Gelen Haberler (Submitted News)
+  db.run(`CREATE TABLE IF NOT EXISTS submitted_news (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fullname TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        media_urls TEXT, -- JSON array of uploaded file URLs
+        status TEXT CHECK(status IN ('pending', 'published', 'rejected')) DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
 });
 
 module.exports = db;
