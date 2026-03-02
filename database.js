@@ -43,6 +43,15 @@ db.serialize(() => {
         FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
 
+  // Migration: Add details, ip_address, status to logs if they don't exist
+  db.all("PRAGMA table_info(logs)", (err, columns) => {
+    if (!err && columns) {
+      if (!columns.some(c => c.name === 'details')) db.run("ALTER TABLE logs ADD COLUMN details TEXT");
+      if (!columns.some(c => c.name === 'ip_address')) db.run("ALTER TABLE logs ADD COLUMN ip_address TEXT");
+      if (!columns.some(c => c.name === 'status')) db.run("ALTER TABLE logs ADD COLUMN status TEXT");
+    }
+  });
+
   // Uygulama Ayarları (Meta API vb.)
   db.run(`CREATE TABLE IF NOT EXISTS settings (
         key TEXT PRIMARY KEY,
