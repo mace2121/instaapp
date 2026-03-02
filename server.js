@@ -36,9 +36,15 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 
-let ACT_ROOT = "/app/your_instagram_activity";
+// ACT_ROOT: /app/data/instagram (docker-compose volume: app/data → /app/data)
+// Kullanıcı sunucuda çalıştırmalı: mv /home/mahsum/instaapp/your_instagram_activity /home/mahsum/instaapp/app/data/instagram
+let ACT_ROOT = "/app/data/instagram";
 if (!fs.existsSync(ACT_ROOT)) {
-  ACT_ROOT = path.join(__dirname, "your_instagram_activity");
+  ACT_ROOT = path.join(__dirname, "data", "instagram");
+}
+if (!fs.existsSync(ACT_ROOT)) {
+  // Eski konum fallback
+  ACT_ROOT = "/app/data/your_instagram_activity";
 }
 if (!fs.existsSync(ACT_ROOT)) {
   ACT_ROOT = path.join(__dirname, "data", "your_instagram_activity");
@@ -48,11 +54,9 @@ let ACT = path.join(ACT_ROOT, "media");
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "http://localhost:3000";
 const MEDIA_BASE_URL = `${PUBLIC_BASE_URL}/media`;
 
-// Standard Static Middleware for Media (Hardcoded absolute path)
-app.use("/media", express.static("/app/your_instagram_activity/media", {
-  index: false,
-  fallthrough: true
-}));
+// Static Media Serve (her iki konum için fallback zinciri)
+app.use("/media", express.static("/app/data/instagram/media", { index: false, fallthrough: true }));
+app.use("/media", express.static("/app/data/your_instagram_activity/media", { index: false, fallthrough: true }));
 
 // ---------------- UI Routes ----------------
 app.get("/", (req, res) => res.redirect("/login"));
