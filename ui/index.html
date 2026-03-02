@@ -1493,28 +1493,22 @@
       <!-- LOGS TAB (Admin) -->
       <div id="logs" class="tab-content">
         <!-- Filter Form -->
-        <div class="card" style="margin-bottom: 1.5rem; padding: 1.5rem;">
-          <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem;">
+        <div class="card" style="margin-bottom:1.5rem; padding:1rem 1.25rem;">
+          <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.75rem;">
 
-            <div style="flex: 1; min-width: 150px;">
-              <label
-                style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Kullanıcı
-                ID</label>
-              <div style="position: relative;">
-                <i class="ri-user-line"
-                  style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                <input type="number" id="filterLogUser" class="form-control" placeholder="Örn: 12"
-                  style="padding-left: 36px; padding-right: 12px; height: 42px; width: 100%; border-radius: 6px;">
-              </div>
+            <!-- Kullanıcı ID -->
+            <div style="position:relative; flex:1; min-width:120px;">
+              <i class="ri-user-line"
+                style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:0.95rem;pointer-events:none;"></i>
+              <input type="number" id="filterLogUser" placeholder="Kullanıcı ID"
+                style="width:100%;height:40px;padding:0 12px 0 34px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-main);font-size:0.875rem;outline:none;" />
             </div>
 
-            <div style="flex: 1; min-width: 150px;">
-              <label
-                style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">İşlem
-                Türü</label>
-              <select id="filterLogAction" class="form-control" style="height: 42px; width: 100%; border-radius: 6px;"
-                onchange="loadLogs()">
-                <option value="">Tümü</option>
+            <!-- İşlem Türü -->
+            <div style="flex:1.2; min-width:140px;">
+              <select id="filterLogAction" onchange="loadLogs()"
+                style="width:100%;height:40px;padding:0 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-main);font-size:0.875rem;outline:none;appearance:auto;">
+                <option value="">İşlem: Tümü</option>
                 <option value="POST_SHARED">POST_SHARED</option>
                 <option value="LOGIN">LOGIN</option>
                 <option value="REGISTER">REGISTER</option>
@@ -1525,112 +1519,117 @@
               </select>
             </div>
 
-            <div style="flex: 1; min-width: 150px;">
-              <label
-                style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Durum</label>
-              <select id="filterLogStatus" class="form-control" style="height: 42px; width: 100%; border-radius: 6px;"
-                onchange="loadLogs()">
-                <option value="">Tümü</option>
-                <option value="SUCCESS">SUCCESS</option>
-                <option value="FAILED">FAILED</option>
-                <option value="WARN">WARN</option>
+            <!-- Durum -->
+            <div style="flex:1; min-width:130px;">
+              <select id="filterLogStatus" onchange="loadLogs()"
+                style="width:100%;height:40px;padding:0 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-main);font-size:0.875rem;outline:none;appearance:auto;">
+                <option value="">Durum: Tümü</option>
+                <option value="SUCCESS">Başarılı</option>
+                <option value="FAILED">Hatalı</option>
+                <option value="WARN">Uyarı</option>
               </select>
             </div>
 
-            <div style="flex: 2; min-width: 250px;">
-              <label
-                style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Tarih
-                Aralığı</label>
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <input type="date" id="filterLogStart" class="form-control"
-                  style="height: 42px; flex: 1; border-radius: 6px;" onchange="loadLogs()">
-                <span style="color: var(--text-muted);">-</span>
-                <input type="date" id="filterLogEnd" class="form-control"
-                  style="height: 42px; flex: 1; border-radius: 6px;" onchange="loadLogs()">
-              </div>
+            <!-- Tarih Aralığı -->
+            <div style="position:relative; display:flex; align-items:center; gap:0.4rem; flex:1.8; min-width:220px;">
+              <i class="ri-calendar-line" style="color:var(--text-muted);font-size:0.95rem;flex-shrink:0;"></i>
+              <input type="date" id="filterLogStart" onchange="loadLogs()"
+                style="flex:1;height:40px;padding:0 8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-main);font-size:0.875rem;outline:none;" />
+              <span style="color:var(--text-muted);">-</span>
+              <input type="date" id="filterLogEnd" onchange="loadLogs()"
+                style="flex:1;height:40px;padding:0 8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-main);font-size:0.875rem;outline:none;" />
             </div>
 
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-              <button class="btn btn-secondary" style="height: 42px; display: flex; align-items: center; gap: 0.5rem;"
-                onclick="clearLogFilters()">
-                <i class="ri-refresh-line"></i> Temizle
+            <!-- Butonlar -->
+            <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+              <button onclick="clearLogFilters()"
+                style="height:40px;padding:0 1rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-main);font-size:0.875rem;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                <i class="ri-loop-right-line"></i> Temizle
               </button>
-              <button class="btn btn-primary" style="height: 42px; display: flex; align-items: center; gap: 0.5rem;"
-                onclick="loadLogs()">
+              <button onclick="loadLogs()"
+                style="height:40px;padding:0 1.25rem;border:none;border-radius:8px;background:var(--primary);color:#fff;font-size:0.875rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
                 <i class="ri-search-line"></i> Filtrele
               </button>
             </div>
 
           </div>
+          <div class="card" style="overflow-x:auto;">
+            <table style="min-width:800px; width:100%; border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th
+                    style="padding:0.75rem 1rem; text-align:left; font-size:0.85rem; color:var(--text-muted); font-weight:600; border-bottom:1px solid var(--border);">
+                    Zaman</th>
+                  <th
+                    style="padding:0.75rem 1rem; text-align:left; font-size:0.85rem; color:var(--text-muted); font-weight:600; border-bottom:1px solid var(--border);">
+                    Kullanıcı</th>
+                  <th
+                    style="padding:0.75rem 1rem; text-align:left; font-size:0.85rem; color:var(--text-muted); font-weight:600; border-bottom:1px solid var(--border);">
+                    İşlem</th>
+                  <th
+                    style="padding:0.75rem 1rem; text-align:left; font-size:0.85rem; color:var(--text-muted); font-weight:600; border-bottom:1px solid var(--border);">
+                    Detay</th>
+                  <th
+                    style="padding:0.75rem 1rem; text-align:left; font-size:0.85rem; color:var(--text-muted); font-weight:600; border-bottom:1px solid var(--border);">
+                    Durum</th>
+                </tr>
+              </thead>
+              <tbody id="logTableBody"></tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="card" style="overflow-x: auto;">
-          <table style="min-width: 800px;">
-            <thead>
-              <tr>
-                <th>Zaman</th>
-                <th>Kullanıcı</th>
-                <th>İşlem</th>
-                <th>Detay</th>
-                <th>Durum</th>
-              </tr>
-            </thead>
-            <tbody id="logTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- TASKS (To-Do) TAB -->
-      <div id="tasks" class="tab-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-          <h2 style="font-size: 1.5rem; color: var(--text-dark);">Görevlerim</h2>
-          <button class="btn btn-primary" onclick="openTaskModal()">
-            <i class="ri-add-line"></i> Yeni Görev
-          </button>
-        </div>
-
-        <!-- Task Category Pill Filter -->
-        <div
-          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-          <div
-            style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; display: flex; overflow: hidden; font-size: 0.9rem;">
-            <button class="task-filter-btn active" onclick="setTaskFilter('all', this)"
-              style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text-dark);">
-              Tüm Görevler <span id="pillCountAll"
-                style="background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
-            </button>
-            <button class="task-filter-btn" onclick="setTaskFilter('pending', this)"
-              style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
-              Yapılacak <span id="pillCountTodo"
-                style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
-            </button>
-            <button class="task-filter-btn" onclick="setTaskFilter('in_progress', this)"
-              style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
-              Devam Eden <span id="pillCountInProgress"
-                style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
-            </button>
-            <button class="task-filter-btn" onclick="setTaskFilter('completed', this)"
-              style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
-              Tamamlanan <span id="pillCountCompleted"
-                style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+        <!-- TASKS (To-Do) TAB -->
+        <div id="tasks" class="tab-content">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; color: var(--text-dark);">Görevlerim</h2>
+            <button class="btn btn-primary" onclick="openTaskModal()">
+              <i class="ri-add-line"></i> Yeni Görev
             </button>
           </div>
-          <button
-            style="background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500;">
-            <i class="ri-equalizer-line"></i> Filtrele & Sırala
-          </button>
+
+          <!-- Task Category Pill Filter -->
+          <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <div
+              style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; display: flex; overflow: hidden; font-size: 0.9rem;">
+              <button class="task-filter-btn active" onclick="setTaskFilter('all', this)"
+                style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text-dark);">
+                Tüm Görevler <span id="pillCountAll"
+                  style="background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+              </button>
+              <button class="task-filter-btn" onclick="setTaskFilter('pending', this)"
+                style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
+                Yapılacak <span id="pillCountTodo"
+                  style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+              </button>
+              <button class="task-filter-btn" onclick="setTaskFilter('in_progress', this)"
+                style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
+                Devam Eden <span id="pillCountInProgress"
+                  style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+              </button>
+              <button class="task-filter-btn" onclick="setTaskFilter('completed', this)"
+                style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
+                Tamamlanan <span id="pillCountCompleted"
+                  style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+              </button>
+            </div>
+            <button
+              style="background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500;">
+              <i class="ri-equalizer-line"></i> Filtrele & Sırala
+            </button>
+          </div>
+
+          <!-- List View Area -->
+          <div id="listViewArea"
+            style="display: flex; flex-direction: column; gap: 1rem; min-height: 400px; overflow-x: auto;">
+            <!-- JS populate here -->
+          </div>
         </div>
 
-        <!-- List View Area -->
-        <div id="listViewArea"
-          style="display: flex; flex-direction: column; gap: 1rem; min-height: 400px; overflow-x: auto;">
-          <!-- JS populate here -->
-        </div>
       </div>
 
     </div>
-
-  </div>
   </div>
 
   <!-- INSTAGRAM STYLE EDIT MODAL -->

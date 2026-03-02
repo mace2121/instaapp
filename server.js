@@ -33,8 +33,17 @@ app.use(express.json({ limit: "100mb" }));
 app.use("/ui", express.static(path.join(__dirname, "ui")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const ACT_ROOT = "/app/your_instagram_activity";
-const ACT = "/app/your_instagram_activity/media";
+const fs = require('fs');
+
+let ACT_ROOT = "/app/your_instagram_activity";
+if (!fs.existsSync(ACT_ROOT)) {
+  ACT_ROOT = path.join(__dirname, "your_instagram_activity");
+}
+if (!fs.existsSync(ACT_ROOT)) {
+  ACT_ROOT = path.join(__dirname, "data", "your_instagram_activity");
+}
+
+let ACT = path.join(ACT_ROOT, "media");
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "http://localhost:3000";
 const MEDIA_BASE_URL = `${PUBLIC_BASE_URL}/media`;
 
