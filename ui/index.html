@@ -1847,13 +1847,13 @@
 
         window._libraryItems = items;
 
-        grid.innerHTML = items.filter(item => item.media && item.media.length > 0).map(item => {
+        grid.innerHTML = items.map(item => {
           // Safe caption escape
           const safeCaption = (item.caption || '').replace(/"/g, '&quot;');
-          const firstMedia = item.media[0];
+          const firstMedia = item.media && item.media.length > 0 ? item.media[0] : null;
 
           // Fallback Strategy ensuring URLs are valid if they are partial routes
-          let mediaUrl = firstMedia.url;
+          let mediaUrl = firstMedia ? firstMedia.url : '';
           if (mediaUrl && !mediaUrl.startsWith('http')) {
             mediaUrl = mediaUrl.startsWith('/') ? mediaUrl : '/' + mediaUrl;
           }
@@ -1862,19 +1862,21 @@
             coverUrl = coverUrl.startsWith('/') ? coverUrl : '/' + coverUrl;
           }
 
+          const hasVideo = firstMedia && firstMedia.kind === 'video';
+
           return `
                     <div class="item-card">
                         <div class="item-media">
                             <span class="item-badge">${item.type}</span>
-                            ${firstMedia.kind === 'video'
+                            ${hasVideo
               ? `<video src="${mediaUrl}" muted loop onmouseenter="this.play()" onmouseleave="this.pause()" poster="${coverUrl}"></video>`
-              : `<img src="${coverUrl}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/300?text=Goruntu+Yok'">`}
+              : `<img src="${coverUrl || 'https://via.placeholder.com/300?text=Goruntu+Yok'}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/300?text=Goruntu+Yok'">`}
                         </div>
                         <div class="item-content">
                             <div class="item-caption">${item.caption || '<em style="color:#ccc">Açıklama yok</em>'}</div>
                             <div style="display: flex; gap: 0.5rem; width: 100%;">
                                 <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem;" 
-                                    onclick="openEditModal('${item.id}', '${firstMedia.url}', '${firstMedia.kind}')">
+                                    onclick="openEditModal('${item.id}', '${firstMedia ? firstMedia.url : ''}', '${firstMedia ? firstMedia.kind : ''}')">
                                     <i class="ri-edit-box-line"></i> Düzenle
                                 </button>
                                 <button class="btn btn-primary" style="flex: 1; padding: 0.5rem;" 
