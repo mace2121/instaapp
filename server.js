@@ -33,7 +33,8 @@ app.use(express.json({ limit: "100mb" }));
 app.use("/ui", express.static(path.join(__dirname, "ui")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const fs = require('fs');
+
+
 
 let ACT_ROOT = "/app/your_instagram_activity";
 if (!fs.existsSync(ACT_ROOT)) {
