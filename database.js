@@ -51,8 +51,9 @@ db.serialize(() => {
     )`);
 
   // Default values for new settings if they don't exist
-  db.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('fee_per_post', '1')`);
+  db.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('fee_per_post', '5')`);
   db.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('min_withdrawal_limit', '200')`);
+  db.run(`INSERT OR IGNORE INTO settings (key, value) VALUES ('bonus_per_100_likes', '10')`);
 
   // Ödeme Talepleri
   db.run(`CREATE TABLE IF NOT EXISTS payment_requests (
@@ -76,16 +77,37 @@ db.serialize(() => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
+  // Migration: Add check_status and last_checked_at to wallet_transactions
+  db.all("PRAGMA table_info(wallet_transactions)", (err, columns) => {
+    if (!err && columns) {
+      if (!columns.some(c => c.name === 'check_status')) db.run("ALTER TABLE wallet_transactions ADD COLUMN check_status TEXT DEFAULT 'pending'");
+      if (!columns.some(c => c.name === 'last_checked_at')) db.run("ALTER TABLE wallet_transactions ADD COLUMN last_checked_at DATETIME");
+    }
+  });
 
   // Gelen Haberler (Submitted News)
   db.run(`CREATE TABLE IF NOT EXISTS submitted_news (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         fullname TEXT NOT NULL,
         title TEXT NOT NULL,
-        description TEXT,
-        media_urls TEXT, -- JSON array of uploaded file URLs
-        status TEXT CHECK(status IN ('pending', 'published', 'rejected')) DEFAULT 'pending',
+        description TEXT NOT NULL,
+        media_urls TEXT,
+        status TEXT DEFAULT 'pending',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+  // Tasks (To-Do Listesi)
+  db.run(`CREATE TABLE IF NOT EXISTS tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        assigned_by INTEGER,
+        assigned_to INTEGER,
+        status TEXT DEFAULT 'pending', /* pending, in_progress, completed */
+        due_date DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(assigned_by) REFERENCES users(id),
+        FOREIGN KEY(assigned_to) REFERENCES users(id)
     )`);
 });
 

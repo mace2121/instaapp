@@ -1,10 +1,10 @@
 require('dotenv').config();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const db = require('./database');
 
-const name = "Mahsum";
-const email = "admin@instaapp.local";
-const password = "123456"; // sonra değiştireceğiz
+const name = "Admin";
+const email = "admin@admin.com";
+const password = "admin123";
 
 (async () => {
   const hash = await bcrypt.hash(password, 10);

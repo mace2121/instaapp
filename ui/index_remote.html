@@ -593,139 +593,6 @@
         transform: translateY(0);
       }
     }
-
-    /* --- Tailadmin Date Picker & Form Controls --- */
-    input[type="date"],
-    input[type="datetime-local"] {
-      appearance: none;
-      -webkit-appearance: none;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      padding: 0.625rem 0.875rem;
-      font-size: 0.875rem;
-      font-family: 'Inter', sans-serif;
-      color: var(--text-main);
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      width: 100%;
-      cursor: pointer;
-    }
-
-    input[type="date"]:focus,
-    input[type="datetime-local"]:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(66, 104, 246, 0.15);
-    }
-
-    input[type="date"]::-webkit-calendar-picker-indicator,
-    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-      background: transparent;
-      cursor: pointer;
-      padding: 4px;
-      filter: opacity(0.6);
-    }
-
-    input[type="date"]:hover::-webkit-calendar-picker-indicator,
-    input[type="datetime-local"]:hover::-webkit-calendar-picker-indicator {
-      filter: opacity(1);
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      font-weight: 500;
-      font-size: 0.85rem;
-      color: var(--text-dark);
-      margin-bottom: 0.4rem;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 0.625rem 0.875rem;
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      font-size: 0.875rem;
-      font-family: 'Inter', sans-serif;
-      color: var(--text-main);
-      background-color: var(--card-bg);
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-      box-sizing: border-box;
-    }
-
-    .form-control:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(66, 104, 246, 0.15);
-    }
-
-    /* --- Task Modal Fix --- */
-    #taskModalOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #taskModalOverlay.open {
-      display: flex;
-    }
-
-    #taskModal {
-      background: var(--card-bg);
-      border-radius: 1rem;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      width: 90%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-      z-index: 1000;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .modal-header h3 {
-      margin: 0;
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-    }
-
-    /* --- User Modal Fix --- */
-    #userModalOverlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #userModalOverlay.open {
-      display: flex;
-    }
   </style>
 </head>
 
@@ -743,16 +610,16 @@
         <i class="ri-dashboard-line"></i> Ana Sayfa
       </div>
       <div class="nav-item" onclick="showTab('quickshare'); toggleSidebar(false)">
-        <i class="ri-rocket-line"></i> Hızlı Paylaş
+        <i class="ri-rocket-line"></i> H??zl?? Payla??
       </div>
       <div class="nav-item" onclick="showTab('library'); toggleSidebar(false)">
-        <i class="ri-image-2-line"></i> Kütüphane
+        <i class="ri-image-2-line"></i> K??t??phane
       </div>
       <div class="nav-item" data-role="super_admin" onclick="showTab('users'); toggleSidebar(false)">
-        <i class="ri-user-settings-line"></i> Kullanıcılar
+        <i class="ri-user-settings-line"></i> Kullan??c??lar
       </div>
       <div class="nav-item" data-role="super_admin" onclick="showTab('payments'); toggleSidebar(false)">
-        <i class="ri-history-line"></i> Ödeme Geçmişi
+        <i class="ri-history-line"></i> ??deme Ge??mi??i
       </div>
       <div class="nav-item" onclick="showTab('finance'); toggleSidebar(false)">
         <i class="ri-wallet-3-line"></i> Finans
@@ -761,13 +628,13 @@
         <i class="ri-settings-3-line"></i> Ayarlar
       </div>
       <div class="nav-item" data-role="super_admin" onclick="showTab('logs'); toggleSidebar(false)">
-        <i class="ri-file-list-3-line"></i> Kayıtlar
+        <i class="ri-file-list-3-line"></i> Kay??tlar
       </div>
       <div class="nav-item" onclick="showTab('submitted_news'); toggleSidebar(false)">
         <i class="ri-mail-download-line"></i> Gelen Haberler
       </div>
       <div class="nav-item" onclick="showTab('tasks'); toggleSidebar(false)">
-        <i class="ri-task-line"></i> Görevler
+        <i class="ri-task-line"></i> G??revler
       </div>
     </div>
     <div class="user-info"
@@ -783,7 +650,7 @@
       <div style="display:flex; gap:0.5rem; align-items:center;">
         <span onclick="showTab('profile'); toggleSidebar(false)" style="cursor:pointer; font-size:1.2rem;"
           title="Profil"><i class="ri-user-settings-line"></i></span>
-        <span class="logout" id="logoutBtn" title="Çıkış Yap"><i class="ri-logout-box-r-line"></i></span>
+        <span class="logout" id="logoutBtn" title="????k???? Yap"><i class="ri-logout-box-r-line"></i></span>
       </div>
     </div>
   </div>
@@ -796,7 +663,7 @@
             <path d="M3 12h18M3 6h18M3 18h18" />
           </svg>
         </div>
-        <div class="header-title" id="pageTitle">Kütüphane</div>
+        <div class="header-title" id="pageTitle">K??t??phane</div>
       </div>
       <div>
         <button class="btn btn-secondary" onclick="toggleTheme()"
@@ -814,8 +681,8 @@
         <div id="editorDashboard" style="display:none; gap:1.5rem; flex-direction:column;">
           <div class="card"
             style="background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white;">
-            <h2 style="margin-bottom: 0.5rem; color: white;">Hoş Geldiniz, <span id="dashEditorName"></span>!</h2>
-            <p style="opacity: 0.9;">Bugün harika görünüyorsun. Hadi yeni bir şeyler paylaşalım.</p>
+            <h2 style="margin-bottom: 0.5rem; color: white;">Ho?? Geldiniz, <span id="dashEditorName"></span>!</h2>
+            <p style="opacity: 0.9;">Bug??n harika g??r??n??yorsun. Hadi yeni bir ??eyler payla??al??m.</p>
           </div>
 
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:1.5rem;">
@@ -825,34 +692,34 @@
                 <div class="card"
                   style="display:flex; flex-direction:column; justify-content:center; align-items:center; padding:1.5rem;">
                   <i class="ri-wallet-3-line" style="font-size:2rem; color:var(--success); margin-bottom:0.5rem;"></i>
-                  <div style="font-size:0.9rem; color:var(--text-muted);">Güncel Bakiye</div>
-                  <div style="font-size:1.8rem; font-weight:700; color:var(--text-main);" id="dashEditorBalance">0 ₺
+                  <div style="font-size:0.9rem; color:var(--text-muted);">G??ncel Bakiye</div>
+                  <div style="font-size:1.8rem; font-weight:700; color:var(--text-main);" id="dashEditorBalance">0 ???
                   </div>
                 </div>
                 <div class="card"
                   style="display:flex; flex-direction:column; justify-content:center; align-items:center; padding:1.5rem;">
                   <i class="ri-upload-cloud-line"
                     style="font-size:2rem; color:var(--primary); margin-bottom:0.5rem;"></i>
-                  <div style="font-size:0.9rem; color:var(--text-muted);">Paylaşım</div>
+                  <div style="font-size:0.9rem; color:var(--text-muted);">Payla????m</div>
                   <div style="font-size:1.8rem; font-weight:700; color:var(--text-main);" id="dashEditorPosts">0</div>
                 </div>
               </div>
 
               <div class="card">
                 <h3 style="margin-bottom:1rem; font-size:1.1rem; color:var(--primary);"><i class="ri-task-line"></i>
-                  Yaklaşan Görevlerim</h3>
+                  Yakla??an G??revlerim</h3>
                 <div id="dashEditorTasks"
                   style="max-height: 250px; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem;">
                   <!-- Tasks will be injected here -->
-                  <div style="color:var(--text-muted); font-size:0.9rem;">Yükleniyor...</div>
+                  <div style="color:var(--text-muted); font-size:0.9rem;">Y??kleniyor...</div>
                 </div>
               </div>
             </div>
 
             <!-- Right Side: Chart -->
             <div class="card" style="min-height: 300px;">
-              <h3 style="margin-bottom:1rem; font-size:1.1rem;"><i class="ri-line-chart-line"></i> Performans Eğrisi
-                (Son 7 Gün)</h3>
+              <h3 style="margin-bottom:1rem; font-size:1.1rem;"><i class="ri-line-chart-line"></i> Performans E??risi
+                (Son 7 G??n)</h3>
               <div id="chartEditorPerformance" style="min-height: 250px;"></div>
             </div>
           </div>
@@ -861,21 +728,21 @@
         <!-- Admin View -->
         <div id="adminDashboard" style="display:none; gap:1.5rem; flex-direction:column;">
           <div class="card" style="background: linear-gradient(135deg, #1f2937, #374151); color: white;">
-            <h2 style="margin-bottom: 0.5rem; color: white;">Sistem Özeti</h2>
-            <p style="opacity: 0.9;">Tüm editör aktivitelerine ve finansal duruma genel bakış.</p>
+            <h2 style="margin-bottom: 0.5rem; color: white;">Sistem ??zeti</h2>
+            <p style="opacity: 0.9;">T??m edit??r aktivitelerine ve finansal duruma genel bak????.</p>
           </div>
 
           <!-- KPI Cards -->
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1.5rem;">
             <div class="card" style="border-left: 4px solid var(--primary); padding: 1.25rem;">
               <div style="color:var(--text-muted); font-size:0.85rem; font-weight:600; text-transform:uppercase;">Aktif
-                Editörler</div>
+                Edit??rler</div>
               <div style="font-size:2rem; font-weight:700; margin-top:0.2rem;" id="dashAdminEditors">0</div>
             </div>
             <div class="card" style="border-left: 4px solid #f59e0b; padding: 1.25rem;">
               <div style="color:var(--text-muted); font-size:0.85rem; font-weight:600; text-transform:uppercase;">
-                Ödenmemiş Kasa</div>
-              <div style="font-size:2rem; font-weight:700; margin-top:0.2rem; color:#f59e0b;" id="dashAdminUnpaid">0 ₺
+                ??denmemi?? Kasa</div>
+              <div style="font-size:2rem; font-weight:700; margin-top:0.2rem; color:#f59e0b;" id="dashAdminUnpaid">0 ???
               </div>
             </div>
             <div class="card" style="border-left: 4px solid var(--danger); padding: 1.25rem;">
@@ -885,8 +752,8 @@
                 id="dashAdminPending">0</div>
             </div>
             <div class="card" style="border-left: 4px solid var(--success); padding: 1.25rem;">
-              <div style="color:var(--text-muted); font-size:0.85rem; font-weight:600; text-transform:uppercase;">Bugün
-                Paylaşılan</div>
+              <div style="color:var(--text-muted); font-size:0.85rem; font-weight:600; text-transform:uppercase;">Bug??n
+                Payla????lan</div>
               <div style="font-size:2rem; font-weight:700; margin-top:0.2rem; color:var(--success);"
                 id="dashAdminTodayPosts">0</div>
             </div>
@@ -897,24 +764,24 @@
 
             <!-- Revenue / Posting Chart -->
             <div class="card">
-              <h3 style="margin-bottom:1rem;"><i class="ri-bar-chart-2-line"></i> Günlük Paylaşım İstatistiği (Son 14
-                Gün)</h3>
+              <h3 style="margin-bottom:1rem;"><i class="ri-bar-chart-2-line"></i> G??nl??k Payla????m ??statisti??i (Son 14
+                G??n)</h3>
               <div id="chartAdminSystem" style="min-height: 300px;"></div>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:1.5rem;">
               <!-- Mini Tasks Widget -->
               <div class="card" style="flex:1;">
-                <h3 style="margin-bottom:1rem;"><i class="ri-task-line"></i> Tamamlanmamış Görevler</h3>
+                <h3 style="margin-bottom:1rem;"><i class="ri-task-line"></i> Tamamlanmam???? G??revler</h3>
                 <div id="dashAdminTasks" style="max-height: 150px; overflow-y:auto; font-size:0.9rem;">
-                  <span style="color:var(--text-muted)">Yükleniyor...</span>
+                  <span style="color:var(--text-muted)">Y??kleniyor...</span>
                 </div>
               </div>
 
               <!-- Top Editors -->
               <div class="card" style="flex:1;">
-                <h3 style="margin-bottom:1rem;"><i class="ri-medal-line"></i> En Çok Kazandıran Editörler</h3>
-                <div id="dashAdminTopEditors" style="font-size:0.9rem;">Yükleniyor...</div>
+                <h3 style="margin-bottom:1rem;"><i class="ri-medal-line"></i> En ??ok Kazand??ran Edit??rler</h3>
+                <div id="dashAdminTopEditors" style="font-size:0.9rem;">Y??kleniyor...</div>
               </div>
             </div>
           </div>
@@ -924,9 +791,9 @@
       <!-- LIBRARY TAB -->
       <div id="library" class="tab-content">
         <div class="filters">
-          <div class="filter-pill active" onclick="filterType(null)">Tümü</div>
+          <div class="filter-pill active" onclick="filterType(null)">T??m??</div>
           <div class="filter-pill" onclick="filterType('REEL')">Reels</div>
-          <div class="filter-pill" onclick="filterType('CAROUSEL')">Albüm</div>
+          <div class="filter-pill" onclick="filterType('CAROUSEL')">Alb??m</div>
           <div class="filter-pill" onclick="filterType('POST')">Post</div>
           <div class="filter-pill" onclick="filterType('STORY')">Hikaye</div>
         </div>
@@ -943,7 +810,7 @@
         <div class="ig-card">
           <!-- Header -->
           <div class="ig-modal-header" style="justify-content: center;">
-            <span>Hızlı Paylaşım</span>
+            <span>H??zl?? Payla????m</span>
           </div>
 
           <!-- Body -->
@@ -962,9 +829,9 @@
                     style="font-size: 5rem; color: var(--text-main); margin-bottom: 0.5rem; font-weight: 100;"></i>
                   <div
                     style="font-size: 1.25rem; margin-top: 1rem; margin-bottom: 2rem; font-weight: 300; color: var(--text-main);">
-                    Fotoğrafları ve videoları buraya sürükle</div>
+                    Foto??raflar?? ve videolar?? buraya s??r??kle</div>
                   <button class="btn btn-primary" onclick="document.getElementById('multiUploadInput').click()"
-                    style="padding: 0.5rem 1rem; border-radius: 0.5rem;">Bilgisayardan seç</button>
+                    style="padding: 0.5rem 1rem; border-radius: 0.5rem;">Bilgisayardan se??</button>
                 </div>
               </div>
 
@@ -1013,11 +880,11 @@
               </script>
 
               <div class="ig-caption-area">
-                <textarea id="quickCaption" placeholder="Açıklama veya Yorum Yaz..."></textarea>
+                <textarea id="quickCaption" placeholder="A????klama veya Yorum Yaz..."></textarea>
               </div>
 
               <div class="ig-footer">
-                <button id="quickShareBtn" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">Paylaş</button>
+                <button id="quickShareBtn" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">Payla??</button>
                 <div id="quickStatus" style="margin-top: 1rem; font-weight: 500; text-align:center;"></div>
                 <div class="ig-progress-wrapper" id="quickProgressWrapper" style="margin-top: 1rem;">
                   <div class="ig-progress-bar" id="quickProgressBar"></div>
@@ -1063,7 +930,7 @@
                 style="font-size:3rem; display:flex; align-items:center; justify-content:center; height:100%;"></i>
             </div>
             <button class="btn btn-secondary" onclick="document.getElementById('avatarInput').click()">
-              <i class="ri-image-edit-line"></i> Resim Değiştir
+              <i class="ri-image-edit-line"></i> Resim De??i??tir
             </button>
             <input type="file" id="avatarInput" style="display:none" accept="image/*" onchange="uploadAvatar(this)">
           </div>
@@ -1079,23 +946,23 @@
               <input type="email" id="profile_email" readonly style="opacity: 0.7; cursor: not-allowed;">
             </div>
             <div style="margin-bottom: 1rem;">
-              <label>Kayıtlı IBAN Bilgisi</label>
+              <label>Kay??tl?? IBAN Bilgisi</label>
               <input type="text" id="profile_iban" placeholder="TR00 0000 0000 0000 0000 0000 00">
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Değişiklikleri Kaydet</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">De??i??iklikleri Kaydet</button>
           </form>
 
 
           <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; text-align: left;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <h3>Kazanç ve Ödemeler</h3>
-              <div style="font-size: 1.2rem; font-weight: bold; color: var(--success);" id="profile_balance">... ₺</div>
+              <h3>Kazan?? ve ??demeler</h3>
+              <div style="font-size: 1.2rem; font-weight: bold; color: var(--success);" id="profile_balance">... ???</div>
             </div>
             <button id="requestPaymentBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;"
-              onclick="requestPayment()">Ödeme Talep Et</button>
+              onclick="requestPayment()">??deme Talep Et</button>
             <div id="paymentStatusBox" style="font-size: 0.9rem; margin-bottom: 1rem;"></div>
 
-            <h4>Son 5 İşlem</h4>
+            <h4>Son 5 ????lem</h4>
             <div
               style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 5px; margin-top: 0.5rem;"
               id="profile_transactions"></div>
@@ -1103,13 +970,13 @@
 
           <form id="updatePasswordForm"
             style="margin-top: 2rem; text-align: left; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-            <h3>Şifre Güncelle</h3>
+            <h3>??ifre G??ncelle</h3>
             <div style="margin-top: 1rem;">
-              <label>Yeni Şifre</label>
+              <label>Yeni ??ifre</label>
               <input type="password" id="new_password" required minlength="6">
             </div>
-            <button type="submit" class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">Şifreyi
-              Güncelle</button>
+            <button type="submit" class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">??ifreyi
+              G??ncelle</button>
           </form>
           <div id="profileStatus" style="margin-top: 1rem;"></div>
         </div>
@@ -1122,21 +989,21 @@
           <div class="card"
             style="display:flex; justify-content:space-between; align-items:center; background:var(--primary); color:white;">
             <div>
-              <div style="font-size:1rem; opacity:0.9;">Çekilebilir Net Bakiye</div>
-              <div style="font-size:2.5rem; font-weight:700;" id="finEditorBalance">0 ₺</div>
+              <div style="font-size:1rem; opacity:0.9;">??ekilebilir Net Bakiye</div>
+              <div style="font-size:2.5rem; font-weight:700;" id="finEditorBalance">0 ???</div>
             </div>
             <button class="btn" style="background:white; color:var(--primary); font-weight:600;"
-              onclick="requestPayout()">Ödeme Talep Et</button>
+              onclick="requestPayout()">??deme Talep Et</button>
           </div>
           <div class="card">
-            <h3>Finansal İşlem Geçmişi</h3>
+            <h3>Finansal ????lem Ge??mi??i</h3>
             <div style="overflow-x:auto; margin-top:1rem;">
               <table>
                 <thead>
                   <tr>
                     <th>Tarih</th>
-                    <th>İşlem Tipi</th>
-                    <th>Açıklama</th>
+                    <th>????lem Tipi</th>
+                    <th>A????klama</th>
                     <th>Durum</th>
                     <th>Tutar</th>
                   </tr>
@@ -1150,16 +1017,16 @@
         <!-- Admin Finance View -->
         <div id="financeAdminView" style="display:none; flex-direction:column; gap:1.5rem;">
           <div class="card">
-            <h2 style="margin-bottom: 1rem;">Editör Finansal Özetleri</h2>
+            <h2 style="margin-bottom: 1rem;">Edit??r Finansal ??zetleri</h2>
             <div style="overflow-x:auto;">
               <table>
                 <thead>
                   <tr>
-                    <th>Editör</th>
-                    <th>Toplam Kazanç</th>
+                    <th>Edit??r</th>
+                    <th>Toplam Kazan??</th>
                     <th>Cezalar/Kesintiler</th>
-                    <th>Ödenen Tutar</th>
-                    <th>İçeride Kalan (Net Kasa)</th>
+                    <th>??denen Tutar</th>
+                    <th>????eride Kalan (Net Kasa)</th>
                   </tr>
                 </thead>
                 <tbody id="finAdminEditorsTableBody"></tbody>
@@ -1173,9 +1040,9 @@
                 <thead>
                   <tr>
                     <th>Tarih</th>
-                    <th>Kullanıcı</th>
-                    <th>İşlem</th>
-                    <th>Açıklama</th>
+                    <th>Kullan??c??</th>
+                    <th>????lem</th>
+                    <th>A????klama</th>
                     <th>Tutar</th>
                   </tr>
                 </thead>
@@ -1188,117 +1055,37 @@
 
       <!-- USERS TAB (Admin) -->
       <div id="users" class="tab-content">
-        <!-- User List View -->
-        <div id="userListView">
-          <div class="grid" style="grid-template-columns: 1fr;">
-            <div class="card" style="overflow-x: auto;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <h3>Kullanıcılar</h3>
-              </div>
-              <table style="min-width: 600px;">
-                <thead>
-                  <tr>
-                    <th>İsim</th>
-                    <th>E-posta</th>
-                    <th>Rol</th>
-                    <th style="text-align:right">İşlem</th>
-                  </tr>
-                </thead>
-                <tbody id="userTableBody"></tbody>
-              </table>
+        <div class="grid" style="grid-template-columns: 1fr;">
+          <div class="card" style="overflow-x: auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <h3>Kullan??c??lar</h3>
             </div>
-            <div class="card">
-              <h3>Yeni Kullanıcı Ekle</h3>
-              <form id="addUserForm"
-                style="display:grid; gap:1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                <div><label>İsim</label><input type="text" id="add_name" required></div>
-                <div><label>E-posta</label><input type="email" id="add_email" required></div>
-                <div><label>Şifre</label><input type="password" id="add_password" required></div>
-                <div><label>Rol</label><select id="add_role">
-                    <option value="editor">Editör</option>
-                    <option value="super_admin">Admin</option>
-                  </select></div>
-                <div style="grid-column: 1/-1;"><button type="submit" class="btn btn-primary"
-                    style="width:100%">Ekle</button></div>
-              </form>
-            </div>
+            <table style="min-width: 600px;">
+              <thead>
+                <tr>
+                  <th>??sim</th>
+                  <th>E-posta</th>
+                  <th>Rol</th>
+                  <th style="text-align:right">????lem</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody"></tbody>
+            </table>
           </div>
-        </div>
-
-        <!-- User Detail View (inline, hidden by default) -->
-        <div id="userDetailView" style="display:none;">
-          <button class="btn btn-secondary" onclick="closeUserDetail()"
-            style="margin-bottom: 1.5rem; display:flex; align-items:center; gap:0.5rem;">
-            <i class="ri-arrow-left-line"></i> Kullanıcı Listesine Dön
-          </button>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-            <!-- Sol: Kullanıcı Düzenleme Formu -->
-            <div class="card">
-              <h4 style="margin-bottom: 1rem; color: var(--primary);"><i class="ri-edit-box-line"></i> Bilgileri
-                Güncelle</h4>
-              <form id="userEditForm" onsubmit="saveUserEdit(event)">
-                <input type="hidden" id="editUserId">
-                <div class="form-group">
-                  <label>Ad Soyad</label>
-                  <input type="text" id="editUserName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                  <label>E-posta</label>
-                  <input type="email" id="editUserEmail" class="form-control" required>
-                </div>
-                <div class="form-group">
-                  <label>Rol</label>
-                  <select id="editUserRole" class="form-control">
-                    <option value="editor">Editör</option>
-                    <option value="super_admin">Süper Admin</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>IBAN (Opsiyonel)</label>
-                  <input type="text" id="editUserIban" class="form-control">
-                </div>
-                <div class="form-group">
-                  <label>Yeni Şifre (Sadece değiştirmek isterseniz)</label>
-                  <input type="password" id="editUserPassword" class="form-control" placeholder="En az 6 karakter...">
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="ri-save-line"></i>
-                  Kaydet</button>
-              </form>
-            </div>
-
-            <!-- Sağ: Kullanıcı İstatistikleri -->
-            <div class="card">
-              <h4 style="margin-bottom: 1rem; color: var(--primary);"><i class="ri-bar-chart-box-line"></i>
-                İstatistikler &
-                Loglar</h4>
-
-              <div
-                style="background: var(--bg); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border); margin-bottom: 1rem;">
-                <div style="font-size: 0.85rem; color: var(--text-muted);">Güncel Bakiye</div>
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--success);" id="statEarnings">0.00 ₺</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">Kayıt: <span
-                    id="statCreatedAt">-</span></div>
-              </div>
-
-              <!-- Aktif Görevler -->
-              <div style="margin-bottom: 1rem;">
-                <strong style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Son Görevleri</strong>
-                <div id="statTasks"
-                  style="font-size: 0.85rem; color: var(--text-dark); max-height: 120px; overflow-y: auto; background: var(--card-bg); padding: 0.5rem; border: 1px solid var(--border); border-radius: 0.3rem;">
-                  Yükleniyor...
-                </div>
-              </div>
-
-              <!-- Son Loglar -->
-              <div>
-                <strong style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Son 10 Sistem Aktivitesi</strong>
-                <div id="statLogs"
-                  style="font-size: 0.8rem; color: var(--text-dark); max-height: 150px; overflow-y: auto; background: var(--card-bg); padding: 0.5rem; border: 1px solid var(--border); border-radius: 0.3rem;">
-                  Yükleniyor...
-                </div>
-              </div>
-            </div>
+          <div class="card">
+            <h3>Yeni Kullan??c?? Ekle</h3>
+            <form id="addUserForm"
+              style="display:grid; gap:1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+              <div><label>??sim</label><input type="text" id="add_name" required></div>
+              <div><label>E-posta</label><input type="email" id="add_email" required></div>
+              <div><label>??ifre</label><input type="password" id="add_password" required></div>
+              <div><label>Rol</label><select id="add_role">
+                  <option value="editor">Edit??r</option>
+                  <option value="super_admin">Admin</option>
+                </select></div>
+              <div style="grid-column: 1/-1;"><button type="submit" class="btn btn-primary"
+                  style="width:100%">Ekle</button></div>
+            </form>
           </div>
         </div>
       </div>
@@ -1307,7 +1094,7 @@
       <div id="payments" class="tab-content">
         <div class="card" style="overflow-x: auto;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <h3>Ödeme Talepleri</h3>
+            <h3>??deme Talepleri</h3>
             <button class="btn btn-secondary" onclick="loadAdminPayments()"><i class="ri-refresh-line"></i>
               Yenile</button>
           </div>
@@ -1315,12 +1102,12 @@
             <thead>
               <tr>
                 <th>Tarih</th>
-                <th>Editör</th>
+                <th>Edit??r</th>
                 <th>E-posta</th>
                 <th>IBAN</th>
                 <th>Tutar</th>
                 <th>Durum</th>
-                <th style="text-align:right">İşlem</th>
+                <th style="text-align:right">????lem</th>
               </tr>
             </thead>
             <tbody id="paymentTableBody"></tbody>
@@ -1334,11 +1121,11 @@
           <h3 style="margin-bottom:1rem;">Genel Ayarlar</h3>
           <form id="settingsForm" onsubmit="event.preventDefault(); saveSettings();">
             <div style="margin-bottom:1rem;">
-              <label>Ödeme Alt Limiti (₺)</label>
+              <label>??deme Alt Limiti (???)</label>
               <input type="number" id="set_min_withdrawal_limit" required>
             </div>
             <div style="margin-bottom:1rem;">
-              <label>Sitenizin Dışa Açık Adresi (URL)</label>
+              <label>Sitenizin D????a A????k Adresi (URL)</label>
               <input type="text" id="set_PUBLIC_BASE_URL" placeholder="http://localhost:3000" required>
             </div>
             <button type="submit" class="btn btn-primary">Kaydet</button>
@@ -1346,7 +1133,7 @@
         </div>
 
         <div class="card" style="max-width: 800px; margin: 0 auto;">
-          <h3>Meta API Ayarları</h3>
+          <h3>Meta API Ayarlar??</h3>
           <form id="settingsFormMeta" style="margin-top: 1.5rem;">
             <div style="margin-bottom:1rem;"><label>App ID</label><input type="text" id="META_APP_ID"></div>
             <div style="margin-bottom:1rem;"><label>App Secret</label><input type="password" id="META_APP_SECRET">
@@ -1356,27 +1143,27 @@
             <div style="margin-bottom:1rem;"><label>Business Account ID</label><input type="text"
                 id="INSTAGRAM_BUSINESS_ACCOUNT_ID"></div>
             <div style="margin-bottom:1rem; border-top:1px solid #eee; padding-top:1rem;">
-              <label>Paylaşım Başına Editör Ücreti (₺)</label>
+              <label>Payla????m Ba????na Edit??r ??creti (???)</label>
               <input type="number" step="0.01" id="fee_per_post" value="1">
             </div>
             <div style="margin-bottom:1rem;">
-              <label>Minimum Ödeme Çekim Limiti (₺)</label>
+              <label>Minimum ??deme ??ekim Limiti (???)</label>
               <input type="number" step="0.01" id="min_withdrawal_limit" value="200">
             </div>
             <div style="margin-bottom:1rem; border-top:1px solid #eee; padding-top:1rem;">
-              <label>100+ Beğeni Bonusu (₺)</label>
+              <label>100+ Be??eni Bonusu (???)</label>
               <input type="number" step="0.01" id="bonus_per_100_likes" value="10">
-              <small style="color:#666">100 beğeniye ulaşan her post için editöre verilecek ekstra ücret.</small>
+              <small style="color:#666">100 be??eniye ula??an her post i??in edit??re verilecek ekstra ??cret.</small>
             </div>
             <div style="margin-bottom:1rem; border-top:1px solid #eee; padding-top:1rem;">
               <label>n8n Webhook URL (Opsiyonel)</label>
               <input type="text" id="N8N_WEBHOOK_URL" placeholder="https://primary.n8n.com/webhook/..."
                 style="width:100%">
-              <small style="color:#666">Eğer girilirse, paylaşım bu adrese gönderilir.</small>
+              <small style="color:#666">E??er girilirse, payla????m bu adrese g??nderilir.</small>
             </div>
             <div style="display:flex; gap:1rem;">
               <button type="button" class="btn btn-secondary" onclick="testConnection()"><i class="ri-plug-line"></i>
-                Bağlantıyı Test Et</button>
+                Ba??lant??y?? Test Et</button>
               <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Kaydet</button>
             </div>
           </form>
@@ -1396,12 +1183,12 @@
             <thead>
               <tr>
                 <th>Tarih</th>
-                <th>Gönderen</th>
-                <th>Başlık</th>
-                <th>Açıklama</th>
+                <th>G??nderen</th>
+                <th>Ba??l??k</th>
+                <th>A????klama</th>
                 <th>Medya</th>
                 <th>Durum</th>
-                <th style="text-align:right">İşlem</th>
+                <th style="text-align:right">????lem</th>
               </tr>
             </thead>
             <tbody id="submittedNewsTableBody"></tbody>
@@ -1414,7 +1201,7 @@
       <div class="bottom-sheet" id="newsEditModal"
         style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:90%; max-width:600px; height:auto; background:var(--card-bg); z-index:1000; border-radius:1rem; padding:2rem; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-          <h3 style="margin:0;">Haberi Düzenle</h3>
+          <h3 style="margin:0;">Haberi D??zenle</h3>
           <button onclick="closeNewsEditModal()"
             style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-main);"><i
               class="ri-close-line"></i></button>
@@ -1422,28 +1209,28 @@
         <form id="newsEditForm">
           <input type="hidden" id="news_edit_id">
           <div style="margin-bottom:1rem;">
-            <label>Gönderen</label>
+            <label>G??nderen</label>
             <input type="text" id="news_edit_fullname">
           </div>
           <div style="margin-bottom:1rem;">
-            <label>Başlık</label>
+            <label>Ba??l??k</label>
             <input type="text" id="news_edit_title">
           </div>
           <div style="margin-bottom:1rem;">
-            <label>Açıklama</label>
+            <label>A????klama</label>
             <textarea id="news_edit_description" rows="5"></textarea>
           </div>
           <div style="margin-bottom:1.5rem;">
             <label>Durum</label>
             <select id="news_edit_status">
               <option value="pending">Beklemede</option>
-              <option value="published">Yayınlandı</option>
+              <option value="published">Yay??nland??</option>
               <option value="rejected">Reddedildi</option>
             </select>
           </div>
           <div style="display:flex; gap:1rem;">
             <button type="button" class="btn btn-secondary" onclick="closeNewsEditModal()"
-              style="flex:1;">İptal</button>
+              style="flex:1;">??ptal</button>
             <button type="submit" class="btn btn-primary" style="flex:1;">Kaydet</button>
           </div>
         </form>
@@ -1457,12 +1244,12 @@
           const bid = document.getElementById('INSTAGRAM_BUSINESS_ACCOUNT_ID').value;
 
           if (!token || !bid) {
-            status.innerHTML = '<span style="color:var(--danger)"><i class="ri-alert-line"></i> Önce Token ve ID giriniz.</span>';
+            status.innerHTML = '<span style="color:var(--danger)"><i class="ri-alert-line"></i> ??nce Token ve ID giriniz.</span>';
             return;
           }
 
           btn.disabled = true;
-          status.innerHTML = 'Bağlanılıyor...';
+          status.innerHTML = 'Ba??lan??l??yor...';
 
           try {
             const res = await fetch('/api/admin/test-connection', {
@@ -1473,7 +1260,7 @@
             const d = await res.json();
             if (d.ok) {
               status.innerHTML = `<div style="color:var(--success); background:#ecfdf5; padding:1rem; border-radius:0.5rem; border:1px solid #10b981;">
-                        <strong><i class="ri-checkbox-circle-line"></i> Bağlantı Başarılı!</strong><br>
+                        <strong><i class="ri-checkbox-circle-line"></i> Ba??lant?? Ba??ar??l??!</strong><br>
                         Hesap: ${d.data.name} (@${d.data.username})<br>
                         ID: ${d.data.id}
                     </div>`;
@@ -1493,28 +1280,19 @@
       <!-- LOGS TAB (Admin) -->
       <div id="logs" class="tab-content">
         <!-- Filter Form -->
-        <div class="card" style="margin-bottom: 1.5rem; padding: 1.5rem;">
-          <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1rem;">
-
-            <div style="flex: 1; min-width: 150px;">
-              <label
-                style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Kullanıcı
-                ID</label>
-              <div style="position: relative;">
-                <i class="ri-user-line"
-                  style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                <input type="number" id="filterLogUser" class="form-control" placeholder="Örn: 12"
-                  style="padding-left: 36px; padding-right: 12px; height: 42px; width: 100%; border-radius: 6px;">
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; overflow-x: auto; padding-bottom: 0px;">
+              <div
+                style="background:var(--bg); border:1px solid var(--border); border-radius:30px; padding:6px 12px; display:flex; align-items:center;">
+                <i class="ri-user-line" style="color:var(--text-muted); margin-right:5px;"></i>
+                <input type="number" id="filterLogUser" placeholder="Kullan??c?? ID"
+                  style="border:none;background:transparent;outline:none;font-size:0.85rem;width:80px;padding:0;" />
               </div>
-            </div>
-
-            <div style="flex: 1; min-width: 150px;">
-              <label
-                style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">İşlem
-                Türü</label>
-              <select id="filterLogAction" class="form-control" style="height: 42px; width: 100%; border-radius: 6px;"
+              <select id="filterLogAction"
+                style="background:var(--bg); border:1px solid var(--border); border-radius:30px; padding:6px 14px; font-size:0.85rem; outline:none; cursor:pointer;"
                 onchange="loadLogs()">
-                <option value="">Tümü</option>
+                <option value="">????lem: T??m??</option>
                 <option value="POST_SHARED">POST_SHARED</option>
                 <option value="LOGIN">LOGIN</option>
                 <option value="REGISTER">REGISTER</option>
@@ -1523,44 +1301,34 @@
                 <option value="SYSTEM">SYSTEM</option>
                 <option value="PAYMENT_APPROVED">PAYMENT_APPROVED</option>
               </select>
-            </div>
-
-            <div style="flex: 1; min-width: 150px;">
-              <label
-                style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Durum</label>
-              <select id="filterLogStatus" class="form-control" style="height: 42px; width: 100%; border-radius: 6px;"
+              <select id="filterLogStatus"
+                style="background:var(--bg); border:1px solid var(--border); border-radius:30px; padding:6px 14px; font-size:0.85rem; outline:none; cursor:pointer;"
                 onchange="loadLogs()">
-                <option value="">Tümü</option>
+                <option value="">Durum: T??m??</option>
                 <option value="SUCCESS">SUCCESS</option>
                 <option value="FAILED">FAILED</option>
                 <option value="WARN">WARN</option>
               </select>
-            </div>
-
-            <div style="flex: 2; min-width: 250px;">
-              <label
-                style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-dark); margin-bottom: 0.5rem;">Tarih
-                Aralığı</label>
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <input type="date" id="filterLogStart" class="form-control"
-                  style="height: 42px; flex: 1; border-radius: 6px;" onchange="loadLogs()">
-                <span style="color: var(--text-muted);">-</span>
-                <input type="date" id="filterLogEnd" class="form-control"
-                  style="height: 42px; flex: 1; border-radius: 6px;" onchange="loadLogs()">
+              <div
+                style="background:var(--bg); border:1px solid var(--border); border-radius:30px; padding:6px 12px; display:flex; gap:8px; align-items:center; font-size:0.85rem;">
+                <i class="ri-calendar-line" style="color:var(--text-muted);"></i>
+                <input type="date" id="filterLogStart"
+                  style="border:none;background:transparent;outline:none;font-size:0.85rem;font-family:inherit;width:110px;"
+                  onchange="loadLogs()" />
+                <span style="color:var(--text-muted);">-</span>
+                <input type="date" id="filterLogEnd"
+                  style="border:none;background:transparent;outline:none;font-size:0.85rem;font-family:inherit;width:110px;"
+                  onchange="loadLogs()" />
               </div>
             </div>
 
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-              <button class="btn btn-secondary" style="height: 42px; display: flex; align-items: center; gap: 0.5rem;"
-                onclick="clearLogFilters()">
-                <i class="ri-refresh-line"></i> Temizle
-              </button>
-              <button class="btn btn-primary" style="height: 42px; display: flex; align-items: center; gap: 0.5rem;"
-                onclick="loadLogs()">
-                <i class="ri-search-line"></i> Filtrele
-              </button>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn"
+                style="background:transparent; border:1px solid var(--border); color:var(--text-dark); border-radius:30px; font-size:0.85rem; padding:6px 14px;"
+                onclick="clearLogFilters()"><i class="ri-refresh-line"></i> Temizle</button>
+              <button class="btn btn-primary" style="border-radius:30px; font-size:0.85rem; padding:6px 16px;"
+                onclick="loadLogs()"><i class="ri-search-line"></i> Filtrele</button>
             </div>
-
           </div>
         </div>
 
@@ -1569,8 +1337,8 @@
             <thead>
               <tr>
                 <th>Zaman</th>
-                <th>Kullanıcı</th>
-                <th>İşlem</th>
+                <th>Kullan??c??</th>
+                <th>????lem</th>
                 <th>Detay</th>
                 <th>Durum</th>
               </tr>
@@ -1583,51 +1351,86 @@
       <!-- TASKS (To-Do) TAB -->
       <div id="tasks" class="tab-content">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-          <h2 style="font-size: 1.5rem; color: var(--text-dark);">Görevlerim</h2>
+          <h2 style="font-size: 1.5rem; color: var(--text-dark);">G??revlerim (To-Do)</h2>
           <button class="btn btn-primary" onclick="openTaskModal()">
-            <i class="ri-add-line"></i> Yeni Görev
+            <i class="ri-add-line"></i> Yeni G??rev
           </button>
         </div>
 
-        <!-- Task Category Pill Filter -->
-        <div
-          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-          <div
-            style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; display: flex; overflow: hidden; font-size: 0.9rem;">
-            <button class="task-filter-btn active" onclick="setTaskFilter('all', this)"
-              style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text-dark);">
-              Tüm Görevler <span id="pillCountAll"
-                style="background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
-            </button>
-            <button class="task-filter-btn" onclick="setTaskFilter('pending', this)"
-              style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
-              Yapılacak <span id="pillCountTodo"
-                style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
-            </button>
-            <button class="task-filter-btn" onclick="setTaskFilter('in_progress', this)"
-              style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
-              Devam Eden <span id="pillCountInProgress"
-                style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
-            </button>
-            <button class="task-filter-btn" onclick="setTaskFilter('completed', this)"
-              style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
-              Tamamlanan <span id="pillCountCompleted"
-                style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
-            </button>
-          </div>
-          <button
-            style="background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500;">
-            <i class="ri-equalizer-line"></i> Filtrele & Sırala
-          </button>
-        </div>
-
-        <!-- List View Area -->
-        <div id="listViewArea"
-          style="display: flex; flex-direction: column; gap: 1rem; min-height: 400px; overflow-x: auto;">
-          <!-- JS populate here -->
-        </div>
       </div>
 
+      <!-- Task Category Pill Filter (Like Image 2) -->
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div
+          style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; display: flex; overflow: hidden; font-size: 0.9rem;">
+          <button class="task-filter-btn active" onclick="setTaskFilter('all', this)"
+            style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text-dark);">
+            All Tasks <span id="pillCountAll"
+              style="background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+          </button>
+          <button class="task-filter-btn" onclick="setTaskFilter('pending', this)"
+            style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
+            To do <span id="pillCountTodo"
+              style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+          </button>
+          <button class="task-filter-btn" onclick="setTaskFilter('in_progress', this)"
+            style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
+            In Progress <span id="pillCountInProgress"
+              style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+          </button>
+          <button class="task-filter-btn" onclick="setTaskFilter('completed', this)"
+            style="padding: 8px 16px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); border-left: 1px solid var(--border);">
+            Completed <span id="pillCountCompleted"
+              style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">0</span>
+          </button>
+        </div>
+        <button
+          style="background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500;">
+          <i class="ri-equalizer-line"></i> Filter & Short
+        </button>
+      </div>
+
+      <!-- Kanban Board Area -->
+      <div id="kanbanBoardArea"
+        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; min-height: 400px; overflow-x: auto;">
+
+        <!-- Column: Pending -->
+        <div
+          style="background: var(--bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.1rem; color: #475569;"><i class="ri-time-line"></i> Yap??lacaklar</h3>
+            <span id="countPending" class="badge" style="background: #e2e8f0; color: #475569;">0</span>
+          </div>
+          <div id="col-pending" style="flex: 1; display: flex; flex-direction: column; gap: 1rem; min-height: 200px;">
+            <!-- Task cards will be injected here -->
+          </div>
+        </div>
+
+        <!-- Column: In Progress -->
+        <div
+          style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.75rem; padding: 1rem; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.1rem; color: #166534;"><i class="ri-loader-4-line"></i> Devam Edenler</h3>
+            <span id="countInProgress" class="badge" style="background: #bbf7d0; color: #166534;">0</span>
+          </div>
+          <div id="col-in_progress"
+            style="flex: 1; display: flex; flex-direction: column; gap: 1rem; min-height: 200px;">
+          </div>
+        </div>
+
+        <!-- Column: Completed -->
+        <div
+          style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.75rem; padding: 1rem; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.1rem; color: #1e3a8a;"><i class="ri-checkbox-circle-line"></i> Tamamlananlar</h3>
+            <span id="countCompleted" class="badge" style="background: #bfdbfe; color: #1e3a8a;">0</span>
+          </div>
+          <div id="col-completed" style="flex: 1; display: flex; flex-direction: column; gap: 1rem; min-height: 200px;">
+          </div>
+        </div>
+
+      </div>
     </div>
 
   </div>
@@ -1638,9 +1441,9 @@
     <div class="ig-modal" id="editModal" onclick="event.stopPropagation()">
       <!-- Header -->
       <div class="ig-modal-header">
-        <button onclick="closeEditModal()">İptal</button>
-        <span>Düzenle & Paylaş</span>
-        <button class="ig-share-btn" id="modalShareBtnText" onclick="shareFromModal()">Paylaş</button>
+        <button onclick="closeEditModal()">??ptal</button>
+        <span>D??zenle & Payla??</span>
+        <button class="ig-share-btn" id="modalShareBtnText" onclick="shareFromModal()">Payla??</button>
       </div>
 
       <!-- Body -->
@@ -1661,7 +1464,7 @@
             <div class="ig-username" id="modalUsername">...</div>
           </div>
           <div class="ig-caption-area">
-            <textarea id="modalCaption" placeholder="Açıklama veya Yorum Yaz..."></textarea>
+            <textarea id="modalCaption" placeholder="A????klama veya Yorum Yaz..."></textarea>
           </div>
           <div class="ig-footer">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
@@ -1680,21 +1483,99 @@
     </div>
   </div>
 
+  <!-- USER PROFILE / EDIT MODAL (Admin Only) -->
+  <div class="modal-overlay" id="userModalOverlay" onclick="closeUserModal(event)">
+    <div class="modal-card" id="userModal" onclick="event.stopPropagation()" style="max-width:800px; width: 90%;">
+      <div class="modal-header">
+        <h3 id="userModalTitle">Kullan??c?? Detaylar??</h3>
+        <button class="btn btn-secondary" onclick="closeUserModal()">Kapat</button>
+      </div>
+      <div class="modal-body" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+
+        <!-- Sol: Kullan??c?? D??zenleme Formu -->
+        <div>
+          <h4 style="margin-bottom: 1rem; color: var(--primary);"><i class="ri-edit-box-line"></i> Bilgileri G??ncelle
+          </h4>
+          <form id="userEditForm" onsubmit="saveUserEdit(event)">
+            <input type="hidden" id="editUserId">
+            <div class="form-group">
+              <label>Ad Soyad</label>
+              <input type="text" id="editUserName" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>E-posta</label>
+              <input type="email" id="editUserEmail" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>Rol</label>
+              <select id="editUserRole" class="form-control">
+                <option value="editor">Edit??r</option>
+                <option value="super_admin">S??per Admin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>IBAN (Opsiyonel)</label>
+              <input type="text" id="editUserIban" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Yeni ??ifre (Sadece de??i??tirmek isterseniz)</label>
+              <input type="password" id="editUserPassword" class="form-control" placeholder="En az 6 karakter...">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="ri-save-line"></i>
+              Kaydet</button>
+          </form>
+        </div>
+
+        <!-- Sa??: Kullan??c?? ??statistikleri -->
+        <div>
+          <h4 style="margin-bottom: 1rem; color: var(--primary);"><i class="ri-bar-chart-box-line"></i> ??statistikler &
+            Loglar</h4>
+
+          <div
+            style="background: var(--bg); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border); margin-bottom: 1rem;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);">G??ncel Bakiye</div>
+            <div style="font-size: 1.5rem; font-weight: bold; color: var(--success);" id="statEarnings">0.00 ???</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">Kay??t: <span
+                id="statCreatedAt">-</span></div>
+          </div>
+
+          <!-- Aktif G??revler -->
+          <div style="margin-bottom: 1rem;">
+            <strong style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Son G??revleri</strong>
+            <div id="statTasks"
+              style="font-size: 0.85rem; color: var(--text-dark); max-height: 120px; overflow-y: auto; background: #fff; padding: 0.5rem; border: 1px solid var(--border); border-radius: 0.3rem;">
+              Y??kleniyor...
+            </div>
+          </div>
+
+          <!-- Son Loglar -->
+          <div>
+            <strong style="display:block; margin-bottom:0.5rem; font-size:0.9rem;">Son 10 Sistem Aktivitesi</strong>
+            <div id="statLogs"
+              style="font-size: 0.8rem; color: var(--text-dark); max-height: 150px; overflow-y: auto; background: #fff; padding: 0.5rem; border: 1px solid var(--border); border-radius: 0.3rem;">
+              Y??kleniyor...
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="modal-overlay" id="taskModalOverlay" onclick="closeTaskModal(event)">
     <div class="modal-card" id="taskModal" onclick="event.stopPropagation()" style="max-width:500px">
       <div class="modal-header">
-        <h3 id="taskModalTitle">Yeni Görev Ekle</h3>
+        <h3 id="taskModalTitle">Yeni G??rev Ekle</h3>
         <button class="btn btn-secondary" onclick="closeTaskModal()">Kapat</button>
       </div>
       <div class="modal-body">
         <form id="taskForm" onsubmit="saveTask(event)">
           <div class="form-group">
-            <label>Görev Başlığı <span style="color:var(--danger)">*</span></label>
+            <label>G??rev Ba??l?????? <span style="color:var(--danger)">*</span></label>
             <input type="text" id="taskTitle" class="form-control" required
-              placeholder="Örn: Bu haftanın reel videoları yüklenecek">
+              placeholder="??rn: Bu haftan??n reel videolar?? y??klenecek">
           </div>
           <div class="form-group">
-            <label>Açıklama</label>
+            <label>A????klama</label>
             <textarea id="taskDesc" class="form-control" rows="3" placeholder="Detaylar..."></textarea>
           </div>
           <div class="form-group" id="taskAssignField" style="display:none;">
@@ -1758,7 +1639,7 @@
       if (document.getElementById('profile_iban')) document.getElementById('profile_iban').value = userData.iban || '';
       if (document.getElementById('profileAvatarPreview')) document.getElementById('profileAvatarPreview').innerHTML = avatarHtml;
 
-      document.getElementById('u-role').textContent = userData.role === 'super_admin' ? 'Süper Admin' : 'Editör';
+      document.getElementById('u-role').textContent = userData.role === 'super_admin' ? 'S??per Admin' : 'Edit??r';
     }
 
     updateUIWithUser(user);
@@ -1795,34 +1676,33 @@
         document.getElementById('pageTitle').textContent = 'Ana Sayfa';
         loadDashboard(); // Refresh on tab switch
       } else if (tabId === 'library') {
-        document.getElementById('pageTitle').textContent = 'Kütüphane';
+        document.getElementById('pageTitle').textContent = 'K??t??phane';
         loadLibrary(1); // Load first page
       } else if (tabId === 'quickshare') {
-        document.getElementById('pageTitle').textContent = 'Hızlı Paylaş';
+        document.getElementById('pageTitle').textContent = 'H??zl?? Payla??';
         renderQuickPreview();
       } else if (tabId === 'users' && user.role === 'super_admin') {
-        document.getElementById('pageTitle').textContent = 'Kullanıcı Yönetimi';
-        if (typeof closeUserDetail === 'function') closeUserDetail();
+        document.getElementById('pageTitle').textContent = 'Kullan??c?? Y??netimi';
         loadUsers();
       } else if (tabId === 'logs' && user.role === 'super_admin') {
-        document.getElementById('pageTitle').textContent = 'Sistem Kayıtları';
+        document.getElementById('pageTitle').textContent = 'Sistem Kay??tlar??';
         loadLogs();
       } else if (tabId === 'settings' && user.role === 'super_admin') {
         document.getElementById('pageTitle').textContent = 'Ayarlar';
         loadSettings();
       } else if (tabId === 'profile') {
-        document.getElementById('pageTitle').textContent = 'Profil & Cüzdan';
+        document.getElementById('pageTitle').textContent = 'Profil & C??zdan';
       } else if (tabId === 'submitted_news') {
         document.getElementById('pageTitle').textContent = 'Gelen Haberler';
         loadSubmittedNews();
       } else if (tabId === 'payments' && user.role === 'super_admin') {
-        document.getElementById('pageTitle').textContent = 'Ödeme Talepleri';
+        document.getElementById('pageTitle').textContent = '??deme Talepleri';
         loadAdminPayments();
       } else if (tabId === 'finance') {
-        document.getElementById('pageTitle').textContent = 'Finans Yönetimi';
+        document.getElementById('pageTitle').textContent = 'Finans Y??netimi';
         loadFinance();
       } else if (tabId === 'tasks') {
-        document.getElementById('pageTitle').textContent = 'Görevler';
+        document.getElementById('pageTitle').textContent = 'G??revler (To-Do)';
         loadTasks();
         if (user && user.role === 'super_admin') loadUsersForTasks();
       }
@@ -1835,7 +1715,7 @@
       currentPage = page;
       const grid = document.getElementById('libraryGrid');
       const paginationControls = document.getElementById('paginationControls');
-      grid.innerHTML = '<div style="padding:1rem">Yükleniyor...</div>';
+      grid.innerHTML = '<div style="padding:1rem">Y??kleniyor...</div>';
       try {
         let url = `/api/library?limit=30&page=${currentPage}`;
         if (currentType) url += `&type=${currentType}`;
@@ -1843,43 +1723,31 @@
         const data = await res.json();
         const items = data.items || data;
         const pagination = data.pagination || null;
-        if (items.length === 0) { grid.innerHTML = '<div style="padding:1rem; color:var(--text-muted)">İçerik bulunamadı.</div>'; if (paginationControls) paginationControls.innerHTML = ''; return; }
+        if (items.length === 0) { grid.innerHTML = '<div style="padding:1rem; color:var(--text-muted)">????erik bulunamad??.</div>'; if (paginationControls) paginationControls.innerHTML = ''; return; }
 
         window._libraryItems = items;
 
-        grid.innerHTML = items.filter(item => item.media && item.media.length > 0).map(item => {
+        grid.innerHTML = items.map(item => {
           // Safe caption escape
           const safeCaption = (item.caption || '').replace(/"/g, '&quot;');
-          const firstMedia = item.media[0];
-
-          // Fallback Strategy ensuring URLs are valid if they are partial routes
-          let mediaUrl = firstMedia.url;
-          if (mediaUrl && !mediaUrl.startsWith('http')) {
-            mediaUrl = mediaUrl.startsWith('/') ? mediaUrl : '/' + mediaUrl;
-          }
-          let coverUrl = item.cover_url || mediaUrl;
-          if (coverUrl && !coverUrl.startsWith('http')) {
-            coverUrl = coverUrl.startsWith('/') ? coverUrl : '/' + coverUrl;
-          }
-
           return `
                     <div class="item-card">
                         <div class="item-media">
                             <span class="item-badge">${item.type}</span>
-                            ${firstMedia.kind === 'video'
-              ? `<video src="${mediaUrl}" muted loop onmouseenter="this.play()" onmouseleave="this.pause()" poster="${coverUrl}"></video>`
-              : `<img src="${coverUrl}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/300?text=Goruntu+Yok'">`}
+                            ${item.media[0].kind === 'video'
+              ? `<video src="${item.media[0].url}" muted loop onmouseenter="this.play()" onmouseleave="this.pause()"></video>`
+              : `<img src="${item.cover_url}" loading="lazy">`}
                         </div>
                         <div class="item-content">
-                            <div class="item-caption">${item.caption || '<em style="color:#ccc">Açıklama yok</em>'}</div>
+                            <div class="item-caption">${item.caption || '<em style="color:#ccc">A????klama yok</em>'}</div>
                             <div style="display: flex; gap: 0.5rem; width: 100%;">
                                 <button class="btn btn-secondary" style="flex: 1; padding: 0.5rem;" 
-                                    onclick="openEditModal('${item.id}', '${firstMedia.url}', '${firstMedia.kind}')">
-                                    <i class="ri-edit-box-line"></i> Düzenle
+                                    onclick="openEditModal('${item.id}', '${item.media[0].url}', '${item.media[0].kind}')">
+                                    <i class="ri-edit-box-line"></i> D??zenle
                                 </button>
                                 <button class="btn btn-primary" style="flex: 1; padding: 0.5rem;" 
                                     onclick="downloadLibraryItem('${item.id}', this)">
-                                    <i class="ri-download-2-line"></i> İndir
+                                    <i class="ri-download-2-line"></i> ??ndir
                                 </button>
                             </div>
                         </div>
@@ -1890,7 +1758,7 @@
         if (paginationControls && pagination && pagination.totalPages > 1) {
           let html = '';
           if (pagination.currentPage > 1) {
-            html += `<button class="btn btn-secondary" onclick="loadLibrary(${pagination.currentPage - 1})">Önceki</button>`;
+            html += `<button class="btn btn-secondary" onclick="loadLibrary(${pagination.currentPage - 1})">??nceki</button>`;
           }
           html += `<span style="font-weight: 500;">Sayfa ${pagination.currentPage} / ${pagination.totalPages}</span>`;
           if (pagination.currentPage < pagination.totalPages) {
@@ -1901,7 +1769,7 @@
           paginationControls.innerHTML = '';
         }
 
-      } catch (err) { console.error('Kütüphane yükleme hatası:', err); grid.innerHTML = '<div style="padding:1rem; color:var(--danger)">Kütüphane yüklenirken hata oluştu. Konsolu kontrol edin.</div>'; if (document.getElementById('paginationControls')) document.getElementById('paginationControls').innerHTML = ''; }
+      } catch (err) { grid.innerHTML = 'Hata olu??tu.'; if (document.getElementById('paginationControls')) document.getElementById('paginationControls').innerHTML = ''; }
     }
 
     async function downloadLibraryItem(itemId, btn) {
@@ -1911,7 +1779,7 @@
       if (!item || !item.media || !item.media[0]) return;
 
       const url = item.media[0].url;
-      const originalText = btn ? btn.innerHTML : 'İndir';
+      const originalText = btn ? btn.innerHTML : '??ndir';
       if (btn) {
         btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> ...';
         btn.disabled = true;
@@ -1925,7 +1793,7 @@
           headers: { 'Authorization': `Bearer ${tokenStr}` }
         });
 
-        if (!response.ok) throw new Error("İndirme başarısız");
+        if (!response.ok) throw new Error("??ndirme ba??ar??s??z");
 
         const blob = await response.blob();
         const blobUrl = window.URL.createObjectURL(blob);
@@ -1958,7 +1826,7 @@
       currentType = type;
       currentPage = 1;
       document.querySelectorAll('.filter-pill').forEach(b => {
-        b.classList.toggle('active', (type && b.textContent.toUpperCase().includes(type)) || (!type && b.textContent === 'Tümü'));
+        b.classList.toggle('active', (type && b.textContent.toUpperCase().includes(type)) || (!type && b.textContent === 'T??m??'));
       });
       loadLibrary(1);
     }
@@ -1972,7 +1840,7 @@
       formData.append('avatar', input.files[0]);
 
       const status = document.getElementById('profileStatus');
-      status.innerHTML = 'Fotoğraf yükleniyor...';
+      status.innerHTML = 'Foto??raf y??kleniyor...';
 
       try {
         const res = await fetch('/api/profile/avatar', {
@@ -1982,7 +1850,7 @@
         });
         const d = await res.json();
         if (res.ok) {
-          status.innerHTML = '<span style="color:var(--success)">✅ Fotoğraf güncellendi!</span>';
+          status.innerHTML = '<span style="color:var(--success)">??? Foto??raf g??ncellendi!</span>';
           user.avatar_url = d.avatar_url;
           localStorage.setItem('user', JSON.stringify(user));
           updateUIWithUser(user);
@@ -1990,7 +1858,7 @@
           throw new Error(d.error);
         }
       } catch (e) {
-        status.innerHTML = `< span style = "color:var(--danger)" >❌ Hata: ${e.message}</span > `;
+        status.innerHTML = `< span style = "color:var(--danger)" >??? Hata: ${e.message}</span > `;
       }
     }
 
@@ -2008,7 +1876,7 @@
         });
         const d = await res.json();
         if (res.ok) {
-          status.innerHTML = '<span style="color:var(--success)">✅ Profil güncellendi!</span>';
+          status.innerHTML = '<span style="color:var(--success)">??? Profil g??ncellendi!</span>';
           user.name = newName;
           user.iban = newIban;
           localStorage.setItem('user', JSON.stringify(user));
@@ -2017,7 +1885,7 @@
           throw new Error(d.error);
         }
       } catch (e) {
-        status.innerHTML = `<span style="color:var(--danger)">❌ Hata: ${escapeHTML(e.message)}</span>`;
+        status.innerHTML = `<span style="color:var(--danger)">??? Hata: ${escapeHTML(e.message)}</span>`;
       }
     };
 
@@ -2048,7 +1916,7 @@
       document.getElementById('modalProgressWrapper').style.display = 'none';
       document.getElementById('modalProgressBar').style.width = '0%';
       document.getElementById('modalStatus').innerHTML = '';
-      document.getElementById('modalShareBtnText').innerText = 'Paylaş';
+      document.getElementById('modalShareBtnText').innerText = 'Payla??';
       document.getElementById('modalShareBtnText').disabled = false;
     }
 
@@ -2072,14 +1940,14 @@
           body: JSON.stringify({ itemId: activeItemId, newCaption: newCap })
         });
         if (res.ok) {
-          status.innerHTML = '<span style="color:var(--success)">✅ Kaydedildi</span>';
+          status.innerHTML = '<span style="color:var(--success)">??? Kaydedildi</span>';
           // Update hidden input and grid if visible
           if (document.getElementById(`cap_${activeItemId} `)) {
             document.getElementById(`cap_${activeItemId} `).value = newCap;
           }
           loadLibrary(currentPage); // Refresh grid to show new caption
         }
-      } catch (e) { status.innerHTML = 'Hata oluştu'; }
+      } catch (e) { status.innerHTML = 'Hata olu??tu'; }
     }
 
     async function shareFromModal() {
@@ -2091,7 +1959,7 @@
 
       btn.disabled = true;
       btn.innerText = 'Bekleyin...';
-      status.innerHTML = '🚀 Paylaşılıyor...';
+      status.innerHTML = '???? Payla????l??yor...';
       progressWrap.style.display = 'block';
       progressBar.style.width = '20%';
 
@@ -2120,8 +1988,8 @@
 
         if (res.ok) {
           progressBar.style.width = '100%';
-          status.innerHTML = '<span style="color:var(--success)">✅ Paylaşıldı!</span>';
-          btn.innerText = 'Tamamlandı';
+          status.innerHTML = '<span style="color:var(--success)">??? Payla????ld??!</span>';
+          btn.innerText = 'Tamamland??';
           setTimeout(closeEditModal, 1500);
         } else {
           const d = await res.json();
@@ -2130,7 +1998,7 @@
       } catch (e) {
         progressBar.style.width = '100%';
         progressBar.style.background = 'var(--danger)';
-        status.innerHTML = `< span style = "color:var(--danger)" >❌ ${e.message}</span > `;
+        status.innerHTML = `< span style = "color:var(--danger)" >??? ${e.message}</span > `;
         btn.innerText = 'Hata';
       } finally {
         setTimeout(() => { btn.disabled = false; }, 2000);
@@ -2152,7 +2020,7 @@
           quickFiles = data.media;
           renderQuickPreview();
         }
-      } catch (e) { alert('Yükleme hatası'); }
+      } catch (e) { alert('Y??kleme hatas??'); }
     }
 
     function renderQuickPreview() {
@@ -2182,7 +2050,7 @@
       const btn = document.getElementById('quickShareBtn');
 
       if (quickFiles.length === 0) {
-        status.innerHTML = '<span style="color:var(--danger)">Lütfen önce dosya yükleyin!</span>';
+        status.innerHTML = '<span style="color:var(--danger)">L??tfen ??nce dosya y??kleyin!</span>';
         return;
       }
 
@@ -2191,7 +2059,7 @@
 
       btn.disabled = true;
       btn.innerText = 'Bekleyin...';
-      status.innerHTML = '🚀 Paylaşılıyor...';
+      status.innerHTML = '???? Payla????l??yor...';
       progressWrap.style.display = 'block';
       progressBar.style.width = '20%';
 
@@ -2207,15 +2075,15 @@
 
         if (res.ok) {
           progressBar.style.width = '100%';
-          status.innerHTML = '<span style="color:var(--success)"><i class="ri-checkbox-circle-line"></i> Başarıyla Paylaşıldı!</span>';
-          btn.innerText = 'Tamamlandı';
+          status.innerHTML = '<span style="color:var(--success)"><i class="ri-checkbox-circle-line"></i> Ba??ar??yla Payla????ld??!</span>';
+          btn.innerText = 'Tamamland??';
           setTimeout(() => {
             quickFiles = [];
             renderQuickPreview();
             document.getElementById('quickCaption').value = '';
             progressWrap.style.display = 'none';
             progressBar.style.width = '0%';
-            btn.innerText = 'Paylaş';
+            btn.innerText = 'Payla??';
             btn.disabled = false;
             status.innerHTML = '';
           }, 2000);
@@ -2288,22 +2156,22 @@
 
     function getStatusBadge(status) {
       if (!status || status === 'pending') return `<span style="font-size:0.75rem; color:#D97706; background:#FEF3C7; padding:2px 6px; border-radius:4px;">Kontrol Ediliyor</span>`;
-      if (status === 'verified') return `<span style="font-size:0.75rem; color:#059669; background:#D1FAE5; padding:2px 6px; border-radius:4px;">Onaylandı</span>`;
-      if (status === 'verified_bonus_paid') return `<span style="font-size:0.75rem; color:#059669; background:#D1FAE5; padding:2px 6px; border-radius:4px;">Onaylandı + Bonus</span>`;
-      if (status === 'reversed') return `<span style="font-size:0.75rem; color:#DC2626; background:#FEE2E2; padding:2px 6px; border-radius:4px;">Silindi / İade</span>`;
+      if (status === 'verified') return `<span style="font-size:0.75rem; color:#059669; background:#D1FAE5; padding:2px 6px; border-radius:4px;">Onayland??</span>`;
+      if (status === 'verified_bonus_paid') return `<span style="font-size:0.75rem; color:#059669; background:#D1FAE5; padding:2px 6px; border-radius:4px;">Onayland?? + Bonus</span>`;
+      if (status === 'reversed') return `<span style="font-size:0.75rem; color:#DC2626; background:#FEE2E2; padding:2px 6px; border-radius:4px;">Silindi / ??ade</span>`;
       return `<span style="font-size:0.75rem; background:#eee; padding:2px 6px; border-radius:4px;">${status}</span>`;
     }
     // Restoring critical admin functions
     async function loadUsers() {
       const tbody = document.getElementById('userTableBody');
-      tbody.innerHTML = '<tr><td colspan="4">Yükleniyor...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4">Y??kleniyor...</td></tr>';
       try {
         const res = await fetch('/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } });
         const users = await res.json();
         tbody.innerHTML = users.map(u => `
           <tr>
             <td>
-              <a href="#" onclick="openUserDetail(${u.id}); return false;" style="color:var(--primary); font-weight:600; text-decoration:none;">
+              <a href="#" onclick="openUserModal(${u.id}); return false;" style="color:var(--primary); font-weight:600; text-decoration:none;">
                 <i class="ri-user-settings-line"></i> ${escapeHTML(u.name)}
               </a>
             </td>
@@ -2315,21 +2183,21 @@
           </tr>
         `).join('');
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="4" style="color:red">Kullanıcılar yüklenemedi.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="color:red">Kullan??c??lar y??klenemedi.</td></tr>';
       }
     }
 
-    async function openUserDetail(id) {
-      // Switch to detail view
-      document.getElementById('userListView').style.display = 'none';
-      document.getElementById('userDetailView').style.display = 'block';
+    async function openUserModal(id) {
+      const overlay = document.getElementById('userModalOverlay');
+      overlay.classList.add('open');
+      overlay.style.display = 'flex';
       document.getElementById('editUserId').value = id;
 
       // Reset texts
-      document.getElementById('statEarnings').innerText = 'Yükleniyor...';
+      document.getElementById('statEarnings').innerText = 'Y??kleniyor...';
       document.getElementById('statCreatedAt').innerText = '-';
-      document.getElementById('statTasks').innerHTML = 'Yükleniyor...';
-      document.getElementById('statLogs').innerHTML = 'Yükleniyor...';
+      document.getElementById('statTasks').innerHTML = 'Y??kleniyor...';
+      document.getElementById('statLogs').innerHTML = 'Y??kleniyor...';
 
       try {
         const res = await fetch(`/api/admin/users/${id}/details`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -2345,12 +2213,12 @@
         document.getElementById('editUserPassword').value = '';
 
         // Fill Stats
-        document.getElementById('statEarnings').innerText = (data.user.earnings_balance || 0).toFixed(2) + ' ₺';
+        document.getElementById('statEarnings').innerText = (data.user.earnings_balance || 0).toFixed(2) + ' ???';
         document.getElementById('statCreatedAt').innerText = new Date(data.user.created_at).toLocaleDateString('tr-TR');
 
         // Fill Tasks
         if (data.tasks.length === 0) {
-          document.getElementById('statTasks').innerHTML = '<div style="color:var(--text-muted)">Görev bulunmuyor.</div>';
+          document.getElementById('statTasks').innerHTML = '<div style="color:var(--text-muted)">G??rev bulunmuyor.</div>';
         } else {
           document.getElementById('statTasks').innerHTML = data.tasks.map(t => {
             let clr = t.status === 'completed' ? 'green' : (t.status === 'in_progress' ? 'orange' : 'gray');
@@ -2363,7 +2231,7 @@
 
         // Fill Logs
         if (data.recentLogs.length === 0) {
-          document.getElementById('statLogs').innerHTML = '<div style="color:var(--text-muted)">Log kaydı bulunmuyor.</div>';
+          document.getElementById('statLogs').innerHTML = '<div style="color:var(--text-muted)">Log kayd?? bulunmuyor.</div>';
         } else {
           document.getElementById('statLogs').innerHTML = data.recentLogs.map(l => {
             return `<div style="border-bottom:1px solid #eee; padding:5px 0; display:flex; justify-content:space-between;">
@@ -2375,19 +2243,17 @@
         }
 
       } catch (err) {
-        alert("Kullanıcı detayları alınamadı: " + err.message);
-        closeUserDetail();
+        alert("Kullan??c?? detaylar?? al??namad??: " + err.message);
+        closeUserModal();
       }
     }
 
-    function closeUserDetail() {
-      document.getElementById('userDetailView').style.display = 'none';
-      document.getElementById('userListView').style.display = 'block';
+    function closeUserModal(e) {
+      const overlay = document.getElementById('userModalOverlay');
+      if (e && e.target !== overlay) return;
+      overlay.classList.remove('open');
+      setTimeout(() => { if (!overlay.classList.contains('open')) overlay.style.display = 'none'; }, 200);
     }
-
-    // Keep backward compatibility
-    function openUserModal(id) { openUserDetail(id); }
-    function closeUserModal() { closeUserDetail(); }
 
     async function saveUserEdit(e) {
       e.preventDefault();
@@ -2412,8 +2278,8 @@
           throw new Error(d.error);
         }
 
-        alert("Kullanıcı başarıyla güncellendi!");
-        closeUserDetail();
+        alert("Kullan??c?? ba??ar??yla g??ncellendi!");
+        closeUserModal();
         loadUsers(); // Refresh table
       } catch (err) {
         alert("Hata: " + err.message);
@@ -2461,25 +2327,18 @@
           // Pattern for IG permalinks (https://...)
           const igLinkMatch = detailsHtml.match(/IG:\s*(https:\/\/www\.instagram\.com\/[^ ]+)/);
           if (igLinkMatch && igLinkMatch[1]) {
-            detailsHtml = detailsHtml.replace(igLinkMatch[0], `<a href="${igLinkMatch[1]}" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:underline;">IG: Instagram'da Gör <i class="ri-external-link-line"></i></a>`);
+            detailsHtml = detailsHtml.replace(igLinkMatch[0], `<a href="${igLinkMatch[1]}" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:underline;">IG: Instagram'da G??r <i class="ri-external-link-line"></i></a>`);
           } else {
             // Pattern for legacy IG IDs
             const igIdMatch = detailsHtml.match(/IG:\s*(\d+)/);
             if (igIdMatch && igIdMatch[1]) {
-              let btnId = `plink_` + Math.random().toString(36).substr(2, 9);
-              detailsHtml = detailsHtml.replace(igIdMatch[0], `
-                <div id="${btnId}_container" style="display:inline-block;">
-                  <button id="${btnId}" onclick="fetchPermalink('${igIdMatch[1]}', '${btnId}')" class="btn" style="padding: 2px 8px; font-size: 0.75rem; background: #e0e7ff; color: #4338ca; border:none; border-radius:4px; display:flex; align-items:center; gap:4px; cursor:pointer;">
-                    <i class="ri-instagram-line"></i> Post'a Git
-                  </button>
-                </div>
-              `);
+              detailsHtml = detailsHtml.replace(igIdMatch[0], `<small style="color:var(--text-muted);">IG ID: ${igIdMatch[1]}</small>`);
             }
           }
 
-          let statusBadge = l.status === 'SUCCESS' ? `<span class="badge" style="background:#dcfce7; color:#166534">Başarılı</span>`
-            : l.status === 'FAILED' ? `<span class="badge" style="background:#fee2e2; color:#991b1b">Hatalı</span>`
-              : `<span class="badge" style="background:#fef9c3; color:#854d0e">Uyarı</span>`;
+          let statusBadge = l.status === 'SUCCESS' ? `<span class="badge" style="background:#dcfce7; color:#166534">SUCCESS</span>`
+            : l.status === 'FAILED' ? `<span class="badge" style="background:#fee2e2; color:#991b1b">FAILED</span>`
+              : `<span class="badge" style="background:#fef9c3; color:#854d0e">${escapeHTML(l.status)}</span>`;
 
           return `
             <tr>
@@ -2492,37 +2351,7 @@
           `;
         }).join('');
       } catch (err) {
-        console.error("Loglar yüklenemedi", err);
-      }
-    }
-
-    async function fetchPermalink(igId, btnId) {
-      const btn = document.getElementById(btnId);
-      if (!btn) return;
-
-      const originalHtml = btn.innerHTML;
-      btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Yükleniyor...';
-      btn.disabled = true;
-
-      try {
-        const res = await fetch(`/api/admin/ig-permalink/${igId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-
-        if (data.ok && data.permalink) {
-          const container = document.getElementById(btnId + '_container');
-          if (container) {
-            container.innerHTML = `<a href="${data.permalink}" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:underline; font-size: 0.85rem;"><i class="ri-instagram-line"></i> Instagram'da Aç</a>`;
-          }
-        } else {
-          alert("Instagram bağlantısı getirilemedi: " + (data.error || "Bilinmeyen hata"));
-          btn.innerHTML = originalHtml;
-          btn.disabled = false;
-        }
-      } catch (err) {
-        console.error("Permalink hatası", err);
-        alert("Bağlantı getirilirken sunucu hatası oluştu.");
-        btn.innerHTML = originalHtml;
-        btn.disabled = false;
+        console.error("Loglar y??klenemedi", err);
       }
     }
     document.getElementById('settingsForm').onsubmit = async (e) => {
@@ -2542,14 +2371,14 @@
 
     async function loadSubmittedNews() {
       const tbody = document.getElementById('submittedNewsTableBody');
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Yükleniyor...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Y??kleniyor...</td></tr>';
       try {
         const res = await fetch('/api/admin/submitted-news', { headers: { 'Authorization': `Bearer ${token}` } });
         const data = await res.json();
         allNews = data;
 
         if (data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Henüz gönderilmiş haber bulunmuyor.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Hen??z g??nderilmi?? haber bulunmuyor.</td></tr>';
           return;
         }
 
@@ -2566,7 +2395,7 @@
 
           let statusHtml = '';
           if (news.status === 'pending') statusHtml = `<span style="color:#D97706; background:#FEF3C7; padding:2px 8px; border-radius:12px;">Beklemede</span>`;
-          else if (news.status === 'published') statusHtml = `<span style="color:#059669; background:#D1FAE5; padding:2px 8px; border-radius:12px;">Yayınlandı</span>`;
+          else if (news.status === 'published') statusHtml = `<span style="color:#059669; background:#D1FAE5; padding:2px 8px; border-radius:12px;">Yay??nland??</span>`;
           else if (news.status === 'rejected') statusHtml = `<span style="color:#DC2626; background:#FEE2E2; padding:2px 8px; border-radius:12px;">Reddedildi</span>`;
 
           const dateStr = new Date(news.created_at).toLocaleString('tr-TR');
@@ -2590,7 +2419,7 @@
           </tr>`;
         }).join('');
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="7" style="color:var(--danger); text-align:center;">Yükleme Hatası</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="color:var(--danger); text-align:center;">Y??kleme Hatas??</td></tr>';
       }
     }
 
@@ -2637,12 +2466,12 @@
           alert(d.error || 'Hata');
         }
       } catch (e) {
-        alert('Bağlantı hatası');
+        alert('Ba??lant?? hatas??');
       }
     };
 
     async function deleteNews(id) {
-      if (!confirm('Bu haberi silmek istediğinize emin misiniz?')) return;
+      if (!confirm('Bu haberi silmek istedi??inize emin misiniz?')) return;
       try {
         const res = await fetch(`/api/admin/submitted-news/${id}`, {
           method: 'DELETE',
@@ -2654,7 +2483,7 @@
           alert('Silinemedi');
         }
       } catch (e) {
-        alert('Bağlantı hatası');
+        alert('Ba??lant?? hatas??');
       }
     }
 
@@ -2664,7 +2493,7 @@
         const res = await fetch('/api/earnings/me', { headers: { 'Authorization': `Bearer ${token}` } });
         const data = await res.json();
         if (data.ok) {
-          document.getElementById('profile_balance').textContent = `${data.balance} ₺`;
+          document.getElementById('profile_balance').textContent = `${data.balance} ???`;
 
           let txHtml = '<table style="font-size:0.85rem;">';
           if (data.transactions && data.transactions.length > 0) {
@@ -2677,11 +2506,11 @@
                   ${escapeHTML(tx.description)}<br>
                   ${getStatusBadge(tx.check_status)}
                 </td>
-                <td style="padding:0.4rem; color:${color}; font-weight:bold;">${sign}${tx.amount}₺</td>
+                <td style="padding:0.4rem; color:${color}; font-weight:bold;">${sign}${tx.amount}???</td>
               </tr>`;
             });
           } else {
-            txHtml += '<tr><td style="padding:1rem; color:#888;">Henüz işlem yok.</td></tr>';
+            txHtml += '<tr><td style="padding:1rem; color:#888;">Hen??z i??lem yok.</td></tr>';
           }
           txHtml += '</table>';
           document.getElementById('profile_transactions').innerHTML = txHtml;
@@ -2708,76 +2537,24 @@
           const d = await res.json();
           if (d.ok) {
             document.getElementById('dashAdminEditors').textContent = d.data.total_editors;
-            document.getElementById('dashAdminUnpaid').textContent = d.data.total_unpaid + ' ₺';
+            document.getElementById('dashAdminUnpaid').textContent = d.data.total_unpaid + ' ???';
             document.getElementById('dashAdminPending').textContent = d.data.pending_count;
             document.getElementById('dashAdminTodayPosts').textContent = d.data.today_posts;
 
-            // Render Top Editors Donut Chart
-            const topEditorsContainer = document.getElementById('dashAdminTopEditors');
-            topEditorsContainer.style.minHeight = '300px';
-
-            if (d.data.top_editors && d.data.top_editors.length > 0) {
-              const names = d.data.top_editors.slice(0, 5).map(te => escapeHTML(te.name));
-              const earnings = d.data.top_editors.slice(0, 5).map(te => te.total_earned);
-
-              if (window.topEditorsChartInstance) window.topEditorsChartInstance.destroy();
-
-              const options = {
-                series: earnings,
-                chart: {
-                  type: 'donut',
-                  height: 300,
-                  fontFamily: 'Inter, sans-serif'
-                },
-                labels: names,
-                colors: ['#4268F6', '#6B8DF8', '#94B2FA', '#BDD7FC', '#E6EBF5'], // Modern adminjs blue variants
-                plotOptions: {
-                  pie: {
-                    donut: {
-                      size: '65%',
-                      labels: {
-                        show: true,
-                        name: { show: true },
-                        value: {
-                          show: true,
-                          formatter: function (val) {
-                            return val + " ₺"
-                          }
-                        },
-                        total: {
-                          show: true,
-                          label: 'Toplam',
-                          formatter: function (w) {
-                            return w.globals.seriesTotals.reduce((a, b) => a + b, 0) + " ₺"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                dataLabels: {
-                  enabled: false
-                },
-                legend: {
-                  position: 'bottom'
-                },
-                tooltip: {
-                  y: {
-                    formatter: function (val) {
-                      return val + " ₺"
-                    }
-                  }
-                }
-              };
-              window.topEditorsChartInstance = new ApexCharts(topEditorsContainer, options);
-              window.topEditorsChartInstance.render();
+            let topHtml = '<table style="font-size:0.85rem; width:100%;">';
+            if (d.data.top_editors.length > 0) {
+              d.data.top_editors.forEach((te, i) => {
+                topHtml += `<tr><td style="padding:0.4rem;">${i + 1}. ${escapeHTML(te.name)}</td><td style="padding:0.4rem; font-weight:bold; color:var(--success); text-align:right;">${te.total_earned} ???</td></tr>`;
+              });
             } else {
-              topEditorsContainer.innerHTML = '<div style="padding:1rem; color:#888; text-align:center; height:100%; display:flex; align-items:center; justify-content:center;">Henüz kazanç yok.</div>';
+              topHtml += '<tr><td style="padding:1rem; color:#888;">Hen??z kazan?? yok.</td></tr>';
             }
+            topHtml += '</table>';
+            document.getElementById('dashAdminTopEditors').innerHTML = topHtml;
 
             // Admin Tasks Filter
             if (d.data.tasks.length === 0) {
-              document.getElementById('dashAdminTasks').innerHTML = '<span style="color:var(--text-muted)">Bekleyen görev yok.</span>';
+              document.getElementById('dashAdminTasks').innerHTML = '<span style="color:var(--text-muted)">Bekleyen g??rev yok.</span>';
             } else {
               document.getElementById('dashAdminTasks').innerHTML = d.data.tasks.map(t => {
                 return `<div style="border-bottom:1px solid #eee; padding:5px 0;">
@@ -2793,7 +2570,7 @@
 
             if (adminChartInstance) adminChartInstance.destroy();
             const options = {
-              series: [{ name: 'Günlük Paylaşım', data: posts }],
+              series: [{ name: 'G??nl??k Payla????m', data: posts }],
               chart: { type: 'area', height: 300, toolbar: { show: false }, fontFamily: 'Inter, sans-serif' },
               colors: ['#4268F6'],
               fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 90, 100] } },
@@ -2805,34 +2582,27 @@
             adminChartInstance = new ApexCharts(document.querySelector("#chartAdminSystem"), options);
             adminChartInstance.render();
           }
-        } catch (e) { console.error('Dashboard yüklenemedi', e); }
+        } catch (e) { console.error('Dashboard y??klenemedi', e); }
       } else {
         document.getElementById('adminDashboard').style.display = 'none';
         document.getElementById('editorDashboard').style.display = 'flex';
-        document.getElementById('dashEditorName').textContent = user.name || 'Editör';
+        document.getElementById('dashEditorName').textContent = user.name || 'Edit??r';
         try {
           const res = await fetch('/api/dashboard/editor', { headers: { 'Authorization': `Bearer ${token}` } });
           const d = await res.json();
           if (d.ok) {
-            document.getElementById('dashEditorBalance').textContent = d.data.balance + ' ₺';
+            document.getElementById('dashEditorBalance').textContent = d.data.balance + ' ???';
             document.getElementById('dashEditorPosts').textContent = d.data.total_posts;
 
             // Tasks
             if (d.data.tasks.length === 0) {
-              document.getElementById('dashEditorTasks').innerHTML = '<span style="color:var(--text-muted)">Yaklaşan görev yok.</span>';
+              document.getElementById('dashEditorTasks').innerHTML = '<span style="color:var(--text-muted)">Yakla??an g??rev yok.</span>';
             } else {
               document.getElementById('dashEditorTasks').innerHTML = d.data.tasks.map(t => {
                 let color = t.due_date && new Date(t.due_date) < new Date() ? 'red' : 'gray';
-
-                // Türkçe Durum Çevirisi
-                let trStatus = t.status;
-                if (t.status === 'pending') trStatus = 'Yapılacak';
-                else if (t.status === 'in_progress') trStatus = 'Devam Eden';
-                else if (t.status === 'completed') trStatus = 'Tamamlandı';
-
                 return `<div style="border-bottom:1px solid #eee; padding:5px 0;">
                   <div style="font-weight:500; font-size:0.95rem;">${escapeHTML(t.title)}</div>
-                  <div style="font-size:0.75rem; color:${color}">${trStatus} ${t.due_date ? '- Son: ' + new Date(t.due_date).toLocaleDateString() : ''}</div>
+                  <div style="font-size:0.75rem; color:${color}">${t.status} ${t.due_date ? '- Son: ' + new Date(t.due_date).toLocaleDateString() : ''}</div>
                  </div>`;
               }).join('');
             }
@@ -2843,7 +2613,7 @@
 
             if (editorChartInstance) editorChartInstance.destroy();
             const options = {
-              series: [{ name: 'Kazanç (₺)', data: earnings }],
+              series: [{ name: 'Kazan?? (???)', data: earnings }],
               chart: { type: 'bar', height: 250, toolbar: { show: false }, fontFamily: 'Inter, sans-serif' },
               colors: ['#10B981'],
               plotOptions: { bar: { borderRadius: 4, columnWidth: '40%' } },
@@ -2854,7 +2624,7 @@
             editorChartInstance = new ApexCharts(document.querySelector("#chartEditorPerformance"), options);
             editorChartInstance.render();
           }
-        } catch (e) { console.error('Dashboard yüklenemedi', e); }
+        } catch (e) { console.error('Dashboard y??klenemedi', e); }
       }
     }
 
@@ -2867,13 +2637,13 @@
         const res = await fetch('/api/earnings/request', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
         const d = await res.json();
         if (d.ok) {
-          box.innerHTML = `<span style="color:var(--success)">✅ ${d.requested_amount}₺ ödeme talep edildi!</span>`;
+          box.innerHTML = `<span style="color:var(--success)">??? ${d.requested_amount}??? ??deme talep edildi!</span>`;
           loadEarningsData();
         } else {
-          box.innerHTML = `<span style="color:var(--danger)">❌ Hata: ${escapeHTML(d.error)}</span>`;
+          box.innerHTML = `<span style="color:var(--danger)">??? Hata: ${escapeHTML(d.error)}</span>`;
         }
       } catch (e) {
-        box.innerHTML = `<span style="color:var(--danger)">❌ Sunucu hatası</span>`;
+        box.innerHTML = `<span style="color:var(--danger)">??? Sunucu hatas??</span>`;
       } finally {
         setTimeout(() => { btn.disabled = false; }, 2000);
       }
@@ -2881,47 +2651,47 @@
 
     async function loadAdminPayments() {
       const tbody = document.getElementById('paymentTableBody');
-      tbody.innerHTML = '<tr><td colspan="7">Yükleniyor...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7">Y??kleniyor...</td></tr>';
       try {
         const res = await fetch('/api/admin/payments', { headers: { 'Authorization': `Bearer ${token}` } });
         const rows = await res.json();
         if (rows.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Talep bulunamadı</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Talep bulunamad??</td></tr>';
           return;
         }
         tbody.innerHTML = rows.map(r => {
           let actionBtn = r.status === 'pending'
-            ? `<button class="btn btn-primary" onclick="completePayment(${r.id})" style="font-size:0.75rem;"><i class="ri-check-line"></i> Tamamlandı İşaretle</button>`
-            : `<span style="color:var(--success); font-weight:bold;">Ödendi</span>`;
-          let statusBadge = r.status === 'pending' ? '<span style="color:var(--danger); font-weight:bold;">Bekliyor</span>' : '<span style="color:var(--success); font-weight:bold;">Tamamlandı</span>';
+            ? `<button class="btn btn-primary" onclick="completePayment(${r.id})" style="font-size:0.75rem;"><i class="ri-check-line"></i> Tamamland?? ????aretle</button>`
+            : `<span style="color:var(--success); font-weight:bold;">??dendi</span>`;
+          let statusBadge = r.status === 'pending' ? '<span style="color:var(--danger); font-weight:bold;">Bekliyor</span>' : '<span style="color:var(--success); font-weight:bold;">Tamamland??</span>';
 
           return `<tr>
              <td>${new Date(r.created_at).toLocaleString('tr-TR')}</td>
              <td>${escapeHTML(r.name)}</td>
              <td>${escapeHTML(r.email)}</td>
              <td><code style="background:#eee; padding:2px 4px; border-radius:3px;">${escapeHTML(r.iban || 'Belirtilmedi')}</code></td>
-             <td style="font-weight:bold;">${r.amount} ₺</td>
+             <td style="font-weight:bold;">${r.amount} ???</td>
              <td>${statusBadge}</td>
              <td style="text-align:right;">${actionBtn}</td>
           </tr>`;
         }).join('');
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="7" style="color:red;">Hata oluştu.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="color:red;">Hata olu??tu.</td></tr>';
       }
     }
 
     async function completePayment(id) {
-      if (!confirm("Bu ödemeyi yaptığınıza emin misiniz? (Kullanıcıya ödeme yapıldı olarak işaretlenecektir)")) return;
+      if (!confirm("Bu ??demeyi yapt??????n??za emin misiniz? (Kullan??c??ya ??deme yap??ld?? olarak i??aretlenecektir)")) return;
       try {
         const res = await fetch(`/api/admin/payments/${id}/complete`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
         if (res.ok) {
           loadAdminPayments();
         } else {
           const e = await res.json();
-          alert(e.error || "Bir hata oluştu");
+          alert(e.error || "Bir hata olu??tu");
         }
       } catch (err) {
-        alert("Sunucu hatası.");
+        alert("Sunucu hatas??.");
       }
     }
 
@@ -2941,14 +2711,14 @@
               edTbody.innerHTML = d.data.editors.map(ed => `
                   <tr>
                     <td><strong>${escapeHTML(ed.name)}</strong><br><small style="color:var(--text-muted);">${escapeHTML(ed.email)}</small></td>
-                    <td style="color:var(--success); font-weight:600;">+${ed.total_earned} ₺</td>
-                    <td style="color:var(--danger); font-weight:600;">-${ed.total_deducted} ₺</td>
-                    <td style="color:#059669; font-weight:600;">${ed.total_paid} ₺</td>
-                    <td style="font-size:1.1rem; font-weight:bold; color:${ed.net_unpaid > 0 ? '#f59e0b' : 'var(--text-main)'};">${ed.net_unpaid} ₺</td>
+                    <td style="color:var(--success); font-weight:600;">+${ed.total_earned} ???</td>
+                    <td style="color:var(--danger); font-weight:600;">-${ed.total_deducted} ???</td>
+                    <td style="color:#059669; font-weight:600;">${ed.total_paid} ???</td>
+                    <td style="font-size:1.1rem; font-weight:bold; color:${ed.net_unpaid > 0 ? '#f59e0b' : 'var(--text-main)'};">${ed.net_unpaid} ???</td>
                   </tr>
                 `).join('');
             } else {
-              edTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">Editör bulunamadı.</td></tr>';
+              edTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">Edit??r bulunamad??.</td></tr>';
             }
 
             // Render All Transactions
@@ -2962,7 +2732,7 @@
                       <td>${new Date(tx.created_at).toLocaleString('tr-TR')}</td>
                       <td><strong>${escapeHTML(tx.user_name || 'Bilinmeyen')}</strong></td>
                       <td>
-                        <span style="font-weight:600; color:${color};">${sign}${Math.abs(tx.amount)} ₺</span><br>
+                        <span style="font-weight:600; color:${color};">${sign}${Math.abs(tx.amount)} ???</span><br>
                         ${getStatusBadge(tx.check_status)}
                       </td>
                       <td style="max-width:300px; font-size:0.85rem; color:var(--text-muted);">${escapeHTML(tx.description)}</td>
@@ -2971,7 +2741,7 @@
                     `;
               }).join('');
             } else {
-              txTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">İşlem geçmişi bulunamadı.</td></tr>';
+              txTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">????lem ge??mi??i bulunamad??.</td></tr>';
             }
           }
         } catch (e) { console.error("Admin Finance Error:", e); }
@@ -2984,7 +2754,7 @@
           const res = await fetch('/api/finance/editor', { headers: { 'Authorization': `Bearer ${token}` } });
           const d = await res.json();
           if (d.ok) {
-            document.getElementById('finEditorBalance').textContent = `${d.balance} ₺`;
+            document.getElementById('finEditorBalance').textContent = `${d.balance} ???`;
 
             const txTbody = document.getElementById('finEditorTxTableBody');
             if (d.transactions && d.transactions.length > 0) {
@@ -2997,12 +2767,12 @@
                       <td><code style="background:#eee; padding:2px 4px; border-radius:3px; font-size:0.8rem;">${tx.type}</code></td>
                       <td style="font-size:0.9rem; color:var(--text-muted);">${escapeHTML(tx.description)}</td>
                       <td>${getStatusBadge(tx.check_status)}</td>
-                      <td style="font-weight:bold; color:${color};">${sign}${Math.abs(tx.amount)} ₺</td>
+                      <td style="font-weight:bold; color:${color};">${sign}${Math.abs(tx.amount)} ???</td>
                     </tr>
                     `;
               }).join('');
             } else {
-              txTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">İşlem geçmişi boş.</td></tr>';
+              txTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">????lem ge??mi??i bo??.</td></tr>';
             }
           }
         } catch (e) { console.error("Editor Finance Error:", e); }
@@ -3010,19 +2780,19 @@
     }
 
     async function requestPayout() {
-      if (!confirm("Net bakiyenizin tamamı için ödeme talebi oluşturulacaktır. Onaylıyor musunuz?")) return;
+      if (!confirm("Net bakiyenizin tamam?? i??in ??deme talebi olu??turulacakt??r. Onayl??yor musunuz?")) return;
       try {
         const res = await fetch('/api/earnings/request', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
         const d = await res.json();
         if (d.ok) {
-          alert(`✅ ${d.requested_amount} ₺ ödeme talep edildi!`);
+          alert(`??? ${d.requested_amount} ??? ??deme talep edildi!`);
           loadFinance(); // Refresh Finance tab
           loadDashboard(); // Refresh Dashboard balance
         } else {
-          alert(`❌ Hata: ${d.error}`);
+          alert(`??? Hata: ${d.error}`);
         }
       } catch (e) {
-        alert("Sunucu hatası.");
+        alert("Sunucu hatas??.");
       }
     }
 
@@ -3049,10 +2819,12 @@
     }
 
     function renderTasks(filter = 'all') {
-      const listView = document.getElementById('listViewArea');
-      if (!listView) return;
+      const todo = document.getElementById('col-pending');
+      const inprog = document.getElementById('col-in_progress');
+      const comp = document.getElementById('col-completed');
+      if (!todo || !inprog || !comp) return;
 
-      listView.innerHTML = '';
+      todo.innerHTML = ''; inprog.innerHTML = ''; comp.innerHTML = '';
 
       let filtered = allTasks;
       if (filter !== 'all') {
@@ -3060,6 +2832,10 @@
       }
 
       // Update badge counts
+      const elTodo = document.getElementById('countPending');
+      const elInprog = document.getElementById('countInProgress');
+      const elComp = document.getElementById('countCompleted');
+
       const counts = {
         all: allTasks.length,
         todo: allTasks.filter(t => t.status === 'pending').length,
@@ -3067,77 +2843,37 @@
         comp: allTasks.filter(t => t.status === 'completed').length
       };
 
+      if (elTodo) elTodo.innerText = counts.todo;
+      if (elInprog) elInprog.innerText = counts.prog;
+      if (elComp) elComp.innerText = counts.comp;
+
       // Update pill filters
       if (document.getElementById('pillCountAll')) document.getElementById('pillCountAll').innerText = counts.all;
       if (document.getElementById('pillCountTodo')) document.getElementById('pillCountTodo').innerText = counts.todo;
       if (document.getElementById('pillCountInProgress')) document.getElementById('pillCountInProgress').innerText = counts.prog;
       if (document.getElementById('pillCountCompleted')) document.getElementById('pillCountCompleted').innerText = counts.comp;
 
-      if (filtered.length === 0) {
-        listView.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">Bu kategoride görev bulunamadı.</div>';
-        return;
-      }
-
-      let html = '';
       filtered.forEach(t => {
-        // Kartın solundaki checkbox (status bazlı)
-        let isChecked = t.status === 'completed' ? 'checked' : '';
-        let checkAction = '';
-        if (t.status === 'pending') {
-          checkAction = `onclick="updateTaskStatus(${t.id}, 'in_progress')"`;
-        } else if (t.status === 'in_progress') {
-          checkAction = `onclick="updateTaskStatus(${t.id}, 'completed')"`;
-        } else {
-          checkAction = `onclick="updateTaskStatus(${t.id}, 'pending')"`;
-        }
+        let assigneeText = user.role === 'super_admin' && t.assignee ? `<small style="display:block;margin-top:5px;color:#666;">Atanan: ${escapeHTML(t.assignee)}</small>` : '';
+        let dateText = t.due_date ? `<small style="display:block;margin-top:5px;color:#d97706;"><i class="ri-calendar-line"></i> ${new Date(t.due_date).toLocaleDateString()}</small>` : '';
 
-        let checkboxHtml = `<input type="checkbox" ${isChecked} ${checkAction} style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);">`;
+        let moveBtn = '';
+        if (t.status === 'pending') moveBtn = `<button class="btn btn-primary" style="padding:4px 8px; font-size:0.75rem;" onclick="updateTaskStatus(${t.id}, 'in_progress')">Ba??la</button>`;
+        else if (t.status === 'in_progress') moveBtn = `<button class="btn btn-success" style="padding:4px 8px; font-size:0.75rem;" onclick="updateTaskStatus(${t.id}, 'completed')">Tamamla</button>`;
 
-        // Dummy/Real veriler (kategori vs. database'de yoksa random/placeholder konur)
-        let category = 'Genel Görev';
-        let catColor = '#6366f1; background:#e0e7ff';
-        if (t.title.toLowerCase().includes('marketing') || t.title.toLowerCase().includes('pazarlama')) {
-          category = 'Marketing'; catColor = '#10b981; background:#d1fae5';
-        } else if (t.title.toLowerCase().includes('video') || t.title.toLowerCase().includes('reels')) {
-          category = 'Video / Reels'; catColor = '#8b5cf6; background:#ede9fe';
-        }
-
-        let dateText = t.due_date ? new Date(t.due_date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }) : 'Belirtilmedi';
-
-        let avatarText = t.assignee ? escapeHTML(t.assignee).substring(0, 2).toUpperCase() : 'B';
-        let assigneeHtml = user.role === 'super_admin' ? `<div title="${escapeHTML(t.assignee || 'Bilinmiyor')}" style="width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold;">${avatarText}</div>` : '';
-
-        // Kart yapısı (2. görsele uygun)
-        html += `
-          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; transition: all 0.2s;">
-            <!-- Sol: Checkbox + Başlık ->-->
-            <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
-              ${checkboxHtml}
-              <div style="display: flex; flex-direction: column;">
-                <span style="font-weight: 500; color: var(--text-dark); ${isChecked ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${escapeHTML(t.title)}</span>
-                ${t.description ? `<span style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">${escapeHTML(t.description)}</span>` : ''}
-              </div>
-            </div>
-
-            <!-- Sağ: Metadatalar ->-->
-            <div style="display: flex; align-items: center; gap: 1.5rem; justify-content: flex-end;">
-              <span style="font-size: 0.75rem; font-weight: 600; color: ${catColor.split(';')[0]}; background: ${catColor.split(';')[1].split(':')[1]}; padding: 4px 10px; border-radius: 20px; white-space: nowrap;">${category}</span>
-              
-              <div style="display: flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap;">
-                <i class="ri-calendar-event-line"></i> ${dateText}
-              </div>
-              
-              <div style="display: flex; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.85rem;">
-                <i class="ri-message-2-line"></i> 0
-              </div>
-              
-              ${assigneeHtml}
-            </div>
+        const card = `
+          <div class="task-card" style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+            <h4 style="margin-top:0;">${escapeHTML(t.title)}</h4>
+            <div style="font-size:0.85rem; color:#444; margin:5px 0;">${escapeHTML(t.description || '')}</div>
+            ${assigneeText}
+            ${dateText}
+            <div style="margin-top:10px;text-align:right;">${moveBtn}</div>
           </div>
         `;
+        if (t.status === 'pending') todo.innerHTML += card;
+        else if (t.status === 'in_progress') inprog.innerHTML += card;
+        else if (t.status === 'completed') comp.innerHTML += card;
       });
-
-      listView.innerHTML = html;
     }
 
     function openTaskModal() {
@@ -3175,7 +2911,7 @@
           closeTaskModal();
           loadTasks();
         } else {
-          alert('Görev eklenemedi');
+          alert('G??rev eklenemedi');
         }
       } catch (err) { console.error(err); }
     }

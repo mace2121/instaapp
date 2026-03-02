@@ -31,18 +31,13 @@ const upload = multer({ storage });
 
 app.use(express.json({ limit: "100mb" }));
 app.use("/ui", express.static(path.join(__dirname, "ui")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(uploadDir));
 
-const ACT_ROOT = "/app/your_instagram_activity";
 const ACT = "/app/your_instagram_activity/media";
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "http://localhost:3000";
 const MEDIA_BASE_URL = `${PUBLIC_BASE_URL}/media`;
 
-// Standard Static Middleware for Media (Hardcoded absolute path)
-app.use("/media", express.static("/app/your_instagram_activity/media", {
-  index: false,
-  fallthrough: true
-}));
+app.use("/media", express.static(ACT));
 
 // ---------------- UI Routes ----------------
 app.get("/", (req, res) => res.redirect("/login"));
@@ -183,12 +178,12 @@ function mediaUrlFromLocalUri(localUri) {
 }
 
 function buildLibrary() {
-  const files = listJsonFiles(ACT_ROOT);
+  const files = listJsonFiles(ACT);
   const items = [];
   const priority = (n) => n.toLowerCase().includes("reel") ? 1 : (n.toLowerCase().includes("post") ? 2 : (n.toLowerCase().includes("stories") ? 3 : 9));
   files.sort((a, b) => priority(a) - priority(b));
   for (const f of files) {
-    const data = readJsonSafe(path.join(ACT_ROOT, f));
+    const data = readJsonSafe(path.join(ACT, f));
     if (!data) continue;
     const arrays = Array.isArray(data) ? [data] : [...Object.values(data).filter(Array.isArray), data.media].filter(Boolean);
     for (const arr of arrays) {
@@ -698,8 +693,7 @@ app.post("/api/share", verifyToken, async (req, res) => {
         });
 
       } catch (e1) {
-        console.error("Parse Error Step 1:", e1, stdout1);
-        logAction(req.user.id, 'SHARE_ERROR', `Parse Error Step 1: ${e1.message}`, req.ip, 'ERROR');
+        logAction(req.user.id, 'SHARE_ERROR', `Parse Error Step 1: ${stdout1}`, req.ip, 'ERROR');
         res.status(500).json({ error: "Container Yanıtı Okunamadı" });
       }
     });
