@@ -54,9 +54,16 @@ let ACT = path.join(ACT_ROOT, "media");
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "http://localhost:3000";
 const MEDIA_BASE_URL = `${PUBLIC_BASE_URL}/media`;
 
-// Static Media Serve (her iki konum için fallback zinciri)
-app.use("/media", express.static("/app/data/instagram/media", { index: false, fallthrough: true }));
-app.use("/media", express.static("/app/data/your_instagram_activity/media", { index: false, fallthrough: true }));
+// Serve media from instagram export
+const MEDIA_ROOT = path.join(__dirname, "data", "instagram", "media");
+console.log("[Server] Serving /media from:", MEDIA_ROOT);
+app.use("/media", (req, res, next) => {
+  // console.log(`[Media Request] ${req.url}`); // Optional: enable for heavy debugging
+  next();
+}, express.static(MEDIA_ROOT, { index: false }));
+
+// Fallback for older paths if needed
+app.use("/media", express.static(path.join(__dirname, "data", "instagram"), { index: false }));
 
 // ---------------- UI Routes ----------------
 app.get("/", (req, res) => res.redirect("/login"));
