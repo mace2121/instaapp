@@ -55,15 +55,13 @@ const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "http://localhost:3000";
 const MEDIA_BASE_URL = `${PUBLIC_BASE_URL}/media`;
 
 // Serve media from instagram export
-const MEDIA_ROOT = path.join(__dirname, "data", "instagram", "media");
-console.log("[Server] Serving /media from:", MEDIA_ROOT);
 app.use("/media", (req, res, next) => {
-  // console.log(`[Media Request] ${req.url}`); // Optional: enable for heavy debugging
+  console.log(`[Media Request] ${req.url}`);
   next();
-}, express.static(MEDIA_ROOT, { index: false }));
+}, express.static(path.join(ACT_ROOT, "media"), { index: false, fallthrough: true }));
 
-// Fallback for older paths if needed
-app.use("/media", express.static(path.join(__dirname, "data", "instagram"), { index: false }));
+// Fallback: Some JSONs might include 'media/' in the path already, so we serve from ACT_ROOT
+app.use("/media", express.static(ACT_ROOT, { index: false }));
 
 // ---------------- UI Routes ----------------
 app.get("/", (req, res) => res.redirect("/login"));
