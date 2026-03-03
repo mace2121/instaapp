@@ -774,9 +774,15 @@
         margin-bottom: 1rem;
       }
 
-      /* Dashboard grids - Force single column on mobile */
+      /* Dashboard KPI cards - 2 grid on mobile */
       [style*="grid-template-columns: repeat(4"],
-      [style*="grid-template-columns: repeat(2"],
+      [style*="grid-template-columns: repeat(2"] {
+        grid-template-columns: 1fr 1fr !important;
+        display: grid !important;
+        gap: 0.75rem !important;
+      }
+
+      /* Dashboard Sections - Stack on mobile */
       [style*="grid-template-columns: repeat(auto-fit"],
       [style*="grid-template-columns: minmax(300px, 2fr)"] {
         grid-template-columns: 1fr !important;
@@ -791,12 +797,14 @@
       /* Tables: wrap in scrollable container */
       .card table,
       table {
-        min-width: 600px;
+        min-width: 100%;
+        display: table;
       }
 
       .card:has(table) {
         overflow-x: auto;
         padding: 0;
+        -webkit-overflow-scrolling: touch;
       }
 
       /* Task Item Responsive */
@@ -836,6 +844,25 @@
       .filters {
         flex-wrap: wrap;
         gap: 0.4rem;
+      }
+
+      /* User Management Table Mobile Optimization */
+      #userListView table th:nth-child(2),
+      #userListView table th:nth-child(3),
+      #userListView table td:nth-child(2),
+      #userListView table td:nth-child(3) {
+        display: none !important;
+      }
+
+      #userListView table {
+        min-width: 100% !important;
+      }
+
+      /* Generic Table Adjustments for Mobile */
+      .card:has(table) {
+        margin-left: -1rem;
+        margin-right: -1rem;
+        border-radius: 0;
       }
     }
 
@@ -1781,6 +1808,51 @@
   </div>
   </div>
 
+  <!-- TASK DETAIL MODAL -->
+  <div id="taskDetailModalOverlay" class="modal-overlay" onclick="closeTaskDetailModal()">
+    <div id="taskDetailModal" class="modal"
+      style="max-width: 500px; width: 90%; background: var(--card-bg); border-radius: 1rem; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);"
+      onclick="event.stopPropagation()">
+      <div class="modal-header"
+        style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);">
+        <h3 id="detailTaskTitle" style="margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-dark);">Görev
+          Detayı</h3>
+        <button onclick="closeTaskDetailModal()"
+          style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);"><i
+            class="ri-close-line"></i></button>
+      </div>
+      <div class="modal-body" style="padding: 1.5rem;">
+        <div style="margin-bottom: 1.5rem;">
+          <label
+            style="display:block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600;">Açıklama</label>
+          <div id="detailTaskDesc"
+            style="font-size: 0.95rem; color: var(--text-main); line-height: 1.6; white-space: pre-wrap;"></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label
+              style="display:block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600;">Atanan</label>
+            <div id="detailTaskAssignee" style="font-size: 0.9rem; font-weight: 500;"></div>
+          </div>
+          <div>
+            <label
+              style="display:block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600;">Tarih</label>
+            <div id="detailTaskDate" style="font-size: 0.9rem; font-weight: 500;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 1.5rem;">
+          <label
+            style="display:block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; text-transform: uppercase; font-weight: 600;">Durum</label>
+          <div id="detailTaskStatusBadge" style="display: inline-block;"></div>
+        </div>
+      </div>
+      <div
+        style="padding: 1.25rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; background: var(--bg);">
+        <button class="btn btn-secondary" onclick="closeTaskDetailModal()">Kapat</button>
+      </div>
+    </div>
+  </div>
+
   <!-- INSTAGRAM STYLE EDIT MODAL -->
   <div class="modal-overlay" id="editModalOverlay" onclick="closeEditModal(event)">
     <div class="ig-modal" id="editModal" onclick="event.stopPropagation()">
@@ -2308,12 +2380,12 @@
     function renderQuickPreview() {
       const div = document.getElementById('uploadPreview');
       div.innerHTML = quickFiles.map(f => `
-            < div style = "width:100%; height:100%; flex-shrink: 0; scroll-snap-align: start; display:flex; align-items:center; justify-content:center;" >
+            <div style="width:100%; height:100%; flex-shrink: 0; scroll-snap-align: start; display:flex; align-items:center; justify-content:center; background:#000;">
               ${f.kind === 'video'
           ? `<video src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;" controls></video>`
           : `<img src="${f.url}" style="max-width:100%; max-height:100%; object-fit:contain;">`
         }
-                </div >
+            </div>
             `).join('');
 
       if (quickFiles.length > 0) {
@@ -3198,6 +3270,49 @@
       } catch (e) { console.error("Tasks Error", e); }
     }
 
+    async function deleteTask(id) {
+      if (!confirm('Bu görevi silmek istediğinize emin misiniz?')) return;
+      try {
+        const res = await fetch(`/api/tasks/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          allTasks = allTasks.filter(t => t.id !== id);
+          renderTasks(currentTaskFilter || 'all');
+        } else {
+          alert("Silme işlemi başarısız.");
+        }
+      } catch (e) { console.error("Delete Task Error", e); }
+    }
+
+    function showTaskDetail(id) {
+      const task = allTasks.find(t => t.id === id);
+      if (!task) return;
+
+      document.getElementById('detailTaskTitle').innerText = task.title;
+      document.getElementById('detailTaskDesc').innerText = task.description || 'Açıklama yok.';
+      document.getElementById('detailTaskDate').innerText = task.due_date ? new Date(task.due_date).toLocaleDateString('tr-TR') : '—';
+
+      const assigneeName = task.assigned_to_name || task.assignee || 'Kendisi';
+      document.getElementById('detailTaskAssignee').innerText = assigneeName;
+
+      // Status badge in modal
+      const statusMap = {
+        pending: ['#f59e0b', '#fffbeb', 'Yapılacak'],
+        in_progress: ['#3b82f6', '#eff6ff', 'Devam Ediyor'],
+        completed: ['#10b981', '#ecfdf5', 'Tamamlandı']
+      };
+      const [sClr, sBg, sLabel] = statusMap[task.status] || ['#6b7280', '#f3f4f6', 'Bilinmiyor'];
+      document.getElementById('detailTaskStatusBadge').innerHTML = `<span style="font-size:0.8rem; font-weight:600; color:${sClr}; background:${sBg}; padding:4px 12px; border-radius:20px;">${sLabel}</span>`;
+
+      document.getElementById('taskDetailModalOverlay').style.display = 'flex';
+    }
+
+    function closeTaskDetailModal() {
+      document.getElementById('taskDetailModalOverlay').style.display = 'none';
+    }
+
     function renderTasks(filter = 'all') {
       const listView = document.getElementById('listViewArea');
       if (!listView) return;
@@ -3272,9 +3387,9 @@
           : '';
 
         html += `
-          <div class="task-card-item" style="background:var(--card-bg); border:1px solid var(--border); border-left:4px solid ${sClr}; border-radius:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; gap:1rem; transition: all 0.2s ease; cursor: default;">
+          <div class="task-card-item" onclick="showTaskDetail(${t.id})" style="background:var(--card-bg); border:1px solid var(--border); border-left:4px solid ${sClr}; border-radius:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; gap:1rem; transition: all 0.2s ease; cursor: pointer;">
             <div style="display:flex; align-items:center; gap:1rem; flex:1; min-width:0;">
-              <div class="task-check-wrapper" style="display:flex; align-items:center;">
+              <div class="task-check-wrapper" style="display:flex; align-items:center;" onclick="event.stopPropagation()">
                 ${checkboxHtml}
               </div>
               <div style="display:flex; flex-direction:column; min-width:0; gap:2px;">
@@ -3290,7 +3405,12 @@
               <div style="display:flex; align-items:center; gap:6px; color:var(--text-muted); font-size:0.85rem; white-space:nowrap; background: var(--bg); padding: 4px 10px; border-radius: 8px;">
                 <i class="ri-calendar-event-line"></i> ${dateText}
               </div>
-              ${assigneeHtml}
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                ${assigneeHtml}
+                <button onclick="event.stopPropagation(); deleteTask(${t.id})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:1.1rem; padding:4px; display:flex; align-items:center;" title="Sil">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </div>
             </div>
           </div>
         `;
