@@ -55,8 +55,14 @@ const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || "http://localhost:3000";
 const MEDIA_BASE_URL = `${PUBLIC_BASE_URL}/media`;
 
 // Serve media from instagram export
+// Serve media from instagram export
 app.use("/media", (req, res, next) => {
-  console.log(`[Media Request] ${req.url}`);
+  const fullPath = path.join(ACT_ROOT, "media", req.url);
+  console.log(`[Media Request] URL: ${req.url} -> Resolve: ${fullPath}`);
+  fs.access(fullPath, fs.constants.R_OK, (err) => {
+    if (err) console.error(`[Media Error] File not readable: ${fullPath}`, err);
+    else console.log(`[Media Success] File is readable: ${fullPath}`);
+  });
   next();
 }, express.static(path.join(ACT_ROOT, "media"), { index: false, fallthrough: true }));
 
