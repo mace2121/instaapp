@@ -1820,7 +1820,10 @@
         <div class="card" style="overflow-x: auto;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
             <h3>İçerik İstekleri</h3>
-            <button class="btn btn-secondary" onclick="loadContentRequests()"><i class="ri-refresh-line"></i> Yenile</button>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+                <span style="font-size:0.8rem; color:var(--text-muted); cursor:pointer;" onclick="window.open('/icerik-istegi', '_blank')"><i class="ri-external-link-line"></i> Form Linki</span>
+                <button class="btn btn-secondary" onclick="loadContentRequests()"><i class="ri-refresh-line"></i> Yenile</button>
+            </div>
           </div>
           <table style="min-width: 800px;">
             <thead>
@@ -3592,8 +3595,16 @@
     // Call initial render here, so all functions (including loadDashboard) are in scope
 
     // --- SURVEYS LOGIC ---
-    function openSurveyModal() { document.getElementById('surveyModalOverlay').style.display = 'flex'; }
-    function closeSurveyModal() { document.getElementById('surveyModalOverlay').style.display = 'none'; }
+    function openSurveyModal() { 
+        const overlay = document.getElementById('surveyModalOverlay');
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.classList.add('open'), 10);
+    }
+    function closeSurveyModal() { 
+        const overlay = document.getElementById('surveyModalOverlay');
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.style.display = 'none', 200);
+    }
     function addSurveyOptionField() {
       const container = document.getElementById('surveyOptionsContainer');
       const count = container.querySelectorAll('.form-group').length + 1;
@@ -3647,7 +3658,11 @@
         await fetch(`/api/admin/surveys/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         loadSurveys();
     }
-    function closeSurveyResultsModal() { document.getElementById('surveyResultsModalOverlay').style.display = 'none'; }
+    function closeSurveyResultsModal() { 
+        const overlay = document.getElementById('surveyResultsModalOverlay');
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.style.display = 'none', 200);
+    }
     async function loadSurveyResults(id) {
         try {
             const res = await fetch(`/api/admin/surveys/${id}/results`, { headers: { 'Authorization': `Bearer ${token}` } });
@@ -3668,7 +3683,9 @@
                     </div>
                 `;
             }).join('') + `<div style="margin-top:1rem; font-weight:700; text-align:right;">Toplam: ${total} Oy</div>`;
-            document.getElementById('surveyResultsModalOverlay').style.display = 'flex';
+            const overlay = document.getElementById('surveyResultsModalOverlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('open'), 10);
         } catch (e) { console.error(e); }
     }
 
