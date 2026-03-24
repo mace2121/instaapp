@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>İçerik İsteği | InstaApp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4268F6;
+            --primary-hover: #2e50d6;
+            --bg: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(66, 104, 246, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .file-drop-area {
+            border: 2px dashed var(--border);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #FAFAFA;
+            margin-top: 0.5rem;
+        }
+
+        .file-drop-area:hover,
+        .file-drop-area.dragover {
+            border-color: var(--primary);
+            background-color: rgba(66, 104, 246, 0.05);
+        }
+
+        .file-drop-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .file-drop-area .hint {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .preview-item img,
+        .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            background-color: #9CA3AF;
+            cursor: not-allowed;
+        }
+
+        .status-message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .status-success {
+            background-color: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+            display: block;
+        }
+
+        .status-error {
+            background-color: #FEF2F2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+            display: block;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>İçerik İsteği</h1>
+        <p class="subtitle">Hangi konuda içerik üretmemizi istersiniz? Önerilerinizi bekliyoruz.</p>
+
+        <form id="requestForm">
+            <div class="form-group">
+                <label for="fullname">Adınız Soyadınız *</label>
+                <input type="text" id="fullname" placeholder="Örn: Ahmet Yılmaz" required>
+            </div>
+
+            <div class="form-group">
+                <label for="title">Öneri Başlığı *</label>
+                <input type="text" id="title" placeholder="İstediğiniz içeriğin kısa adı" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Öneri Detayları *</label>
+                <textarea id="description" placeholder="İstediğiniz içerik hakkında detaylı bilgi verin..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Varsa Kaynak Dosyalar (Opsiyonel)</label>
+                <div class="file-drop-area" id="dropArea" onclick="document.getElementById('fileInput').click()">
+                    <i class="ri-upload-cloud-2-line"></i>
+                    <strong>Tıklayın</strong> veya dosyaları buraya sürükleyin
+                    <div class="hint">Fotoğraf veya MP4 video dosyaları desteklenir.</div>
+                </div>
+                <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display: none;"
+                    onchange="handleFileSelect(event)">
+                <div class="preview-container" id="previewContainer"></div>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                <span id="btnText">Öneriyi Gönder</span>
+                <div class="loader" id="btnLoader"></div>
+            </button>
+
+            <div id="statusMessage" class="status-message"></div>
+        </form>
+    </div>
+
+    <script>
+        let selectedFiles = [];
+        const dropArea = document.getElementById('dropArea');
+        const previewContainer = document.getElementById('previewContainer');
+        const form = document.getElementById('requestForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false);
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+            handleFiles(files);
+        });
+
+        function handleFileSelect(event) {
+            handleFiles(event.target.files);
+        }
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                selectedFiles.push(file);
+                renderPreview(file, selectedFiles.length - 1);
+            });
+            document.getElementById('fileInput').value = '';
+        }
+
+        function renderPreview(file, index) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = function () {
+                const div = document.createElement('div');
+                div.className = 'preview-item';
+                div.dataset.index = index;
+
+                let mediaEl = '';
+                if (file.type.startsWith('image/')) {
+                    mediaEl = `<img src="${reader.result}" alt="preview">`;
+                } else if (file.type.startsWith('video/')) {
+                    mediaEl = `<video src="${reader.result}"></video>`;
+                }
+
+                div.innerHTML = `
+          ${mediaEl}
+          <button type="button" class="remove-btn" onclick="removeFile(${index})"><i class="ri-close-line"></i></button>
+        `;
+                previewContainer.appendChild(div);
+            }
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            refreshPreviews();
+        }
+
+        function refreshPreviews() {
+            previewContainer.innerHTML = '';
+            const oldFiles = [...selectedFiles];
+            selectedFiles = [];
+            oldFiles.forEach((f) => {
+                selectedFiles.push(f);
+                renderPreview(f, selectedFiles.length - 1);
+            });
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fullname = document.getElementById('fullname').value.trim();
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            if (!fullname || !title || !description) {
+                showStatus('Lütfen zorunlu alanları doldurun.', 'error');
+                return;
+            }
+
+            setLoading(true);
+            showStatus('Kaydediliyor, lütfen bekleyin...', '');
+
+            try {
+                const uploadedMediaUrls = [];
+
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    const uploadFormData = new FormData();
+                    uploadFormData.append('files[]', file);
+
+                    const uploadRes = await fetch('https://uguu.se/upload.php', {
+                        method: 'POST',
+                        body: uploadFormData
+                    });
+
+                    if (!uploadRes.ok) throw new Error('Medya yükleme hatası.');
+                    const data = await uploadRes.json();
+
+                    if (data.success && data.files && data.files.length > 0) {
+                        const uploadedFile = data.files[0];
+                        uploadedMediaUrls.push({
+                            url: uploadedFile.url,
+                            filename: file.name,
+                            kind: file.type.startsWith('video/') ? 'video' : 'photo'
+                        });
+                    }
+                }
+
+                const res = await fetch('/api/public/content-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullname,
+                        title,
+                        description,
+                        media_urls: uploadedMediaUrls
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    showStatus('Öneriniz başarıyla ulaştırıldı! Teşekkür ederiz.', 'success');
+                    form.reset();
+                    selectedFiles = [];
+                    previewContainer.innerHTML = '';
+                } else {
+                    showStatus(data.error || 'Bir hata oluştu.', 'error');
+                }
+            } catch (err) {
+                showStatus(err.message || 'Bağlantı hatası oluştu.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        function showStatus(msg, type) {
+            statusMessage.textContent = msg;
+            statusMessage.className = `status-message status-${type}`;
+        }
+
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            document.getElementById('btnText').style.display = isLoading ? 'none' : 'block';
+            document.getElementById('btnLoader').style.display = isLoading ? 'block' : 'none';
+        }
+    </script>
+</body>
+
+</html>

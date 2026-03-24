@@ -74,6 +74,8 @@ app.get("/", (req, res) => res.redirect("/login"));
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, "ui", "login.html")));
 app.get("/panel", (req, res) => res.sendFile(path.join(__dirname, "ui", "index.html")));
 app.get("/haber-gonder", (req, res) => res.sendFile(path.join(__dirname, "ui", "haber_gonder.html")));
+app.get("/anket", (req, res) => res.sendFile(path.join(__dirname, "ui", "anket.html")));
+app.get("/icerik-istegi", (req, res) => res.sendFile(path.join(__dirname, "ui", "icerik_istegi.html")));
 
 // ---------------- Auth API ----------------
 app.post("/api/auth/login", async (req, res) => {
@@ -744,7 +746,8 @@ app.post("/api/share", verifyToken, async (req, res) => {
   }
 
   try {
-    logAction(req.user.id, 'SHARE_STARTED', `ID: ${itemId || 'CUSTOM'}`, req.ip, 'INFO');
+    logAction(req.user.id, 'SHARE_STARTED', `ID: ${itemId || 'CUSTOM'}, Media: ${JSON.stringify(mediaList.map(m=>m.url))}`, req.ip, 'INFO');
+    console.log("[Share Debug] Sharing started for media:", JSON.stringify(mediaList, null, 2));
     let finalContainerId;
 
     if (mediaList.length > 1) {
@@ -1076,6 +1079,109 @@ app.get("/api/finance/admin", verifyToken, isSuperAdmin, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+
+// ---------------- Anket (Survey) API ----------------
+app.get("/api/public/active-surveys", (req, res) => {
+  db.all(`SELECT * FROM surveys WHERE is_active = 1 ORDER BY created_at DESC`, [], (err, surveys) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (surveys.length === 0) return res.json([]);
+    const surveyIds = surveys.map(s => s.id);
+    db.all(`SELECT * FROM survey_options WHERE survey_id IN (${surveyIds.join(',')})`, [], (err2, options) => {
+      if (err2) return res.status(500).json({ error: err2.message });
+      const result = surveys.map(s => ({ ...s, options: options.filter(o => o.survey_id === s.id) }));
+      res.json(result);
+    });
+  });
+});
+
+app.post("/api/public/surveys/:id/vote", async (req, res) => {
+  const { id } = req.params;
+  const { option_id } = req.body;
+  const ip = req.ip || req.headers['x-forwarded-for'] || '';
+  if (!option_id) return res.status(400).json({ error: "Lütfen bir seçenek seçin" });
+  db.get(`SELECT id FROM survey_responses WHERE survey_id = ? AND ip_address = ?`, [id, ip], (err, row) => {
+    if (row) return res.status(400).json({ error: "Bu ankete zaten oy verdiniz." });
+    db.run(`INSERT INTO survey_responses (survey_id, option_id, ip_address) VALUES (?, ?, ?)`, [id, option_id, ip], function (err2) {
+      if (err2) return res.status(500).json({ error: err2.message });
+      res.json({ ok: true });
+    });
+  });
+});
+
+app.get("/api/admin/surveys", verifyToken, isSuperAdmin, (req, res) => {
+  db.all(`SELECT s.*, (SELECT COUNT(*) FROM survey_responses r WHERE r.survey_id = s.id) as total_votes FROM surveys s ORDER BY s.created_at DESC`, [], (err, surveys) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(surveys);
+  });
+});
+
+app.post("/api/admin/surveys", verifyToken, isSuperAdmin, (req, res) => {
+  const { question, options } = req.body;
+  if (!question || !options || !Array.isArray(options) || options.length < 2) return res.status(400).json({ error: "Soru ve en az 2 seçenek gereklidir." });
+  db.serialize(() => {
+    db.run("BEGIN TRANSACTION");
+    db.run(`INSERT INTO surveys (question) VALUES (?)`, [question], function (err) {
+      if (err) { db.run("ROLLBACK"); return res.status(500).json({ error: err.message }); }
+      const surveyId = this.lastID;
+      const stmt = db.prepare(`INSERT INTO survey_options (survey_id, option_text) VALUES (?, ?)`);
+      options.forEach(opt => stmt.run(surveyId, opt));
+      stmt.finalize((err2) => {
+        if (err2) { db.run("ROLLBACK"); return res.status(500).json({ error: err2.message }); }
+        db.run("COMMIT");
+        logAction(req.user.id, 'SURVEY_CREATED', `Yeni anket oluşturuldu: ${question}`, req.ip, 'SUCCESS');
+        res.json({ ok: true, id: surveyId });
+      });
+    });
+  });
+});
+
+app.get("/api/admin/surveys/:id/results", verifyToken, isSuperAdmin, (req, res) => {
+  db.all(`SELECT o.id, o.option_text, COUNT(r.id) as votes FROM survey_options o LEFT JOIN survey_responses r ON o.id = r.option_id WHERE o.survey_id = ? GROUP BY o.id`, [req.params.id], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
+app.delete("/api/admin/surveys/:id", verifyToken, isSuperAdmin, (req, res) => {
+  db.run(`DELETE FROM surveys WHERE id = ?`, [req.params.id], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    logAction(req.user.id, 'SURVEY_DELETED', `Anket silindi (ID: ${req.params.id})`, req.ip, 'SUCCESS');
+    res.json({ ok: true });
+  });
+});
+
+// ---------------- İçerik İsteği (Content Request) API ----------------
+app.post("/api/public/content-request", express.json(), (req, res) => {
+  const { fullname, title, description, media_urls } = req.body;
+  if (!fullname || !title || !description) return res.status(400).json({ error: "Lütfen gerekli alanları doldurun." });
+  db.run(`INSERT INTO content_requests (fullname, title, description, media_urls) VALUES (?, ?, ?, ?)`, [fullname, title, description, JSON.stringify(media_urls || [])], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ ok: true, message: "Öneriniz başarıyla alındı." });
+  });
+});
+
+app.get("/api/admin/content-requests", verifyToken, isSuperAdmin, (req, res) => {
+  db.all(`SELECT * FROM content_requests ORDER BY created_at DESC`, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    rows.forEach(r => { try { r.media_urls = JSON.parse(r.media_urls || "[]"); } catch (e) { r.media_urls = []; } });
+    res.json(rows);
+  });
+});
+
+app.put("/api/admin/content-requests/:id", verifyToken, isSuperAdmin, (req, res) => {
+  db.run(`UPDATE content_requests SET status = ? WHERE id = ?`, [req.body.status, req.params.id], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ ok: true });
+  });
+});
+
+app.delete("/api/admin/content-requests/:id", verifyToken, isSuperAdmin, (req, res) => {
+  db.run(`DELETE FROM content_requests WHERE id = ?`, [req.params.id], function (err) {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ ok: true });
+  });
 });
 
 app.listen(PORT, () => {

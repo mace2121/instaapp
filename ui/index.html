@@ -939,6 +939,12 @@
       <div class="nav-item" onclick="showTab('tasks'); toggleSidebar(false)">
         <i class="ri-task-line"></i> Görevler
       </div>
+      <div class="nav-item" data-role="super_admin" onclick="showTab('surveys'); toggleSidebar(false)">
+        <i class="ri-survey-line"></i> Anketler
+      </div>
+      <div class="nav-item" data-role="super_admin" onclick="showTab('content_requests'); toggleSidebar(false)">
+        <i class="ri-lightbulb-line"></i> İçerik İstekleri
+      </div>
     </div>
     <div class="user-info"
       style="display:flex; align-items:center; gap:0.75rem; padding:1rem; border-top:1px solid var(--border);">
@@ -1794,12 +1800,42 @@
           </button>
         </div>
 
-        <!-- Modernized Task List Container -->
-        <div class="card" style="padding: 1.5rem; margin-top: 1rem;">
-          <div id="listViewArea"
-            style="display: flex; flex-direction: column; gap: 1rem; min-height: 400px; overflow-x: auto;">
-            <!-- JS populate here -->
+      </div>
+
+      <!-- SURVEYS TAB -->
+      <div id="surveys" class="tab-content">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h3>Anketler</h3>
+            <button class="btn btn-primary" onclick="openSurveyModal()"><i class="ri-add-line"></i> Yeni Anket</button>
           </div>
+          <div id="surveysList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:1.5rem;">
+            <!-- Surveys will be loaded here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT REQUESTS TAB -->
+      <div id="content_requests" class="tab-content">
+        <div class="card" style="overflow-x: auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3>İçerik İstekleri</h3>
+            <button class="btn btn-secondary" onclick="loadContentRequests()"><i class="ri-refresh-line"></i> Yenile</button>
+          </div>
+          <table style="min-width: 800px;">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Gönderen</th>
+                <th>Başlık</th>
+                <th>Açıklama</th>
+                <th>Medya</th>
+                <th>Durum</th>
+                <th style="text-align:right">İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="contentRequestTableBody"></tbody>
+          </table>
         </div>
       </div>
 
@@ -1936,6 +1972,53 @@
     </div>
   </div>
 
+  <!-- SURVEY ADD MODAL -->
+  <div class="modal-overlay" id="surveyModalOverlay" onclick="closeSurveyModal(event)">
+    <div class="modal-card" id="surveyModal" onclick="event.stopPropagation()" style="max-width:500px">
+      <div class="modal-header">
+        <h3>Yeni Anket Oluştur</h3>
+        <button class="btn btn-secondary" onclick="closeSurveyModal()">Kapat</button>
+      </div>
+      <div class="modal-body">
+        <form id="surveyForm" onsubmit="saveSurvey(event)">
+          <div class="form-group">
+            <label>Anket Sorusu</label>
+            <input type="text" id="surveyQuestion" class="form-control" placeholder="Örn: Yeni kapak fotoğrafı nasıl olsun?" required>
+          </div>
+          <div id="surveyOptionsContainer">
+            <div class="form-group">
+              <label>Seçenek 1</label>
+              <input type="text" class="form-control survey-option-input" required>
+            </div>
+            <div class="form-group">
+              <label>Seçenek 2</label>
+              <input type="text" class="form-control survey-option-input" required>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary" style="margin-top:0.5rem; width:100%;" onclick="addSurveyOptionField()">
+            <i class="ri-add-line"></i> Seçenek Ekle
+          </button>
+          <div style="margin-top:1.5rem; text-align:right;">
+            <button type="submit" class="btn btn-primary">Anketi Yayınla</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SURVEY RESULTS MODAL -->
+  <div class="modal-overlay" id="surveyResultsModalOverlay" onclick="closeSurveyResultsModal()">
+    <div class="modal-card" id="surveyResultsModal" style="max-width:500px; padding:20px;">
+        <div class="modal-header">
+            <h3>Anket Sonuçları</h3>
+            <button class="btn btn-secondary" onclick="closeSurveyResultsModal()">Kapat</button>
+        </div>
+        <div class="modal-body" id="surveyResultsBody">
+            <!-- Results injected here -->
+        </div>
+    </div>
+  </div>
+
   <script>
     const API_URL = '';
     // --- AUTH & SETUP ---
@@ -2045,6 +2128,12 @@
         document.getElementById('pageTitle').textContent = 'Görevler';
         loadTasks();
         if (user && user.role === 'super_admin') loadUsersForTasks();
+      } else if (tabId === 'surveys' && user.role === 'super_admin') {
+        document.getElementById('pageTitle').textContent = 'Anket Yönetimi';
+        loadSurveys();
+      } else if (tabId === 'content_requests' && user.role === 'super_admin') {
+        document.getElementById('pageTitle').textContent = 'İçerik İstekleri';
+        loadContentRequests();
       }
     }
 
@@ -3501,7 +3590,140 @@
     }
 
     // Call initial render here, so all functions (including loadDashboard) are in scope
+
+    // --- SURVEYS LOGIC ---
+    function openSurveyModal() { document.getElementById('surveyModalOverlay').style.display = 'flex'; }
+    function closeSurveyModal() { document.getElementById('surveyModalOverlay').style.display = 'none'; }
+    function addSurveyOptionField() {
+      const container = document.getElementById('surveyOptionsContainer');
+      const count = container.querySelectorAll('.form-group').length + 1;
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.innerHTML = `<label>Seçenek ${count}</label><input type="text" class="form-control survey-option-input" required>`;
+      container.appendChild(div);
+    }
+    async function saveSurvey(e) {
+      e.preventDefault();
+      const question = document.getElementById('surveyQuestion').value;
+      const options = Array.from(document.querySelectorAll('.survey-option-input')).map(i => i.value);
+      try {
+        const res = await fetch('/api/admin/surveys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ question, options })
+        });
+        if (res.ok) {
+          closeSurveyModal();
+          loadSurveys();
+          e.target.reset();
+          document.getElementById('surveyOptionsContainer').innerHTML = '<div class="form-group"><label>Seçenek 1</label><input type="text" class="form-control survey-option-input" required></div><div class="form-group"><label>Seçenek 2</label><input type="text" class="form-control survey-option-input" required></div>';
+        }
+      } catch (err) { console.error(err); }
+    }
+    async function loadSurveys() {
+      try {
+        const res = await fetch('/api/admin/surveys', { headers: { 'Authorization': `Bearer ${token}` } });
+        const surveys = await res.json();
+        const list = document.getElementById('surveysList');
+        list.innerHTML = surveys.map(s => `
+          <div class="card" style="padding:1.5rem; border-left:4px solid var(--primary);">
+            <h4 style="margin-bottom:0.5rem;">${escapeHTML(s.question)}</h4>
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+              <i class="ri-user-voice-line"></i> ${s.total_votes || 0} Katılımcı | ${new Date(s.created_at).toLocaleDateString()}
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn btn-secondary" style="flex:1" onclick="loadSurveyResults(${s.id})"><i class="ri-bar-chart-line"></i> Sonuçlar</button>
+              <button class="btn btn-secondary" style="color:var(--danger)" onclick="deleteSurvey(${s.id})"><i class="ri-delete-bin-line"></i></button>
+            </div>
+            <div style="margin-top:1rem; font-size:0.8rem; border-top:1px solid var(--border); padding-top:0.5rem; color:var(--primary); cursor:pointer;" onclick="window.open('/ui/anket.html?id=${s.id}', '_blank')">
+                <i class="ri-external-link-line"></i> Paylaşım Linki
+            </div>
+          </div>
+        `).join('');
+      } catch (err) { console.error(err); }
+    }
+    async function deleteSurvey(id) {
+        if (!confirm('Bu anketi silmek istediğinize emin misiniz?')) return;
+        await fetch(`/api/admin/surveys/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        loadSurveys();
+    }
+    function closeSurveyResultsModal() { document.getElementById('surveyResultsModalOverlay').style.display = 'none'; }
+    async function loadSurveyResults(id) {
+        try {
+            const res = await fetch(`/api/admin/surveys/${id}/results`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const results = await res.json();
+            const body = document.getElementById('surveyResultsBody');
+            const total = results.reduce((a, b) => a + b.votes, 0);
+            body.innerHTML = results.map(r => {
+                const perc = total > 0 ? (r.votes / total * 100).toFixed(1) : 0;
+                return `
+                    <div style="margin-bottom:1rem;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem; font-size:0.9rem;">
+                            <span>${escapeHTML(r.option_text)}</span>
+                            <span>%${perc} (${r.votes} Oy)</span>
+                        </div>
+                        <div style="height:8px; width:100%; background:#eee; border-radius:4px; overflow:hidden;">
+                            <div style="height:100%; width:${perc}%; background:var(--primary);"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('') + `<div style="margin-top:1rem; font-weight:700; text-align:right;">Toplam: ${total} Oy</div>`;
+            document.getElementById('surveyResultsModalOverlay').style.display = 'flex';
+        } catch (e) { console.error(e); }
+    }
+
+    // --- CONTENT REQUESTS LOGIC ---
+    async function loadContentRequests() {
+      try {
+        const res = await fetch('/api/admin/content-requests', { headers: { 'Authorization': `Bearer ${token}` } });
+        const rows = await res.json();
+        const tbody = document.getElementById('contentRequestTableBody');
+        tbody.innerHTML = rows.map(r => `
+          <tr>
+            <td>${new Date(r.created_at).toLocaleDateString()}</td>
+            <td><strong>${escapeHTML(r.fullname)}</strong></td>
+            <td>${escapeHTML(r.title)}</td>
+            <td><div style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHTML(r.description)}">${escapeHTML(r.description)}</div></td>
+            <td>${r.media_urls.length > 0 ? `<button class="btn btn-secondary btn-sm" onclick="showMediaModal(${JSON.stringify(r.media_urls).replace(/"/g, '&quot;')})"><i class="ri-image-line"></i> ${r.media_urls.length} Dosya</button>` : 'Dosya Yok'}</td>
+            <td><span class="badge badge-${r.status === 'pending' ? 'warn' : 'success'}">${r.status}</span></td>
+            <td style="text-align:right">
+              <button class="btn btn-secondary" onclick="updateContentRequestStatus(${r.id}, 'completed')"><i class="ri-check-line"></i></button>
+              <button class="btn btn-secondary" style="color:var(--danger)" onclick="deleteContentRequest(${r.id})"><i class="ri-delete-bin-line"></i></button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) { console.error(err); }
+    }
+    async function updateContentRequestStatus(id, s) {
+        await fetch(`/api/admin/content-requests/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status: s }) });
+        loadContentRequests();
+    }
+    async function deleteContentRequest(id) {
+        if (!confirm('Silmek istediğinize emin misiniz?')) return;
+        await fetch(`/api/admin/content-requests/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+        loadContentRequests();
+    }
+    function showMediaModal(urls) {
+        let html = urls.map(m => `
+            <div style="margin-bottom:1rem; border-bottom:1px solid #eee; padding-bottom:0.5rem;">
+                <a href="${m.url}" target="_blank" style="color:var(--primary); text-decoration:none;">
+                    <i class="${m.kind === 'video' ? 'ri-video-line' : 'ri-image-line'}"></i> ${escapeHTML(m.filename)}
+                </a>
+            </div>
+        `).join('');
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay open';
+        overlay.onclick = () => overlay.remove();
+        overlay.innerHTML = `<div class="card" style="max-width:400px; margin:auto; background:white; padding:20px; border-radius:10px;" onclick="event.stopPropagation()">
+            <h3 style="margin-bottom:1rem;">Medya Dosyaları</h3>
+            ${html}
+            <button class="btn btn-primary" style="width:100%;" onclick="this.parentElement.parentElement.remove()">Kapat</button>
+        </div>`;
+        document.body.appendChild(overlay);
+    }
+
     showTab('dashboard');
+
   </script>
 </body>
 

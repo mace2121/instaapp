@@ -118,6 +118,46 @@ db.serialize(() => {
         FOREIGN KEY(assigned_by) REFERENCES users(id),
         FOREIGN KEY(assigned_to) REFERENCES users(id)
     )`);
+
+  // Anketler (Surveys)
+  db.run(`CREATE TABLE IF NOT EXISTS surveys (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question TEXT NOT NULL,
+        is_active INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+  // Anket Seçenekleri (Survey Options)
+  db.run(`CREATE TABLE IF NOT EXISTS survey_options (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        survey_id INTEGER NOT NULL,
+        option_text TEXT NOT NULL,
+        FOREIGN KEY(survey_id) REFERENCES surveys(id) ON DELETE CASCADE
+    )`);
+
+  // Anket Cevapları (Survey Responses)
+  db.run(`CREATE TABLE IF NOT EXISTS survey_responses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        survey_id INTEGER NOT NULL,
+        option_id INTEGER NOT NULL,
+        user_id INTEGER,
+        ip_address TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
+        FOREIGN KEY(option_id) REFERENCES survey_options(id) ON DELETE CASCADE,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )`);
+
+  // İçerik İstekleri (Content Requests)
+  db.run(`CREATE TABLE IF NOT EXISTS content_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        fullname TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        media_urls TEXT,
+        status TEXT DEFAULT 'pending',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
 });
 
 module.exports = db;

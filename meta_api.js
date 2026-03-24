@@ -32,6 +32,9 @@ async function metaRequest(endpoint, params = {}, method = 'POST') {
 
     const url = urlObj.toString();
 
+    console.log(`[Meta Debug] ${method} -> ${url}`);
+    if (params && Object.keys(params).length) console.log(`[Meta Debug] Body:`, JSON.stringify(params, null, 2));
+
     try {
         const response = await fetch(url, {
             method: method,
