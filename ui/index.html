@@ -727,7 +727,47 @@
       display: flex;
     }
 
-    /* ─── Mobile Responsive (Unified & Enhanced) ─── */
+    /* --- Survey & Content Request Modals --- */
+    #surveyModalOverlay, #surveyResultsModalOverlay, #contentRequestModalOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s ease;
+      opacity: 0;
+    }
+
+    #surveyModalOverlay.open, #surveyResultsModalOverlay.open, #contentRequestModalOverlay.open {
+      display: flex !important;
+      opacity: 1 !important;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border-radius: 1rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 95%;
+      max-width: 500px;
+      padding: 0 !important;
+      overflow: hidden;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-warn { background: #fef3c7; color: #92400e; }
+    .badge-success { background: #d1fae5; color: #065f46; }
     @media (max-width: 768px) {
       body {
         overflow: hidden;
@@ -2018,6 +2058,22 @@
         </div>
         <div class="modal-body" id="surveyResultsBody">
             <!-- Results injected here -->
+        </div>
+    </div>
+  </div>
+  <!-- CONTENT REQUEST DETAIL MODAL -->
+  <div class="modal-overlay" id="contentRequestModalOverlay" onclick="closeContentRequestModal()">
+    <div class="modal-card" id="contentRequestModal" style="max-width:600px;" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>İçerik İsteği Detayı</h3>
+            <button class="btn btn-secondary" onclick="closeContentRequestModal()">Kapat</button>
+        </div>
+        <div class="modal-body" id="contentRequestDetailBody">
+            <!-- Details injected here -->
+        </div>
+        <div style="padding:1.5rem; border-top:1px solid var(--border); text-align:right; background:var(--bg); display:flex; justify-content:flex-end; gap:0.5rem;">
+             <button class="btn btn-secondary" onclick="closeContentRequestModal()">Vazgeç</button>
+             <button class="btn btn-primary" id="btnMarkComplete" onclick="">Tamamlandı İşaretle</button>
         </div>
     </div>
   </div>
@@ -3596,14 +3652,20 @@
 
     // --- SURVEYS LOGIC ---
     function openSurveyModal() { 
+        document.getElementById('surveyForm').reset();
+        document.getElementById('surveyOptionsContainer').innerHTML = `
+            <div class="form-group"><label>Seçenek 1</label><input type="text" class="form-control survey-option-input" required></div>
+            <div class="form-group"><label>Seçenek 2</label><input type="text" class="form-control survey-option-input" required></div>
+        `;
         const overlay = document.getElementById('surveyModalOverlay');
         overlay.style.display = 'flex';
-        setTimeout(() => overlay.classList.add('open'), 10);
+        setTimeout(() => overlay.classList.add('open'), 50);
     }
-    function closeSurveyModal() { 
+    function closeSurveyModal(e) { 
         const overlay = document.getElementById('surveyModalOverlay');
+        if (e && e.target !== overlay && e.target.tagName !== 'BUTTON') return;
         overlay.classList.remove('open');
-        setTimeout(() => overlay.style.display = 'none', 200);
+        setTimeout(() => overlay.style.display = 'none', 300);
     }
     function addSurveyOptionField() {
       const container = document.getElementById('surveyOptionsContainer');
@@ -3690,53 +3752,89 @@
     }
 
     // --- CONTENT REQUESTS LOGIC ---
+    let allContentRequests = [];
     async function loadContentRequests() {
       try {
         const res = await fetch('/api/admin/content-requests', { headers: { 'Authorization': `Bearer ${token}` } });
         const rows = await res.json();
+        allContentRequests = rows;
         const tbody = document.getElementById('contentRequestTableBody');
+        const statusMap = { pending: 'Beklemede', completed: 'Tamamlandı' };
+
         tbody.innerHTML = rows.map(r => `
-          <tr>
+          <tr onclick="openContentRequestModal(${r.id})" style="cursor:pointer;">
             <td>${new Date(r.created_at).toLocaleDateString()}</td>
             <td><strong>${escapeHTML(r.fullname)}</strong></td>
             <td>${escapeHTML(r.title)}</td>
             <td><div style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHTML(r.description)}">${escapeHTML(r.description)}</div></td>
-            <td>${r.media_urls.length > 0 ? `<button class="btn btn-secondary btn-sm" onclick="showMediaModal(${JSON.stringify(r.media_urls).replace(/"/g, '&quot;')})"><i class="ri-image-line"></i> ${r.media_urls.length} Dosya</button>` : 'Dosya Yok'}</td>
-            <td><span class="badge badge-${r.status === 'pending' ? 'warn' : 'success'}">${r.status}</span></td>
-            <td style="text-align:right">
-              <button class="btn btn-secondary" onclick="updateContentRequestStatus(${r.id}, 'completed')"><i class="ri-check-line"></i></button>
+            <td>${r.media_urls.length > 0 ? `<i class="ri-image-line"></i> ${r.media_urls.length} Dosya` : 'Dosya Yok'}</td>
+            <td><span class="badge badge-${r.status === 'pending' ? 'warn' : 'success'}">${statusMap[r.status] || r.status}</span></td>
+            <td style="text-align:right" onclick="event.stopPropagation()">
               <button class="btn btn-secondary" style="color:var(--danger)" onclick="deleteContentRequest(${r.id})"><i class="ri-delete-bin-line"></i></button>
             </td>
           </tr>
         `).join('');
       } catch (err) { console.error(err); }
     }
+    
+    function openContentRequestModal(id) {
+        const req = allContentRequests.find(r => r.id === id);
+        if (!req) return;
+        
+        const body = document.getElementById('contentRequestDetailBody');
+        const mediaHtml = req.media_urls.map(m => `
+            <div style="margin-top:1rem; border:1px solid var(--border); border-radius:8px; padding:0.5rem; display:flex; align-items:center; gap:0.5rem;">
+                <i class="${m.kind === 'video' ? 'ri-video-line' : 'ri-image-line'}" style="font-size:1.5rem; color:var(--primary);"></i>
+                <div style="flex:1; overflow:hidden;">
+                    <div style="font-size:0.85rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHTML(m.filename)}</div>
+                    <a href="${m.url}" target="_blank" style="font-size:0.75rem; color:var(--primary); text-decoration:none;">Dosyayı Görüntüle</a>
+                </div>
+            </div>
+        `).join('');
+
+        body.innerHTML = `
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Gönderen</label>
+                <div style="font-weight:600; font-size:1.1rem;">${escapeHTML(req.fullname)}</div>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Başlık</label>
+                <div style="font-weight:600;">${escapeHTML(req.title)}</div>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Açıklama</label>
+                <div style="white-space:pre-wrap; line-height:1.5;">${escapeHTML(req.description)}</div>
+            </div>
+            <div>
+                <label style="font-size:0.8rem; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Medya Dosyaları (${req.media_urls.length})</label>
+                <div>${mediaHtml || '<div style="color:var(--text-muted); margin-top:0.5rem;">Dosya yüklenmemiş.</div>'}</div>
+            </div>
+        `;
+        
+        const btn = document.getElementById('btnMarkComplete');
+        btn.onclick = () => updateContentRequestStatus(id, 'completed');
+        btn.style.display = req.status === 'pending' ? 'inline-flex' : 'none';
+
+        const overlay = document.getElementById('contentRequestModalOverlay');
+        overlay.style.display = 'flex';
+        setTimeout(() => overlay.classList.add('open'), 10);
+    }
+
+    function closeContentRequestModal() {
+        const overlay = document.getElementById('contentRequestModalOverlay');
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.style.display = 'none', 200);
+    }
+
     async function updateContentRequestStatus(id, s) {
         await fetch(`/api/admin/content-requests/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ status: s }) });
+        closeContentRequestModal();
         loadContentRequests();
     }
     async function deleteContentRequest(id) {
         if (!confirm('Silmek istediğinize emin misiniz?')) return;
         await fetch(`/api/admin/content-requests/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         loadContentRequests();
-    }
-    function showMediaModal(urls) {
-        let html = urls.map(m => `
-            <div style="margin-bottom:1rem; border-bottom:1px solid #eee; padding-bottom:0.5rem;">
-                <a href="${m.url}" target="_blank" style="color:var(--primary); text-decoration:none;">
-                    <i class="${m.kind === 'video' ? 'ri-video-line' : 'ri-image-line'}"></i> ${escapeHTML(m.filename)}
-                </a>
-            </div>
-        `).join('');
-        const overlay = document.createElement('div');
-        overlay.className = 'modal-overlay open';
-        overlay.onclick = () => overlay.remove();
-        overlay.innerHTML = `<div class="card" style="max-width:400px; margin:auto; background:white; padding:20px; border-radius:10px;" onclick="event.stopPropagation()">
-            <h3 style="margin-bottom:1rem;">Medya Dosyaları</h3>
-            ${html}
-            <button class="btn btn-primary" style="width:100%;" onclick="this.parentElement.parentElement.remove()">Kapat</button>
-        </div>`;
-        document.body.appendChild(overlay);
     }
 
     showTab('dashboard');
