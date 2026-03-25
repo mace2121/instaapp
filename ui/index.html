@@ -2024,6 +2024,10 @@
       </div>
       <div class="modal-body" style="max-height:75vh; overflow-y:auto;">
         <form id="surveyForm" onsubmit="saveSurvey(event)">
+          <div class="form-group" style="margin-bottom:1.5rem;">
+            <label style="font-weight:700; color:var(--primary);">Anket Başlığı (Genel)</label>
+            <input type="text" id="surveyGeneralTitle" class="form-control" placeholder="Örn: Müşteri Memnuniyet Anketi" required>
+          </div>
           <div id="surveyQuestionsContainer">
             <!-- Sorular dinamik olarak oluşturulacak -->
           </div>
@@ -3646,11 +3650,18 @@
         document.getElementById('surveyForm').reset();
         document.getElementById('surveyQuestionsContainer').innerHTML = '';
         surveyQuestionCount = 0;
-        addSurveyQuestion(); // Start with one question
+        addSurveyQuestion(); // Start with one question area
 
         const overlay = document.getElementById('surveyModalOverlay');
         overlay.style.display = 'flex';
         setTimeout(() => overlay.classList.add('open'), 50);
+    }
+
+    function closeSurveyModal(e) { 
+        const overlay = document.getElementById('surveyModalOverlay');
+        if (e && e.target !== overlay && e.target.tagName !== 'BUTTON') return;
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.style.display = 'none', 300);
     }
 
     function addSurveyQuestion() {
@@ -3680,12 +3691,12 @@
             </div>
         `;
         container.appendChild(qDiv);
-        addSurveyOptionField(qIdx, 'radio'); // Start with one radio option
-        addSurveyOptionField(qIdx, 'radio'); // And another for a valid survey
+        // Removed automatic addition of radio options
     }
 
     function addSurveyOptionField(qIdx, type) {
         const qBlocks = document.querySelectorAll('.survey-question-block');
+        if (qIdx >= qBlocks.length) return;
         const container = qBlocks[qIdx].querySelector('.options-container');
         const optCount = container.querySelectorAll('.option-row').length + 1;
         
@@ -3695,10 +3706,7 @@
         
         if (type === 'text') {
             div.innerHTML = `
-                <div style="flex:1; background:#fff; border:1px dashed var(--border); padding:0.5rem; border-radius:4px; font-size:0.8rem; color:var(--text-muted);">
-                   <i class="ri-text-input"></i> Kullanıcı buraya metin yazacak
-                </div>
-                <input type="hidden" class="option-text" value="Metin Cevabı">
+                <input type="text" class="form-control option-text" style="padding:0.4rem; font-size:0.85rem;" placeholder="Metin alanı etiketi (Örn: Görüşünüz)" value="Cevabınız" required>
                 <input type="hidden" class="option-type" value="text">
                 <button type="button" class="btn btn-secondary" style="padding:0.25rem 0.5rem;" onclick="this.parentElement.remove()"><i class="ri-close-line"></i></button>
             `;
@@ -3715,6 +3723,7 @@
     async function saveSurvey(e) {
       e.preventDefault();
       
+      const surveyTitle = document.getElementById('surveyGeneralTitle').value;
       const qBlocks = document.querySelectorAll('.survey-question-block');
       const questionsData = [];
       
@@ -3728,18 +3737,28 @@
               });
           });
           
-          questionsData.push({
-              question_text: questionText,
-              sort_order: idx,
-              options: options
-          });
+          if (options.length > 0) {
+              questionsData.push({
+                  question_text: questionText,
+                  sort_order: idx,
+                  options: options
+              });
+          }
       });
+
+      if (questionsData.length === 0) {
+          alert('Lütfen en az bir soru ve seçenek ekleyin.');
+          return;
+      }
 
       try {
         const res = await fetch('/api/admin/surveys', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ questions: questionsData })
+          body: JSON.stringify({ 
+              question: surveyTitle, // Main title
+              questions: questionsData 
+          })
         });
         const data = await res.json();
         if (res.ok) {

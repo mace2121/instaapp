@@ -210,7 +210,7 @@
                         <div class="options-list">
                             ${q.options.map(opt => {
                                 if (opt.option_type === 'text') {
-                                    return `<input type="text" class="text-answer-input" placeholder="Cevabınızı buraya yazın..." data-opt-id="${opt.id}">`;
+                                    return `<input type="text" class="text-answer-input" placeholder="${escapeHTML(opt.option_text)}..." data-opt-id="${opt.id}">`;
                                 } else {
                                     return `<div class="option-item" onclick="selectOption(${q.id}, ${opt.id}, this)" data-opt-id="${opt.id}">
                                         ${escapeHTML(opt.option_text)}
