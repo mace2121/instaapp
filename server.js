@@ -1083,69 +1083,225 @@ app.get("/api/finance/admin", verifyToken, isSuperAdmin, async (req, res) => {
 
 
 // ---------------- Anket (Survey) API ----------------
+// Aktif anketleri sorgular ve sorular + seçeneklerle birlikte döndürür
 app.get("/api/public/active-surveys", (req, res) => {
   db.all(`SELECT * FROM surveys WHERE is_active = 1 ORDER BY created_at DESC`, [], (err, surveys) => {
     if (err) return res.status(500).json({ error: err.message });
     if (surveys.length === 0) return res.json([]);
     const surveyIds = surveys.map(s => s.id);
-    db.all(`SELECT * FROM survey_options WHERE survey_id IN (${surveyIds.join(',')})`, [], (err2, options) => {
+    const placeholders = surveyIds.map(() => '?').join(',');
+
+    db.all(`SELECT * FROM survey_questions WHERE survey_id IN (${placeholders}) ORDER BY sort_order ASC`, surveyIds, (err2, questions) => {
       if (err2) return res.status(500).json({ error: err2.message });
-      const result = surveys.map(s => ({ ...s, options: options.filter(o => o.survey_id === s.id) }));
-      res.json(result);
-    });
-  });
-});
 
-app.post("/api/public/surveys/:id/vote", async (req, res) => {
-  const { id } = req.params;
-  const { option_id } = req.body;
-  const ip = req.ip || req.headers['x-forwarded-for'] || '';
-  if (!option_id) return res.status(400).json({ error: "Lütfen bir seçenek seçin" });
-  db.get(`SELECT id FROM survey_responses WHERE survey_id = ? AND ip_address = ?`, [id, ip], (err, row) => {
-    if (row) return res.status(400).json({ error: "Bu ankete zaten oy verdiniz." });
-    db.run(`INSERT INTO survey_responses (survey_id, option_id, ip_address) VALUES (?, ?, ?)`, [id, option_id, ip], function (err2) {
-      if (err2) return res.status(500).json({ error: err2.message });
-      res.json({ ok: true });
-    });
-  });
-});
+      db.all(`SELECT * FROM survey_options WHERE survey_id IN (${placeholders})`, surveyIds, (err3, options) => {
+        if (err3) return res.status(500).json({ error: err3.message });
 
-app.get("/api/admin/surveys", verifyToken, isSuperAdmin, (req, res) => {
-  db.all(`SELECT s.*, (SELECT COUNT(*) FROM survey_responses r WHERE r.survey_id = s.id) as total_votes FROM surveys s ORDER BY s.created_at DESC`, [], (err, surveys) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(surveys);
-  });
-});
+        const result = surveys.map(s => {
+          const surveyQuestions = (questions || []).filter(q => q.survey_id === s.id);
+          const surveyOptions = (options || []).filter(o => o.survey_id === s.id);
 
-app.post("/api/admin/surveys", verifyToken, isSuperAdmin, (req, res) => {
-  const { question, options } = req.body;
-  if (!question || !options || !Array.isArray(options) || options.length < 2) return res.status(400).json({ error: "Soru ve en az 2 seçenek gereklidir." });
-  db.serialize(() => {
-    db.run("BEGIN TRANSACTION");
-    db.run(`INSERT INTO surveys (question) VALUES (?)`, [question], function (err) {
-      if (err) { db.run("ROLLBACK"); return res.status(500).json({ error: err.message }); }
-      const surveyId = this.lastID;
-      const stmt = db.prepare(`INSERT INTO survey_options (survey_id, option_text) VALUES (?, ?)`);
-      options.forEach(opt => stmt.run(surveyId, opt));
-      stmt.finalize((err2) => {
-        if (err2) { db.run("ROLLBACK"); return res.status(500).json({ error: err2.message }); }
-        db.run("COMMIT");
-        logAction(req.user.id, 'SURVEY_CREATED', `Yeni anket oluşturuldu: ${question}`, req.ip, 'SUCCESS');
-        res.json({ ok: true, id: surveyId });
+          // Eğer survey_questions tablosunda soru yoksa eski format (survey.question) geri dön
+          let finalQuestions = surveyQuestions;
+          if (finalQuestions.length === 0) {
+            // Eski format uyumluluğu: survey.question'u tek soru olarak kullan
+            finalQuestions = [{ id: null, survey_id: s.id, question_text: s.question, sort_order: 0 }];
+          }
+
+          return {
+            ...s,
+            questions: finalQuestions.map(q => ({
+              ...q,
+              options: surveyOptions.filter(o => o.question_id === q.id || (!o.question_id && q.id === null))
+            })),
+            // Eski uyumluluk için düz options listesi
+            options: surveyOptions
+          };
+        });
+        res.json(result);
       });
     });
   });
 });
 
-app.get("/api/admin/surveys/:id/results", verifyToken, isSuperAdmin, (req, res) => {
-  db.all(`SELECT o.id, o.option_text, COUNT(r.id) as votes FROM survey_options o LEFT JOIN survey_responses r ON o.id = r.option_id WHERE o.survey_id = ? GROUP BY o.id`, [req.params.id], (err, rows) => {
+// Oy verme (hem radio seçenek hem metin cevabı destekler)
+app.post("/api/public/surveys/:id/vote", async (req, res) => {
+  const { id } = req.params;
+  const { answers } = req.body; // [{ question_id, option_id?, text_answer? }]
+  const ip = req.ip || req.headers['x-forwarded-for'] || '';
+
+  if (!answers || !Array.isArray(answers) || answers.length === 0) {
+    return res.status(400).json({ error: "Lütfen en az bir soruyu cevaplayın" });
+  }
+
+  // IP bazlı duplicate check
+  db.get(`SELECT id FROM survey_responses WHERE survey_id = ? AND ip_address = ?`, [id, ip], (err, row) => {
+    if (row) return res.status(400).json({ error: "Bu ankete zaten oy verdiniz." });
+
+    db.serialize(() => {
+      db.run("BEGIN TRANSACTION");
+      let hasError = false;
+      let pending = answers.length;
+
+      answers.forEach(answer => {
+        const { question_id, option_id, text_answer } = answer;
+        db.run(
+          `INSERT INTO survey_responses (survey_id, question_id, option_id, text_answer, ip_address) VALUES (?, ?, ?, ?, ?)`,
+          [id, question_id || null, option_id || null, text_answer || null, ip],
+          function(err2) {
+            if (err2) hasError = true;
+            pending--;
+            if (pending === 0) {
+              if (hasError) {
+                db.run("ROLLBACK");
+                return res.status(500).json({ error: "Cevaplar kaydedilemedi" });
+              }
+              db.run("COMMIT");
+              res.json({ ok: true });
+            }
+          }
+        );
+      });
+    });
+  });
+});
+
+app.get("/api/admin/surveys", verifyToken, isSuperAdmin, (req, res) => {
+  db.all(`SELECT s.*, (SELECT COUNT(DISTINCT ip_address) FROM survey_responses r WHERE r.survey_id = s.id) as total_votes FROM surveys s ORDER BY s.created_at DESC`, [], (err, surveys) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
+    res.json(surveys);
+  });
+});
+
+// Yeni anket oluşturma (çoklu soru + seçenek tipi)
+app.post("/api/admin/surveys", verifyToken, isSuperAdmin, (req, res) => {
+  const { question, questions, options } = req.body;
+
+  // Çoklu soru formatı: questions = [{ question_text, sort_order, options: [{ option_text, option_type }] }]
+  // Tek soru formatı (eski uyumluluk): question + options[]
+  const hasMultipleQuestions = questions && Array.isArray(questions) && questions.length > 0;
+
+  if (!question && !hasMultipleQuestions) return res.status(400).json({ error: "En az bir soru gereklidir." });
+
+  if (hasMultipleQuestions) {
+    // Validate: her soruda option tipine göre kontrol
+    for (const q of questions) {
+      if (!q.question_text || !q.question_text.trim()) return res.status(400).json({ error: "Soru metni boş olamaz" });
+      if (!q.options || !Array.isArray(q.options) || q.options.length === 0) return res.status(400).json({ error: `'${q.question_text}' sorusu için en az 1 seçenek gereklidir.` });
+
+      // radio sorular için en az 2 seçenek
+      const radioOptions = q.options.filter(o => o.option_type !== 'text');
+      if (radioOptions.length > 0 && radioOptions.length < 2) return res.status(400).json({ error: `'${q.question_text}' için en az 2 seçenek gereklidir.` });
+    }
+
+    db.serialize(() => {
+      db.run("BEGIN TRANSACTION");
+      // Ana anket başlığı olarak ilk soru
+      const mainQuestion = questions[0].question_text;
+      db.run(`INSERT INTO surveys (question) VALUES (?)`, [mainQuestion], function(err) {
+        if (err) { db.run("ROLLBACK"); return res.status(500).json({ error: err.message }); }
+        const surveyId = this.lastID;
+        let questionsDone = 0;
+        let hasQError = false;
+
+        questions.forEach((q, qIdx) => {
+          db.run(
+            `INSERT INTO survey_questions (survey_id, question_text, sort_order) VALUES (?, ?, ?)`,
+            [surveyId, q.question_text.trim(), qIdx],
+            function(qErr) {
+              if (qErr) { hasQError = true; }
+              else {
+                const questionId = this.lastID;
+                const stmt = db.prepare(`INSERT INTO survey_options (survey_id, question_id, option_text, option_type) VALUES (?, ?, ?, ?)`);
+                q.options.forEach(opt => stmt.run(surveyId, questionId, opt.option_text, opt.option_type || 'radio'));
+                stmt.finalize();
+              }
+              questionsDone++;
+              if (questionsDone === questions.length) {
+                if (hasQError) { db.run("ROLLBACK"); return res.status(500).json({ error: "Sorular kaydedilemedi" }); }
+                db.run("COMMIT");
+                logAction(req.user.id, 'SURVEY_CREATED', `Yeni anket oluşturuldu: ${mainQuestion} (${questions.length} soru)`, req.ip, 'SUCCESS');
+                res.json({ ok: true, id: surveyId });
+              }
+            }
+          );
+        });
+      });
+    });
+  } else {
+    // Eski format uyumluluğu
+    if (!options || !Array.isArray(options) || options.length < 2) return res.status(400).json({ error: "Soru ve en az 2 seçenek gereklidir." });
+    db.serialize(() => {
+      db.run("BEGIN TRANSACTION");
+      db.run(`INSERT INTO surveys (question) VALUES (?)`, [question], function(err) {
+        if (err) { db.run("ROLLBACK"); return res.status(500).json({ error: err.message }); }
+        const surveyId = this.lastID;
+        const stmt = db.prepare(`INSERT INTO survey_options (survey_id, option_text, option_type) VALUES (?, ?, 'radio')`);
+        options.forEach(opt => stmt.run(surveyId, opt));
+        stmt.finalize((err2) => {
+          if (err2) { db.run("ROLLBACK"); return res.status(500).json({ error: err2.message }); }
+          db.run("COMMIT");
+          logAction(req.user.id, 'SURVEY_CREATED', `Yeni anket oluşturuldu: ${question}`, req.ip, 'SUCCESS');
+          res.json({ ok: true, id: surveyId });
+        });
+      });
+    });
+  }
+});
+
+// Anket sonuçları (her soru için ayrı veriler)
+app.get("/api/admin/surveys/:id/results", verifyToken, isSuperAdmin, (req, res) => {
+  const surveyId = req.params.id;
+
+  // Soruları getir
+  db.all(`SELECT * FROM survey_questions WHERE survey_id = ? ORDER BY sort_order ASC`, [surveyId], (err, questions) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    // Seçenekleri ve oy sayılarını getir (radio seçenekler için)
+    db.all(`
+      SELECT o.id, o.option_text, o.option_type, o.question_id,
+             COUNT(CASE WHEN r.option_id IS NOT NULL THEN 1 END) as votes
+      FROM survey_options o
+      LEFT JOIN survey_responses r ON o.id = r.option_id
+      WHERE o.survey_id = ?
+      GROUP BY o.id
+    `, [surveyId], (err2, options) => {
+      if (err2) return res.status(500).json({ error: err2.message });
+
+      // Metin cevaplarını getir (text tipi seçenekler için)
+      db.all(`
+        SELECT r.question_id, r.text_answer, r.created_at
+        FROM survey_responses r
+        WHERE r.survey_id = ? AND r.text_answer IS NOT NULL AND r.text_answer != ''
+        ORDER BY r.created_at DESC
+      `, [surveyId], (err3, textAnswers) => {
+        if (err3) return res.status(500).json({ error: err3.message });
+
+        if (questions && questions.length > 0) {
+          // Çoklu soru formatı
+          const result = questions.map(q => {
+            const qOptions = options.filter(o => o.question_id === q.id);
+            const qTextAnswers = textAnswers.filter(t => t.question_id === q.id).map(t => t.text_answer);
+            return {
+              question_id: q.id,
+              question_text: q.question_text,
+              options: qOptions,
+              text_answers: qTextAnswers
+            };
+          });
+          return res.json({ type: 'multi', questions: result });
+        } else {
+          // Eski format uyumluluğu
+          const legacyOptions = options.filter(o => !o.question_id);
+          return res.json({ type: 'single', questions: [{ question_text: '', options: legacyOptions, text_answers: [] }] });
+        }
+      });
+    });
   });
 });
 
 app.delete("/api/admin/surveys/:id", verifyToken, isSuperAdmin, (req, res) => {
-  db.run(`DELETE FROM surveys WHERE id = ?`, [req.params.id], function (err) {
+  db.run(`DELETE FROM surveys WHERE id = ?`, [req.params.id], function(err) {
     if (err) return res.status(500).json({ error: err.message });
     logAction(req.user.id, 'SURVEY_DELETED', `Anket silindi (ID: ${req.params.id})`, req.ip, 'SUCCESS');
     res.json({ ok: true });

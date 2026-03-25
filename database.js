@@ -127,19 +127,41 @@ db.serialize(() => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 
+  // Anket Soruları (Survey Questions) - Çoklu soru desteği
+  db.run(`CREATE TABLE IF NOT EXISTS survey_questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        survey_id INTEGER NOT NULL,
+        question_text TEXT NOT NULL,
+        sort_order INTEGER DEFAULT 0,
+        FOREIGN KEY(survey_id) REFERENCES surveys(id) ON DELETE CASCADE
+    )`);
+
   // Anket Seçenekleri (Survey Options)
   db.run(`CREATE TABLE IF NOT EXISTS survey_options (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         survey_id INTEGER NOT NULL,
+        question_id INTEGER,
         option_text TEXT NOT NULL,
-        FOREIGN KEY(survey_id) REFERENCES surveys(id) ON DELETE CASCADE
+        option_type TEXT DEFAULT 'radio',
+        FOREIGN KEY(survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
+        FOREIGN KEY(question_id) REFERENCES survey_questions(id) ON DELETE CASCADE
     )`);
+
+  // Migration: survey_options'a option_type ve question_id ekle
+  db.all("PRAGMA table_info(survey_options)", (err, columns) => {
+    if (!err && columns) {
+      if (!columns.some(c => c.name === 'option_type')) db.run("ALTER TABLE survey_options ADD COLUMN option_type TEXT DEFAULT 'radio'");
+      if (!columns.some(c => c.name === 'question_id')) db.run("ALTER TABLE survey_options ADD COLUMN question_id INTEGER");
+    }
+  });
 
   // Anket Cevapları (Survey Responses)
   db.run(`CREATE TABLE IF NOT EXISTS survey_responses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         survey_id INTEGER NOT NULL,
-        option_id INTEGER NOT NULL,
+        question_id INTEGER,
+        option_id INTEGER,
+        text_answer TEXT,
         user_id INTEGER,
         ip_address TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -147,6 +169,14 @@ db.serialize(() => {
         FOREIGN KEY(option_id) REFERENCES survey_options(id) ON DELETE CASCADE,
         FOREIGN KEY(user_id) REFERENCES users(id)
     )`);
+
+  // Migration: survey_responses'a question_id, text_answer ekle, option_id nullable yap
+  db.all("PRAGMA table_info(survey_responses)", (err, columns) => {
+    if (!err && columns) {
+      if (!columns.some(c => c.name === 'question_id')) db.run("ALTER TABLE survey_responses ADD COLUMN question_id INTEGER");
+      if (!columns.some(c => c.name === 'text_answer')) db.run("ALTER TABLE survey_responses ADD COLUMN text_answer TEXT");
+    }
+  });
 
   // İçerik İstekleri (Content Requests)
   db.run(`CREATE TABLE IF NOT EXISTS content_requests (
