@@ -1196,36 +1196,71 @@ app.post("/api/admin/surveys", verifyToken, isSuperAdmin, (req, res) => {
 
     db.serialize(() => {
       db.run("BEGIN TRANSACTION");
-      // Ana anket başlığı olarak ilk soru
-      const mainQuestion = questions[0].question_text;
-      db.run(`INSERT INTO surveys (question) VALUES (?)`, [mainQuestion], function(err) {
+      // Ana anket başlığı (Veya gönderilen genel anket başlığı)
+      const mainTitle = req.body.question || questions[0].question_text;
+      
+      db.run(`INSERT INTO surveys (question) VALUES (?)`, [mainTitle], function(err) {
         if (err) { db.run("ROLLBACK"); return res.status(500).json({ error: err.message }); }
         const surveyId = this.lastID;
-        let questionsDone = 0;
-        let hasQError = false;
-
-        questions.forEach((q, qIdx) => {
-          db.run(
-            `INSERT INTO survey_questions (survey_id, question_text, sort_order) VALUES (?, ?, ?)`,
-            [surveyId, q.question_text.trim(), qIdx],
-            function(qErr) {
-              if (qErr) { hasQError = true; }
-              else {
-                const questionId = this.lastID;
-                const stmt = db.prepare(`INSERT INTO survey_options (survey_id, question_id, option_text, option_type) VALUES (?, ?, ?, ?)`);
-                q.options.forEach(opt => stmt.run(surveyId, questionId, opt.option_text, opt.option_type || 'radio'));
-                stmt.finalize();
+        
+        const qIdMap = {}; // index -> actual_id mapping for logic
+        const optIdMap = {}; // index_optionText -> actual_id mapping for logic
+        
+        // Soruları sırayla kaydetmeliyiz ki bağımlılıkları yönetelim
+        async function saveAllQuestions() {
+          try {
+            for (let i = 0; i < questions.length; i++) {
+              const q = questions[i];
+              
+              // Logic mapping
+              let pQId = null;
+              let pOId = null;
+              if (q.parent_index !== undefined && qIdMap[q.parent_index]) {
+                pQId = qIdMap[q.parent_index];
+                if (q.parent_option_text && optIdMap[`${q.parent_index}_${q.parent_option_text}`]) {
+                  pOId = optIdMap[`${q.parent_index}_${q.parent_option_text}`];
+                }
               }
-              questionsDone++;
-              if (questionsDone === questions.length) {
-                if (hasQError) { db.run("ROLLBACK"); return res.status(500).json({ error: "Sorular kaydedilemedi" }); }
-                db.run("COMMIT");
-                logAction(req.user.id, 'SURVEY_CREATED', `Yeni anket oluşturuldu: ${mainQuestion} (${questions.length} soru)`, req.ip, 'SUCCESS');
-                res.json({ ok: true, id: surveyId });
+
+              const questionId = await new Promise((resolve, reject) => {
+                db.run(
+                  `INSERT INTO survey_questions (survey_id, question_text, selection_type, parent_question_id, parent_option_id, sort_order) VALUES (?, ?, ?, ?, ?, ?)`,
+                  [surveyId, q.question_text.trim(), q.selection_type || 'single', pQId, pOId, i],
+                  function(qErr) {
+                    if (qErr) reject(qErr);
+                    else resolve(this.lastID);
+                  }
+                );
+              });
+
+              qIdMap[i] = questionId;
+
+              // Seçenekleri kaydet
+              for (const opt of q.options) {
+                const optId = await new Promise((resolve, reject) => {
+                  db.run(
+                    `INSERT INTO survey_options (survey_id, question_id, option_text, option_type) VALUES (?, ?, ?, ?)`,
+                    [surveyId, questionId, opt.option_text, opt.option_type || 'radio'],
+                    function(oErr) {
+                      if (oErr) reject(oErr);
+                      else resolve(this.lastID);
+                    }
+                  );
+                });
+                // Logic için seçeneği de haritala
+                optIdMap[`${i}_${opt.option_text}`] = optId;
               }
             }
-          );
-        });
+            db.run("COMMIT");
+            logAction(req.user.id, 'SURVEY_CREATED', `Yeni anket oluşturuldu: ${mainTitle} (${questions.length} soru)`, req.ip, 'SUCCESS');
+            res.json({ ok: true, id: surveyId });
+          } catch (error) {
+            db.run("ROLLBACK");
+            res.status(500).json({ error: "Anket kaydedilirken hata oluştu: " + error.message });
+          }
+        }
+
+        saveAllQuestions();
       });
     });
   } else {

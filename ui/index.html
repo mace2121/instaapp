@@ -3669,12 +3669,41 @@
         const qIdx = surveyQuestionCount++;
         const qDiv = document.createElement('div');
         qDiv.className = 'survey-question-block';
-        qDiv.style = 'background:var(--bg); padding:1rem; border-radius:0.5rem; margin-bottom:1rem; border:1px solid var(--border);';
+        qDiv.setAttribute('data-index', qIdx);
+        qDiv.style = 'background:var(--bg); padding:1rem; border-radius:1rem; margin-bottom:1.5rem; border:1px solid var(--border); box-shadow:0 2px 4px rgba(0,0,0,0.05);';
         qDiv.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                <label style="font-weight:700;">Soru ${qIdx + 1}</label>
-                ${qIdx > 0 ? `<button type="button" class="btn btn-secondary" style="padding:0.25rem 0.5rem; color:var(--danger);" onclick="this.parentElement.parentElement.remove()"><i class="ri-delete-bin-line"></i></button>` : ''}
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
+                <label style="font-weight:700; font-size:1rem; color:var(--primary);">Soru ${qIdx + 1}</label>
+                <div style="display:flex; gap:0.5rem;">
+                    <button type="button" class="btn btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="toggleAdvancedSettings(${qIdx})"><i class="ri-settings-4-line"></i> Ayarlar</button>
+                    ${qIdx > 0 ? `<button type="button" class="btn btn-secondary" style="padding:0.25rem 0.6rem; color:var(--danger);" onclick="this.closest('.survey-question-block').remove()"><i class="ri-delete-bin-line"></i></button>` : ''}
+                </div>
             </div>
+
+            <!-- GELİŞMİŞ AYARLAR -->
+            <div id="advancedSettings_${qIdx}" style="display:none; background:#fff; padding:1rem; border-radius:0.5rem; border:1px solid var(--border); margin-bottom:1rem; font-size:0.85rem;">
+                <div class="form-group" style="margin-bottom:1rem;">
+                    <label style="font-weight:600; display:block; margin-bottom:0.4rem;">Seçim Türü</label>
+                    <select class="form-control selection-type-select" style="padding:0.3rem;">
+                        <option value="single">Tekli Seçim (Radio)</option>
+                        <option value="multiple">Çoklu Seçim (Checkbox)</option>
+                    </select>
+                </div>
+                ${qIdx > 0 ? `
+                <div class="form-group">
+                    <label style="font-weight:600; display:block; margin-bottom:0.4rem;">Görünüm Koşulu (Bağlantılı Soru)</label>
+                    <div style="display:flex; gap:0.5rem;">
+                        <select class="form-control parent-question-select" style="flex:1; padding:0.3rem;" onchange="updateParentOptions(${qIdx})">
+                            <option value="">Koşul Yok (Her zaman göster)</option>
+                            ${getPreviousQuestionsOptions(qIdx)}
+                        </select>
+                        <select class="form-control parent-option-select" style="flex:1; padding:0.3rem; display:none;">
+                            <option value="">Seçenek Seçiniz...</option>
+                        </select>
+                    </div>
+                </div>` : ''}
+            </div>
+
             <div class="form-group">
                 <input type="text" class="form-control question-text-input" placeholder="Soru metnini girin..." required>
             </div>
@@ -3691,13 +3720,47 @@
             </div>
         `;
         container.appendChild(qDiv);
-        // Removed automatic addition of radio options
+    }
+
+    function toggleAdvancedSettings(idx) {
+        const div = document.getElementById(`advancedSettings_${idx}`);
+        div.style.display = div.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function getPreviousQuestionsOptions(currentIdx) {
+        const questions = document.querySelectorAll('.survey-question-block');
+        let html = '';
+        questions.forEach((q, i) => {
+            if (i < currentIdx) {
+                const text = q.querySelector('.question-text-input').value || `Soru ${i + 1}`;
+                html += `<option value="${i}">${text}</option>`;
+            }
+        });
+        return html;
+    }
+
+    function updateParentOptions(qIdx) {
+        const qBlock = document.querySelector(`.survey-question-block[data-index="${qIdx}"]`);
+        const parentIdx = qBlock.querySelector('.parent-question-select').value;
+        const optSelect = qBlock.querySelector('.parent-option-select');
+        
+        if (parentIdx === "") {
+            optSelect.style.display = 'none';
+            return;
+        }
+        
+        const parentBlock = document.querySelector(`.survey-question-block[data-index="${parentIdx}"]`);
+        const options = Array.from(parentBlock.querySelectorAll('.option-row')).filter(r => r.querySelector('.option-type').value === 'radio');
+        
+        optSelect.innerHTML = '<option value="">Cevap Seçiniz...</option>' + 
+            options.map(opt => `<option value="${opt.querySelector('.option-text').value}">${opt.querySelector('.option-text').value}</option>`).join('');
+        optSelect.style.display = 'block';
     }
 
     function addSurveyOptionField(qIdx, type) {
-        const qBlocks = document.querySelectorAll('.survey-question-block');
-        if (qIdx >= qBlocks.length) return;
-        const container = qBlocks[qIdx].querySelector('.options-container');
+        const qBlock = document.querySelector(`.survey-question-block[data-index="${qIdx}"]`);
+        if (!qBlock) return;
+        const container = qBlock.querySelector('.options-container');
         const optCount = container.querySelectorAll('.option-row').length + 1;
         
         const div = document.createElement('div');
@@ -3729,6 +3792,10 @@
       
       qBlocks.forEach((block, idx) => {
           const questionText = block.querySelector('.question-text-input').value;
+          const selectionType = block.querySelector('.selection-type-select').value;
+          const parentIndex = block.querySelector('.parent-question-select')?.value;
+          const parentOptionText = block.querySelector('.parent-option-select')?.value;
+
           const options = [];
           block.querySelectorAll('.option-row').forEach(row => {
               options.push({
@@ -3740,6 +3807,9 @@
           if (options.length > 0) {
               questionsData.push({
                   question_text: questionText,
+                  selection_type: selectionType,
+                  parent_index: parentIndex !== "" ? parseInt(parentIndex) : undefined,
+                  parent_option_text: parentOptionText !== "" ? parentOptionText : undefined,
                   sort_order: idx,
                   options: options
               });

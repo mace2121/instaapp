@@ -203,23 +203,7 @@
                 document.getElementById('surveyContent').style.display = 'block';
                 document.getElementById('surveyTitle').innerText = survey.question;
 
-                const container = document.getElementById('questionsContainer');
-                container.innerHTML = survey.questions.map((q, idx) => `
-                    <div class="question-block" data-q-id="${q.id}">
-                        <label class="question-text">${idx + 1}. ${escapeHTML(q.question_text)}</label>
-                        <div class="options-list">
-                            ${q.options.map(opt => {
-                                if (opt.option_type === 'text') {
-                                    return `<input type="text" class="text-answer-input" placeholder="${escapeHTML(opt.option_text)}..." data-opt-id="${opt.id}">`;
-                                } else {
-                                    return `<div class="option-item" onclick="selectOption(${q.id}, ${opt.id}, this)" data-opt-id="${opt.id}">
-                                        ${escapeHTML(opt.option_text)}
-                                    </div>`;
-                                }
-                            }).join('')}
-                        </div>
-                    </div>
-                `).join('');
+                renderQuestions();
 
             } catch (err) {
                 console.error(err);
@@ -227,39 +211,104 @@
             }
         }
 
-        function selectOption(qId, optId, el) {
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = currentSurveyData.questions.map((q, idx) => {
+                const isHidden = q.parent_question_id ? 'style="display:none;"' : '';
+                return `
+                    <div class="question-block" data-q-id="${q.id}" data-parent-q="${q.parent_question_id || ''}" data-parent-opt="${q.parent_option_id || ''}" ${isHidden}>
+                        <label class="question-text">${escapeHTML(q.question_text)} ${q.selection_type === 'multiple' ? '<span style="font-size:0.7rem; color:var(--primary); font-weight:400;">(Birden fazla seçebilirsiniz)</span>' : ''}</label>
+                        <div class="options-list">
+                            ${q.options.map(opt => {
+                                if (opt.option_type === 'text') {
+                                    return `<input type="text" class="text-answer-input" placeholder="${escapeHTML(opt.option_text)}..." data-opt-id="${opt.id}">`;
+                                } else {
+                                    const inputType = q.selection_type === 'multiple' ? 'checkbox' : 'radio';
+                                    return `
+                                        <div class="option-item ${q.selection_type}" onclick="selectOption(${q.id}, ${opt.id}, this, '${q.selection_type}')" data-opt-id="${opt.id}">
+                                            ${escapeHTML(opt.option_text)}
+                                        </div>`;
+                                }
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            checkVisibility(); // Başlangıçta gizlilikleri kontrol et
+        }
+
+        function selectOption(qId, optId, el, selectionType) {
             const qBlock = el.closest('.question-block');
-            qBlock.querySelectorAll('.option-item').forEach(item => item.classList.remove('selected'));
-            el.classList.add('selected');
+            
+            if (selectionType === 'multiple') {
+                el.classList.toggle('selected');
+            } else {
+                qBlock.querySelectorAll('.option-item').forEach(item => item.classList.remove('selected'));
+                el.classList.add('selected');
+            }
+            
+            checkVisibility(); // Seçim değiştikçe alt soruları göster/gizle
+        }
+
+        function checkVisibility() {
+            const qBlocks = document.querySelectorAll('.question-block');
+            const selectedOptionIds = Array.from(document.querySelectorAll('.option-item.selected')).map(el => el.dataset.optId);
+
+            let changed = false;
+            qBlocks.forEach(block => {
+                const pQId = block.dataset.parentQ;
+                const pOptId = block.dataset.parentOpt;
+
+                if (pQId && pOptId) {
+                    const shouldBeVisible = selectedOptionIds.includes(pOptId);
+                    const isVisible = block.style.display !== 'none';
+                    
+                    if (shouldBeVisible !== isVisible) {
+                        block.style.display = shouldBeVisible ? 'block' : 'none';
+                        changed = true;
+                        
+                        // Eğer gizlendiyse içindeki seçimleri temizle (zincirleme gizleme için)
+                        if (!shouldBeVisible) {
+                            block.querySelectorAll('.option-item').forEach(opt => opt.classList.remove('selected'));
+                            block.querySelectorAll('.text-answer-input').forEach(input => input.value = '');
+                        }
+                    }
+                }
+            });
+
+            // Eğer bir şey değiştiyse tekrar kontrol et (iç içe bağımlılıklar için)
+            if (changed) checkVisibility();
         }
 
         async function submitVote() {
             const answers = [];
             const qBlocks = document.querySelectorAll('.question-block');
-            let allValid = true;
 
             qBlocks.forEach(block => {
-                const qId = block.dataset.qId;
-                const selectedOpt = block.querySelector('.option-item.selected');
-                const textInput = block.querySelector('.text-answer-input');
+                // Sadece görünür olan soruların cevaplarını alalım
+                if (block.style.display === 'none') return;
 
-                if (selectedOpt) {
+                const qId = block.dataset.qId;
+                const selectedOpts = block.querySelectorAll('.option-item.selected');
+                const textInputs = block.querySelectorAll('.text-answer-input');
+
+                selectedOpts.forEach(opt => {
                     answers.push({
-                        question_id: qId === 'null' ? null : qId,
-                        option_id: selectedOpt.dataset.optId
+                        question_id: qId === 'null' || qId === '' ? null : qId,
+                        option_id: opt.dataset.optId
                     });
-                } else if (textInput) {
-                    if (textInput.value.trim() === '') {
-                        // Text input zorunlu değilse bunu geçebiliriz, ama genelde en az bir şey istenir
-                        // allValid = false;
-                    } else {
+                });
+
+                textInputs.forEach(textInput => {
+                    if (textInput.value.trim() !== '') {
                         answers.push({
-                            question_id: qId === 'null' ? null : qId,
+                            question_id: qId === 'null' || qId === '' ? null : qId,
                             option_id: textInput.dataset.optId,
                             text_answer: textInput.value.trim()
                         });
                     }
-                }
+                });
             });
 
             if (answers.length === 0) {
@@ -292,7 +341,7 @@
                             <i class="ri-checkbox-circle-line" style="font-size:5rem; color:var(--primary);"></i>
                             <h2 style="margin-top:1.5rem; font-size:1.8rem;">Teşekkürler!</h2>
                             <p style="color:var(--text-muted); margin-top:0.75rem; font-size:1.1rem;">Cevaplarınız başarıyla kaydedildi.</p>
-                            <button class="btn" style="margin-top:2rem;" onclick="window.close()">Kapat</button>
+                            <button class="btn" style="margin-top:2rem;" onclick="window.close()">Anketi Kapat</button>
                         </div>
                     `;
                 } else {

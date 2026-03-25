@@ -128,13 +128,16 @@ db.serialize(() => {
     )`);
 
   // Anket Soruları (Survey Questions) - Çoklu soru desteği
-  db.run(`CREATE TABLE IF NOT EXISTS survey_questions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        survey_id INTEGER NOT NULL,
-        question_text TEXT NOT NULL,
-        sort_order INTEGER DEFAULT 0,
-        FOREIGN KEY(survey_id) REFERENCES surveys(id) ON DELETE CASCADE
-    )`);
+        db.run(`CREATE TABLE IF NOT EXISTS survey_questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            survey_id INTEGER,
+            question_text TEXT,
+            selection_type TEXT DEFAULT 'single', -- single or multiple
+            parent_question_id INTEGER DEFAULT NULL,
+            parent_option_id INTEGER DEFAULT NULL,
+            sort_order INTEGER DEFAULT 0,
+            FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE
+        )`);
 
   // Anket Seçenekleri (Survey Options)
   db.run(`CREATE TABLE IF NOT EXISTS survey_options (
@@ -147,11 +150,26 @@ db.serialize(() => {
         FOREIGN KEY(question_id) REFERENCES survey_questions(id) ON DELETE CASCADE
     )`);
 
-  // Migration: survey_options'a option_type ve question_id ekle
-  db.all("PRAGMA table_info(survey_options)", (err, columns) => {
-    if (!err && columns) {
-      if (!columns.some(c => c.name === 'option_type')) db.run("ALTER TABLE survey_options ADD COLUMN option_type TEXT DEFAULT 'radio'");
-      if (!columns.some(c => c.name === 'question_id')) db.run("ALTER TABLE survey_options ADD COLUMN question_id INTEGER");
+  // Migration: survey_options'a option_type        // survey_questions migration
+        db.all("PRAGMA table_info(survey_questions)", (err, rows) => {
+            if (err) return;
+            const cols = rows.map(r => r.name);
+            if (!cols.includes('selection_type')) {
+                db.run("ALTER TABLE survey_questions ADD COLUMN selection_type TEXT DEFAULT 'single'");
+            }
+            if (!cols.includes('parent_question_id')) {
+                db.run("ALTER TABLE survey_questions ADD COLUMN parent_question_id INTEGER DEFAULT NULL");
+            }
+            if (!cols.includes('parent_option_id')) {
+                db.run("ALTER TABLE survey_questions ADD COLUMN parent_option_id INTEGER DEFAULT NULL");
+            }
+        });
+
+        // survey_options migration
+        db.all("PRAGMA table_info(survey_options)", (err, rows) => {
+    if (!err && rows) {
+      if (!rows.some(c => c.name === 'option_type')) db.run("ALTER TABLE survey_options ADD COLUMN option_type TEXT DEFAULT 'radio'");
+      if (!rows.some(c => c.name === 'question_id')) db.run("ALTER TABLE survey_options ADD COLUMN question_id INTEGER");
     }
   });
 
