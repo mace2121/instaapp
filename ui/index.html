@@ -3645,11 +3645,14 @@
 
     // --- SURVEYS LOGIC ---
     let surveyQuestionCount = 0;
+    let currentEditingSurveyId = null;
 
     function openSurveyModal() { 
         document.getElementById('surveyForm').reset();
         document.getElementById('surveyQuestionsContainer').innerHTML = '';
         surveyQuestionCount = 0;
+        currentEditingSurveyId = null;
+        document.querySelector('#surveyModalOverlay h2').innerText = 'Yeni Anket Oluştur';
         addSurveyQuestion(); // Start with one question area
 
         const overlay = document.getElementById('surveyModalOverlay');
@@ -3808,8 +3811,8 @@
               questionsData.push({
                   question_text: questionText,
                   selection_type: selectionType,
-                  parent_index: parentIndex !== "" ? parseInt(parentIndex) : undefined,
-                  parent_option_text: parentOptionText !== "" ? parentOptionText : undefined,
+                  parent_index: parentIndex !== "" && parentIndex !== undefined ? parseInt(parentIndex) : undefined,
+                  parent_option_text: parentOptionText !== "" && parentOptionText !== undefined ? parentOptionText : undefined,
                   sort_order: idx,
                   options: options
               });
@@ -3821,12 +3824,15 @@
           return;
       }
 
+      const url = currentEditingSurveyId ? `/api/admin/surveys/${currentEditingSurveyId}` : '/api/admin/surveys';
+      const method = currentEditingSurveyId ? 'PUT' : 'POST';
+
       try {
-        const res = await fetch('/api/admin/surveys', {
-          method: 'POST',
+        const res = await fetch(url, {
+          method: method,
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ 
-              question: surveyTitle, // Main title
+              question: surveyTitle,
               questions: questionsData 
           })
         });
@@ -3834,11 +3840,74 @@
         if (res.ok) {
           closeSurveyModal();
           loadSurveys();
-          showToast('Anket başarıyla yayınlandı', 'success');
+          showToast(currentEditingSurveyId ? 'Anket güncellendi' : 'Anket başarıyla yayınlandı', 'success');
         } else {
           alert(data.error || 'Hata oluştu');
         }
       } catch (err) { console.error(err); }
+    }
+
+    async function editSurvey(id) {
+        currentEditingSurveyId = id;
+        document.querySelector('#surveyModalOverlay h2').innerText = 'Anketi Düzenle';
+        
+        try {
+            const res = await fetch('/api/public/active-surveys');
+            const surveys = await res.json();
+            const survey = surveys.find(s => s.id == id);
+            
+            if (!survey) return alert('Anket verisi alınamadı.');
+            
+            document.getElementById('surveyQuestionsContainer').innerHTML = '';
+            document.getElementById('surveyGeneralTitle').value = survey.question;
+            surveyQuestionCount = 0;
+            
+            // Soruları ekle
+            survey.questions.forEach((q, qIdx) => {
+                addSurveyQuestion();
+                const qBlock = document.querySelectorAll('.survey-question-block')[qIdx];
+                qBlock.querySelector('.question-text-input').value = q.question_text;
+                qBlock.querySelector('.selection-type-select').value = q.selection_type || 'single';
+                
+                // Seçenekleri temizle (addSurveyOptionField otomatik bir tane eklemiyor artık)
+                qBlock.querySelector('.options-container').innerHTML = '';
+                
+                q.options.forEach(opt => {
+                    addSurveyOptionField(qIdx, opt.option_type);
+                    const optRows = qBlock.querySelectorAll('.option-row');
+                    const lastRow = optRows[optRows.length - 1];
+                    lastRow.querySelector('.option-text').value = opt.option_text;
+                });
+            });
+            
+            // Logic/Bağımlılıkları ikinci turda ekle (ebeveynler oluştuğu için)
+            survey.questions.forEach((q, qIdx) => {
+                const qBlock = document.querySelectorAll('.survey-question-block')[qIdx];
+                if (q.parent_question_id) {
+                    // Bulunduğu index'i bulmalıyız
+                    const pIdx = survey.questions.findIndex(pq => pq.id === q.parent_question_id);
+                    if (pIdx !== -1) {
+                        const pSelect = qBlock.querySelector('.parent-question-select');
+                        pSelect.value = pIdx;
+                        updateParentOptions(qIdx);
+                        
+                        // Seçeneği bul
+                        const pOpt = survey.questions[pIdx].options.find(po => po.id === q.parent_option_id);
+                        if (pOpt) {
+                            qBlock.querySelector('.parent-option-select').value = pOpt.option_text;
+                        }
+                    }
+                }
+            });
+
+            const overlay = document.getElementById('surveyModalOverlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('open'), 50);
+
+        } catch (err) {
+            console.error(err);
+            alert('Yükleme hatası');
+        }
     }
 
     async function loadSurveys() {
@@ -3852,8 +3921,9 @@
             <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
               <i class="ri-user-voice-line"></i> ${s.total_votes || 0} Katılımcı | ${new Date(s.created_at).toLocaleDateString()}
             </div>
-            <div style="display:flex; gap:0.5rem;">
-              <button class="btn btn-secondary" style="flex:1" onclick="loadSurveyResults(${s.id})"><i class="ri-bar-chart-line"></i> Sonuçlar</button>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button class="btn btn-secondary" style="flex:1; min-width:80px;" onclick="loadSurveyResults(${s.id})"><i class="ri-bar-chart-line"></i> Sonuçlar</button>
+              <button class="btn btn-secondary" style="flex:1; min-width:80px;" onclick="editSurvey(${s.id})"><i class="ri-edit-line"></i> Düzenle</button>
               <button class="btn btn-secondary" style="color:var(--danger)" onclick="deleteSurvey(${s.id})"><i class="ri-delete-bin-line"></i></button>
             </div>
             <div style="margin-top:1rem; font-size:0.8rem; border-top:1px solid var(--border); padding-top:0.5rem; color:var(--primary); cursor:pointer;" onclick="window.open('/ui/anket.html?id=${s.id}', '_blank')">

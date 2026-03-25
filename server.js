@@ -1284,15 +1284,77 @@ app.post("/api/admin/surveys", verifyToken, isSuperAdmin, (req, res) => {
   }
 });
 
+// Anket düzenleme
+app.put("/api/admin/surveys/:id", verifyToken, isSuperAdmin, (req, res) => {
+  const { id } = req.params;
+  const { questions, question } = req.body;
+
+  if (!questions || !Array.isArray(questions) || questions.length === 0) {
+    return res.status(400).json({ error: "En az bir soru gereklidir." });
+  }
+
+  db.serialize(() => {
+    db.run("BEGIN TRANSACTION");
+    db.run(`UPDATE surveys SET question = ? WHERE id = ?`, [question || questions[0].question_text, id], (err) => {
+      if (err) { db.run("ROLLBACK"); return res.status(500).json({ error: err.message }); }
+      
+      db.run(`DELETE FROM survey_questions WHERE survey_id = ?`, [id], async (err2) => {
+        if (err2) { db.run("ROLLBACK"); return res.status(500).json({ error: err2.message }); }
+
+        const qIdMap = {};
+        const optIdMap = {};
+        
+        try {
+          for (let i = 0; i < questions.length; i++) {
+            const q = questions[i];
+            let pQId = null;
+            let pOId = null;
+            if (q.parent_index !== undefined && qIdMap[q.parent_index]) {
+                pQId = qIdMap[q.parent_index];
+                if (q.parent_option_text && optIdMap[`${q.parent_index}_${q.parent_option_text}`]) {
+                    pOId = optIdMap[`${q.parent_index}_${q.parent_option_text}`];
+                }
+            }
+
+            const questionId = await new Promise((resolve, reject) => {
+              db.run(
+                `INSERT INTO survey_questions (survey_id, question_text, selection_type, parent_question_id, parent_option_id, sort_order) VALUES (?, ?, ?, ?, ?, ?)`,
+                [id, q.question_text.trim(), q.selection_type || 'single', pQId, pOId, i],
+                function(qErr) { if (qErr) reject(qErr); else resolve(this.lastID); }
+              );
+            });
+            qIdMap[i] = questionId;
+
+            for (const opt of q.options) {
+              const optId = await new Promise((resolve, reject) => {
+                db.run(
+                  `INSERT INTO survey_options (survey_id, question_id, option_text, option_type) VALUES (?, ?, ?, ?)`,
+                  [id, questionId, opt.option_text, opt.option_type || 'radio'],
+                  function(oErr) { if (oErr) reject(oErr); else resolve(this.lastID); }
+                );
+              });
+              optIdMap[`${i}_${opt.option_text}`] = optId;
+            }
+          }
+          db.run("COMMIT");
+          logAction(req.user.id, 'SURVEY_UPDATED', `Anket güncellendi: ${id}`, req.ip, 'SUCCESS');
+          res.json({ ok: true });
+        } catch (error) {
+          db.run("ROLLBACK");
+          res.status(500).json({ error: "Güncelleme sırasında hata: " + error.message });
+        }
+      });
+    });
+  });
+});
+
 // Anket sonuçları (her soru için ayrı veriler)
 app.get("/api/admin/surveys/:id/results", verifyToken, isSuperAdmin, (req, res) => {
   const surveyId = req.params.id;
 
-  // Soruları getir
   db.all(`SELECT * FROM survey_questions WHERE survey_id = ? ORDER BY sort_order ASC`, [surveyId], (err, questions) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    // Seçenekleri ve oy sayılarını getir (radio seçenekler için)
     db.all(`
       SELECT o.id, o.option_text, o.option_type, o.question_id,
              COUNT(CASE WHEN r.option_id IS NOT NULL THEN 1 END) as votes
@@ -1303,7 +1365,6 @@ app.get("/api/admin/surveys/:id/results", verifyToken, isSuperAdmin, (req, res) 
     `, [surveyId], (err2, options) => {
       if (err2) return res.status(500).json({ error: err2.message });
 
-      // Metin cevaplarını getir (text tipi seçenekler için)
       db.all(`
         SELECT r.question_id, r.text_answer, r.created_at
         FROM survey_responses r
@@ -1313,7 +1374,6 @@ app.get("/api/admin/surveys/:id/results", verifyToken, isSuperAdmin, (req, res) 
         if (err3) return res.status(500).json({ error: err3.message });
 
         if (questions && questions.length > 0) {
-          // Çoklu soru formatı
           const result = questions.map(q => {
             const qOptions = options.filter(o => o.question_id === q.id);
             const qTextAnswers = textAnswers.filter(t => t.question_id === q.id).map(t => t.text_answer);
@@ -1326,15 +1386,15 @@ app.get("/api/admin/surveys/:id/results", verifyToken, isSuperAdmin, (req, res) 
           });
           return res.json({ type: 'multi', questions: result });
         } else {
-          // Eski format uyumluluğu
-          const legacyOptions = options.filter(o => !o.question_id);
-          return res.json({ type: 'single', questions: [{ question_text: '', options: legacyOptions, text_answers: [] }] });
+            const legacyOptions = options.filter(o => !o.question_id);
+            return res.json({ type: 'single', questions: [{ question_text: '', options: legacyOptions, text_answers: [] }] });
         }
       });
     });
   });
 });
 
+// Anket silme
 app.delete("/api/admin/surveys/:id", verifyToken, isSuperAdmin, (req, res) => {
   db.run(`DELETE FROM surveys WHERE id = ?`, [req.params.id], function(err) {
     if (err) return res.status(500).json({ error: err.message });
