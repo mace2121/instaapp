@@ -3652,7 +3652,8 @@
         document.getElementById('surveyQuestionsContainer').innerHTML = '';
         surveyQuestionCount = 0;
         currentEditingSurveyId = null;
-        document.querySelector('#surveyModalOverlay h2').innerText = 'Yeni Anket Oluştur';
+        const modalTitle = document.querySelector('#surveyModalOverlay h3');
+        if (modalTitle) modalTitle.innerText = 'Yeni Anket Oluştur';
         addSurveyQuestion(); // Start with one question area
 
         const overlay = document.getElementById('surveyModalOverlay');
@@ -3849,7 +3850,8 @@
 
     async function editSurvey(id) {
         currentEditingSurveyId = id;
-        document.querySelector('#surveyModalOverlay h2').innerText = 'Anketi Düzenle';
+        const modalTitle = document.querySelector('#surveyModalOverlay h3');
+        if (modalTitle) modalTitle.innerText = 'Anketi Düzenle';
         
         try {
             const res = await fetch('/api/public/active-surveys');
